@@ -10,7 +10,7 @@ public class CamControl : MonoBehaviour
     void Start()
     {
         playerObj = GameObject.Find("spartans");
-        offsetPos = new Vector3(0, , playerObj.transform.forward*-);
+        offsetPos = new Vector3(0, 0, 0);//playerObj.transform.forward*-7.7);
     }
 
     // Update is called once per frame
