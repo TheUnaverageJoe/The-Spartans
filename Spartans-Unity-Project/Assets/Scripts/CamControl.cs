@@ -16,6 +16,6 @@ public class CamControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //transform.position = playerObj.transform.position
+        transform.position = playerObj.transform.position;
     }
 }

@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
     private Rigidbody rb;
     //primative class variables-----
     private bool isGrounded;
+    private Vector3 walk = new Vector3(0,0,1);
 
     //------------------------------
     // Start is called before the first frame update
@@ -24,13 +25,25 @@ public class Player : MonoBehaviour
     void Update()
     {
         //consider changing |Input.GetAxis("Vertical")| --> |rb.velocity|
-        anim.SetFloat("Moving", Mathf.Abs(Input.GetAxis("Vertical")));//change animator variable for walking and Idle
+        if(Input.GetKey("w")){
+            anim.SetBool("isWalking", true);//change animator variable for walking and Idle
+        }else{
+            anim.SetBool("isWalking", false);//change animator variable for walking and Idle
+        }
+
+        
+        if(Input.GetKeyDown("f")){
+            anim.SetTrigger("throw");
+        }
+
 
     }
 
     void FixedUpdate(){
-        if(Input.GetKey(KeyCode.W)){
-            rb.velocity = new Vector3(0,0,1);
+        if(Input.GetKey("w")){
+            rb.velocity = walk;
+        }else{
+            rb.velocity = Vector3.zero;
         }
     }
 }
