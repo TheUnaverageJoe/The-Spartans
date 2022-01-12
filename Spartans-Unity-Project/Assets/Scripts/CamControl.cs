@@ -16,6 +16,7 @@ public class CamControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Debug.Log("Cam Control script is running");
         transform.position = playerObj.transform.position;
     }
 }
