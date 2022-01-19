@@ -11,7 +11,7 @@ public class Player : NetworkBehaviour
     //primative class variables-----
     [SerializeField] private bool isGrounded;
     [SerializeField] private float MAX_SPEED = 10.0f;
-    [SerializeField] private float MOVE_SPEED = 0.1f;
+    [SerializeField] private float MOVE_SPEED = 1f;
     [SerializeField] private float X_SENS = 1.0f;
 
     //------------------------------
@@ -46,7 +46,8 @@ public class Player : NetworkBehaviour
         }
 
         if(Input.GetKeyDown("f")){
-            anim.SetTrigger("throw");
+            anim.SetBool("throw", true);
+            StartCoroutine("throwAnimationTime");
         }
 
         if(Input.GetKeyDown(KeyCode.Escape)){
@@ -91,7 +92,12 @@ public class Player : NetworkBehaviour
      Gizmos.color = Color.red;
      //Use the same vars you use to draw your Overlap SPhere to draw your Wire Sphere.
      Gizmos.DrawWireCube(transform.position-Vector3.down*0.1f, new Vector3(1, 0.5f, 0.5f));
- }
+    }
+
+    private IEnumerator throwAnimationTime(){
+        yield return new WaitForSeconds(1);
+        anim.SetBool("throw", false);
+    }
 
     void Move(){
         if(!isGrounded) return; //we arent touching the floor, we can't move in the air
@@ -102,8 +108,18 @@ public class Player : NetworkBehaviour
         float YAXIS = rb.velocity.y;
         Vector3 yAxis = new Vector3(0, YAXIS, 0);
 
+        float horizInput = Input.GetAxis("Horizontal");
+        float vertInput = Input.GetAxis("Vertical");
+        Vector3 direction = new Vector3(horizInput, 0, vertInput).normalized;
+        Vector3 moveDirection = transform.TransformDirection(direction);
+
+        if(rb.velocity.magnitude < MAX_SPEED){
+        Debug.Log("Direction: " + moveDirection);
+        rb.velocity = moveDirection * MOVE_SPEED;
+        }
         //Detect Inputs(Vectical>0 = W pressed  Vectical<0 = S pressed)
         //Forward, backward movement
+        /*
         if(Input.GetAxis("Vertical")>0){
             var temp = rb.velocity + transform.forward*MOVE_SPEED;
             if(!(temp.magnitude > MAX_SPEED)){
@@ -125,6 +141,7 @@ public class Player : NetworkBehaviour
         if(Input.GetAxis("Horizontal")>0){
 
         }
+        */
     }
 
     void Look(){

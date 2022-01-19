@@ -181,7 +181,7 @@ AnimatorController:
     m_DefaultBool: 0
     m_Controller: {fileID: 0}
   - m_Name: throw
-    m_Type: 9
+    m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
@@ -216,7 +216,7 @@ AnimatorStateMachine:
     m_Position: {x: 30, y: 390, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -2344973359245609178}
-    m_Position: {x: 380, y: 390, z: 0}
+    m_Position: {x: 390, y: 400, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 3800395625935208264}
     m_Position: {x: 210, y: 520, z: 0}
