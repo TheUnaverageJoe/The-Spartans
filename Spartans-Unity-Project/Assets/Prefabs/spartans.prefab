@@ -1270,7 +1270,9 @@ GameObject:
   - component: {fileID: 7975495182481887494}
   - component: {fileID: 7975495182481887495}
   - component: {fileID: 7975495182481887483}
+  - component: {fileID: 7167338817175085449}
   - component: {fileID: 2857688332266724158}
+  - component: {fileID: 324439227796420258}
   m_Layer: 3
   m_Name: spartans
   m_TagString: Untagged
@@ -1359,6 +1361,18 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &7167338817175085449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7093115869597867190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2b6f5d37aac3c74c94f3889c4f2835c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &2857688332266724158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1375,8 +1389,35 @@ MonoBehaviour:
     m_InternalValue: {x: 0, y: 0, z: 0}
   isGrounded: 0
   MAX_SPEED: 10
-  MOVE_SPEED: 1
+  MOVE_SPEED: 6
   X_SENS: 1
+--- !u!114 &324439227796420258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7093115869597867190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  InLocalSpace: 0
+  Interpolate: 1
+  CanCommitToTransform: 0
 --- !u!1 &7178700922430649940
 GameObject:
   m_ObjectHideFlags: 0
