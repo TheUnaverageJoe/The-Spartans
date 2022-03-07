@@ -69,8 +69,8 @@ namespace Spartans{
                 
                 if (NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient )
                 {
-                    NetworkClient temp = NetworkManager.Singleton.ConnectedClients[NetworkManager.Singleton.ConnectedClientsIds[0]];
-                    _players.Add(TryGetComponent<>);
+                    //NetworkClient temp = NetworkManager.Singleton.ConnectedClients[NetworkManager.Singleton.ConnectedClientsIds[0]];
+                    //_players.Add(TryGetComponent<>);
                 }
                 else
                 {

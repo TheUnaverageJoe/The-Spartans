@@ -29,7 +29,8 @@ namespace Spartans.Players
             rb = GetComponent<Rigidbody>();
             cam = GetComponentInChildren<Camera>();
 
-            Position.Value = new Vector3(0.0f,0.0f,0.0f);
+            //Position.Value = new Vector3(0.0f,0.0f,0.0f);
+            print(Position.Value);
     
 
             //class variable init
@@ -64,6 +65,8 @@ namespace Spartans.Players
                 if(Cursor.visible) MouseLock(true);
                 else MouseLock(false);
             }
+            transform.position = Position.Value;
+            //print("Transform pos is: " + transform.position);
 
         }
 
@@ -84,11 +87,12 @@ namespace Spartans.Players
             if(hitColliders.Length > 0) isGrounded = true;
             
             Look();
+            Move();
         }        
 
         //return Vector3.negativeInfinity to indicate that movement should not be allowed on this call of Move()
-        Vector3 TryMove(){
-            if(!isGrounded) return Vector3.negativeInfinity; //we arent touching the floor, we can't move in the air
+        bool TryMove(){
+            if(!isGrounded) return false; //we arent touching the floor, we can't move in the air
 
             //store Y axis component of velocity because it should remain unchanged by player input aside from jumping
             float YAXIS = rb.velocity.y;
@@ -100,31 +104,28 @@ namespace Spartans.Players
             Vector3 moveDirection = transform.TransformDirection(direction);
 
             if(rb.velocity.magnitude < MAX_SPEED){
-                //Debug.Log("Direction: " + moveDirection);
+                //Debug.Log("Direction: " + moveDirection + "Speed: " + rb.velocity.magnitude);
                 rb.velocity = moveDirection * MOVE_SPEED;
-                return rb.velocity;
+                return true;
             }
-            return  Vector3.negativeInfinity;
+            return  false;
             
         }
         [ServerRpc]
-        void PlayerMoveServerRpc(ServerRpcParams rpcParams = default){
-            Vector3 holder = TryMove();
-            if(holder != Vector3.negativeInfinity){
-                Position.Value = holder;
+        void PlayerMoveServerRpc(){
+            if(TryMove()){
+                print("from serverRPC isServer: " + IsServer);
+                Position.Value += rb.velocity;
                 return;
             }
-            Debug.Log("Player not grounded and cant move");
         }
         
         public void Move(){
             if(IsServer && IsClient){
-                //Debug.Log("I is the host");
-                Vector3 vec = TryMove();
-                if(vec != Vector3.negativeInfinity) Position.Value = vec;
-                return;
-            }
-            if(IsClient){
+                Debug.Log("I is the host: " + TryMove());
+                if(TryMove()) Position.Value = transform.position;
+            }else if(IsClient){
+                print("Moving in client");
                 PlayerMoveServerRpc();
             }else{
                 Debug.Log("Something is terribly wrong");
