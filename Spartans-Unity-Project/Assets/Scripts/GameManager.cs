@@ -61,7 +61,7 @@ namespace Spartans{
                     print("-------");
                     
                 }else if(NetworkManager.Singleton.IsClient){
-
+                    
                 }
 
                 //OLD CODE
@@ -76,9 +76,9 @@ namespace Spartans{
                 {
                     //Debug.Log("Hey look I made it");
                     
-                    NetworkObject playerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
-                    PlayerMovement player = playerObject.GetComponent<PlayerMovement>();
-                    player.Move();
+                    //NetworkObject playerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+                    //PlayerMovement player = playerObject.GetComponent<PlayerMovement>();
+                    //player.Move();
                 }
             }
     }

@@ -9,7 +9,6 @@ namespace Spartans.Players
     {
         private Animator anim;
         private Rigidbody rb;
-        private Camera cam;
         
         //Network Variable neccessary for syncing with server,
         //because we must update client side from the info on server side
@@ -27,20 +26,9 @@ namespace Spartans.Players
         public void Init(){
             anim = GetComponent<Animator>();
             rb = GetComponent<Rigidbody>();
-            cam = GetComponentInChildren<Camera>();
-
-            //Position.Value = new Vector3(0.0f,0.0f,0.0f);
-            print(Position.Value);
-    
 
             //class variable init
             isGrounded = false;
-
-            //All players have a camera object on the prefab, disable all other cameras if its not ours
-            if(!IsLocalPlayer)
-            {
-                cam.enabled = false;
-            }
         }
         
 
@@ -65,7 +53,8 @@ namespace Spartans.Players
                 if(Cursor.visible) MouseLock(true);
                 else MouseLock(false);
             }
-            transform.position = Position.Value;
+            print("transform of: " + NetworkObject.NetworkObjectId + " is " + Position.Value);
+            //transform.position = Position.Value;
             //print("Transform pos is: " + transform.position);
 
         }

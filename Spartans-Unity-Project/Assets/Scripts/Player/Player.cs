@@ -11,22 +11,35 @@ namespace Spartans.Players
         private GameObject _mainCamera;
         private PlayerMovement _playerMovement;
         private PlayerCanvasManager _HUD;
+        private Camera cam;
         public string playerName{ get; private set; }
         public void Start(){
+            
             _playerMovement = GetComponent<PlayerMovement>();
             _HUD = FindObjectOfType<PlayerCanvasManager>();
             _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+            cam = GetComponentInChildren<Camera>();
 
-            _playerMovement.Init();
-            _HUD.Init();
-            playerName = NetworkManager.Singleton.LocalClientId.ToString();
+            
+            playerName = NetworkObject.NetworkObjectId.ToString();
+            print("playerName: " + playerName);
 
-            _mainCamera.SetActive(false);
+            if(IsLocalPlayer){
+                _mainCamera.SetActive(false);
+                _playerMovement.Init();
+                _HUD.Init();
+            }else{
+                //All players have a camera object on the prefab, disable all other cameras if its not ours
+                cam.gameObject.SetActive(false);
+            }
         }
 
         // Update is called once per frame
         void Update()
         {
+            
+        }
+        public override void OnNetworkSpawn(){
             
         }
     }
