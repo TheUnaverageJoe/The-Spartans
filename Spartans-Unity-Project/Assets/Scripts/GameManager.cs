@@ -53,6 +53,7 @@ namespace Spartans{
                 //
                 //print(NetworkManager.Singleton.IsServer);
                 //print(NetworkManager.Singleton.IsClient);
+                /*
                 if(NetworkManager.Singleton.IsServer){
                     print("Players: ");
                     foreach(Player player in _players){
@@ -63,7 +64,8 @@ namespace Spartans{
                 }else if(NetworkManager.Singleton.IsClient){
                     
                 }
-
+                */
+                
                 //OLD CODE
                 if(!NetworkManager.Singleton.IsServer) return;
                 

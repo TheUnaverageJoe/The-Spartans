@@ -37,16 +37,13 @@ namespace Spartans.Players
         // Update is called once per frame
         void Update()
         {
-            if(Input.GetKeyDown(KeyCode.Escape)){
-                if(Cursor.visible) MouseLock(true);
-                else MouseLock(false);
+            if(IsLocalPlayer){
+                if(Input.GetKeyDown(KeyCode.Escape)){
+                    if(Cursor.visible) MouseLock(true);
+                    else MouseLock(false);
+                }
             }
-            
         }
-        public override void OnNetworkSpawn(){
-            print("IsLocalPlayer: " + IsLocalPlayer + " ID: " + NetworkObject.NetworkObjectId);
-        }
-
         void MouseLock(bool Lock){
             if(Lock){
                 Cursor.lockState = CursorLockMode.Locked;
@@ -60,6 +57,8 @@ namespace Spartans.Players
 
         //Used to handle logic when Alt Tabbing in and out of the application
         void OnApplicationFocus(bool hasFocus){
+            if(!IsLocalPlayer) return;
+            
             if(hasFocus){
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;

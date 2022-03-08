@@ -1390,7 +1390,7 @@ MonoBehaviour:
     m_InternalValue: {x: 0, y: 0, z: 0}
   isGrounded: 0
   MAX_SPEED: 10
-  MOVE_SPEED: 0.01
+  MOVE_SPEED: 0.1
   X_SENS: 1
 --- !u!114 &324439227796420258
 MonoBehaviour:

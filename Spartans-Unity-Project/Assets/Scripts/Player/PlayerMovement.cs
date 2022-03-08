@@ -19,7 +19,7 @@ namespace Spartans.Players
         //primative class variables-----
         [SerializeField] private bool isGrounded;
         [SerializeField] private float MAX_SPEED = 10.0f;
-        [SerializeField] private float MOVE_SPEED = 1f;
+        [SerializeField] private float MOVE_SPEED = 1.0f;
         [SerializeField] private float X_SENS = 1.0f;
 
         //------------------------------
@@ -55,10 +55,22 @@ namespace Spartans.Players
 
         }
 
-        void FixedUpdate(){
+        void FixedUpdate(){        
+            if(IsServer){
+                print("Server side var values: " + moveDirection);
+                UpdateServer();
+                //print("is server");
+            }
+            if(IsClient && IsOwner){
+                Look();
+                UpdateClient();
+                //print("is client and owner");
+            }
             if(!IsLocalPlayer) return;//Ensure Each client only moves there own player,
             //I dont understand why this is neccessary given each player should have their own script instance for the player character and own game window in focus
             //Debug.Log("In Fixed Update");
+            //EDIT DATE 3/8/2022: This is because every running .exe file has all exact same set of objects in it.
+            //Thus each client has multiple player objects in the hierarchy
 
             //binary conversion, layer mask should be an int(Layermask is parameter of OverlapBox), convert it to binary to see which layers are true(1) or false(0)
             //00000000000000000000000000000001(Binary) = 1(Integer)
@@ -71,40 +83,38 @@ namespace Spartans.Players
             if(hitColliders.Length == 0) isGrounded = false;
             if(hitColliders.Length > 0) isGrounded = true;
             
-            Look();
-            Move();
-        }     
-
-        //return false to indicate "cannot move"
-        void UpdateInput(){
-            float horizInput = Input.GetAxis("Horizontal");
-            float vertInput = Input.GetAxis("Vertical");
-            Vector3 direction = new Vector3(horizInput, 0, vertInput).normalized;
-            moveDirection = transform.TransformDirection(direction);
+            
         }
-        
-        public void Move(){
-            UpdateInput();
-            if(IsServer && IsClient){
-                Debug.Log("I is the host: ");
-                if(isGrounded) Position.Value += moveDirection;
-            }else if(IsClient && !IsServer){
-                print("Moving in client");
-                //PlayerMoveServerRpc();
-                PlayerInputServerRpc(moveDirection);
-            }else{
-                Debug.Log("Something is terribly wrong");
+
+        private void UpdateServer(){
+            if(!isGrounded){
+                print("client with gameObj ID: " + NetworkObjectId);
+                return;
             }
+            Position.Value += moveDirection;
+            //moveDirection = new Vector3(0,0,0);
+        }
+        [ServerRpc]
+        private void UpdateServerRpc(Vector3 dir){
+            moveDirection = dir;
         }
 
-        [ServerRpc]
-        void PlayerInputServerRpc(Vector3 input){
-            Position.Value += input;
-        }   
+        private void UpdateClient(){
+            //Get Input manager inputs for Up down arrow keys and left right arrow keys
+            float inputVert = Input.GetAxis("Vertical");
+            float inputHoriz = Input.GetAxis("Horizontal");
+            //create a object space vector3 with inputs and normalize 
+            Vector3 input = new Vector3(inputHoriz, 0, inputVert).normalized;
+            //transform vector3 to world space to get desired direction of translation
+            input = transform.TransformDirection(input) * MOVE_SPEED;
+
+            moveDirection = input;
+            UpdateServerRpc(input);
+
+        }
 
         void Look(){
             transform.Rotate(0,Input.GetAxis("Mouse X")*X_SENS,0);
-            //transform.localEulerAngles.y += Input.GetAxis("Mouse X") * X_SENS;
         }
 
         private IEnumerator throwAnimationTime(){
