@@ -13,6 +13,7 @@ namespace Spartans.Players
         //Network Variable neccessary for syncing with server,
         //because we must update client side from the info on server side
         public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
+        Vector3 moveDirection = new Vector3(0,0,0);
         
 
         //primative class variables-----
@@ -48,13 +49,8 @@ namespace Spartans.Players
                 anim.SetBool("throw", true);
                 StartCoroutine("throwAnimationTime");
             }
-
-            if(Input.GetKeyDown(KeyCode.Escape)){
-                if(Cursor.visible) MouseLock(true);
-                else MouseLock(false);
-            }
-            print("transform of: " + NetworkObject.NetworkObjectId + " is " + Position.Value);
-            //transform.position = Position.Value;
+            //print("transform of: " + NetworkObject.NetworkObjectId + " is " + Position.Value);
+            transform.position = Position.Value;
             //print("Transform pos is: " + transform.position);
 
         }
@@ -77,81 +73,38 @@ namespace Spartans.Players
             
             Look();
             Move();
-        }        
+        }     
 
-        //return Vector3.negativeInfinity to indicate that movement should not be allowed on this call of Move()
-        bool TryMove(){
-            if(!isGrounded) return false; //we arent touching the floor, we can't move in the air
-
-            //store Y axis component of velocity because it should remain unchanged by player input aside from jumping
-            float YAXIS = rb.velocity.y;
-            Vector3 yAxis = new Vector3(0, YAXIS, 0);
-
+        //return false to indicate "cannot move"
+        void UpdateInput(){
             float horizInput = Input.GetAxis("Horizontal");
             float vertInput = Input.GetAxis("Vertical");
             Vector3 direction = new Vector3(horizInput, 0, vertInput).normalized;
-            Vector3 moveDirection = transform.TransformDirection(direction);
-
-            if(rb.velocity.magnitude < MAX_SPEED){
-                //Debug.Log("Direction: " + moveDirection + "Speed: " + rb.velocity.magnitude);
-                rb.velocity = moveDirection * MOVE_SPEED;
-                return true;
-            }
-            return  false;
-            
-        }
-        [ServerRpc]
-        void PlayerMoveServerRpc(){
-            if(TryMove()){
-                print("from serverRPC isServer: " + IsServer);
-                Position.Value += rb.velocity;
-                return;
-            }
+            moveDirection = transform.TransformDirection(direction);
         }
         
         public void Move(){
+            UpdateInput();
             if(IsServer && IsClient){
-                Debug.Log("I is the host: " + TryMove());
-                if(TryMove()) Position.Value = transform.position;
-            }else if(IsClient){
+                Debug.Log("I is the host: ");
+                if(isGrounded) Position.Value += moveDirection;
+            }else if(IsClient && !IsServer){
                 print("Moving in client");
-                PlayerMoveServerRpc();
+                //PlayerMoveServerRpc();
+                PlayerInputServerRpc(moveDirection);
             }else{
                 Debug.Log("Something is terribly wrong");
             }
         }
 
+        [ServerRpc]
+        void PlayerInputServerRpc(Vector3 input){
+            Position.Value += input;
+        }   
+
         void Look(){
             transform.Rotate(0,Input.GetAxis("Mouse X")*X_SENS,0);
             //transform.localEulerAngles.y += Input.GetAxis("Mouse X") * X_SENS;
-        }
-
-        void MouseLock(bool Lock){
-            if(Lock){
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-                return;
-            }else if(!Lock){
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            }
-        }
-
-        //Used to handle logic when Alt Tabbing in and out of the application
-        void OnApplicationFocus(bool hasFocus){
-            if(hasFocus){
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-            }else{
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            }
-        }
-        //OnDrawGizmos is being usec purly for debugging  purposes to see where the hitbox is in world space
-        private void OnDrawGizmos() {
-        Gizmos.color = Color.red;
-        //Use the same vars you use to draw your Overlap SPhere to draw your Wire Sphere.
-        Gizmos.DrawWireCube(transform.position-Vector3.down*0.1f, new Vector3(1, 0.5f, 0.5f));
         }
 
         private IEnumerator throwAnimationTime(){

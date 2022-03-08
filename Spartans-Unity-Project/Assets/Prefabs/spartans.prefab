@@ -1273,6 +1273,7 @@ GameObject:
   - component: {fileID: 7167338817175085449}
   - component: {fileID: 2857688332266724158}
   - component: {fileID: 324439227796420258}
+  - component: {fileID: -6915281490330311222}
   m_Layer: 3
   m_Name: spartans
   m_TagString: Untagged
@@ -1389,7 +1390,7 @@ MonoBehaviour:
     m_InternalValue: {x: 0, y: 0, z: 0}
   isGrounded: 0
   MAX_SPEED: 10
-  MOVE_SPEED: 6
+  MOVE_SPEED: 0.01
   X_SENS: 1
 --- !u!114 &324439227796420258
 MonoBehaviour:
@@ -1418,6 +1419,21 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   CanCommitToTransform: 0
+--- !u!114 &-6915281490330311222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7093115869597867190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Animator: {fileID: 7975495182481887495}
+  m_ParameterSendBits: 0
+  m_SendRate: 0.1
 --- !u!1 &7178700922430649940
 GameObject:
   m_ObjectHideFlags: 0
