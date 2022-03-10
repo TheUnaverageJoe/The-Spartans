@@ -15,5 +15,9 @@ namespace Spartans.UI{
             _connectionsRegion.Init();
             _connectionsRegion.gameObject.SetActive(false);
         }
+
+        public PanelManager GetPanelManager(){
+            return _connectionsRegion;
+        }
     }
 }

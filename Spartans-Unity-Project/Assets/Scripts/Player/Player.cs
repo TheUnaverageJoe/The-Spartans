@@ -22,8 +22,9 @@ namespace Spartans.Players
 
             
             playerName = NetworkObject.NetworkObjectId.ToString();
-            print("playerName: " + playerName);
+            //print("playerName: " + playerName);
 
+            //isLocalPlayer makes anything in player scripts happen only on 1 time
             if(IsLocalPlayer){
                 _mainCamera.SetActive(false);
                 _playerMovement.Init();
@@ -41,6 +42,10 @@ namespace Spartans.Players
                 if(Input.GetKeyDown(KeyCode.Escape)){
                     if(Cursor.visible) MouseLock(true);
                     else MouseLock(false);
+                }
+
+                if(Input.GetKeyDown(KeyCode.Tab)){
+                    _HUD.GetPanelManager().gameObject.SetActive(!_HUD.GetPanelManager().gameObject.activeSelf);
                 }
             }
         }

@@ -13,7 +13,7 @@ namespace Spartans.Players
         //Network Variable neccessary for syncing with server,
         //because we must update client side from the info on server side
         public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
-        Vector3 moveDirection = new Vector3(0,0,0);
+        public Vector3 moveDirection = new Vector3(0,0,0);
         
 
         //primative class variables-----
@@ -30,6 +30,10 @@ namespace Spartans.Players
 
             //class variable init
             isGrounded = false;
+
+            Position.OnValueChanged += (Vector3 prev, Vector3 updated) => {
+                
+            };
         }
         
 
@@ -50,14 +54,14 @@ namespace Spartans.Players
                 StartCoroutine("throwAnimationTime");
             }
             //print("transform of: " + NetworkObject.NetworkObjectId + " is " + Position.Value);
-            transform.position = Position.Value;
-            //print("Transform pos is: " + transform.position);
+            //transform.position = Position.Value;
+            //print("Transform pos is: " + transform.position + "from player " +  NetworkObjectId);
 
         }
 
         void FixedUpdate(){        
             if(IsServer){
-                print("Server side var values: " + moveDirection);
+                //print("Server side var values: " + moveDirection + " for " + NetworkObjectId);
                 UpdateServer();
                 //print("is server");
             }
@@ -88,29 +92,38 @@ namespace Spartans.Players
 
         private void UpdateServer(){
             if(!isGrounded){
-                print("client with gameObj ID: " + NetworkObjectId);
+                print("client with gameObj ID: " + NetworkObjectId + " is not grounded");
                 return;
             }
             Position.Value += moveDirection;
-            //moveDirection = new Vector3(0,0,0);
         }
         [ServerRpc]
         private void UpdateServerRpc(Vector3 dir){
             moveDirection = dir;
+            Debug.LogError("Server Rpc Called from remote client");
         }
 
         private void UpdateClient(){
             //Get Input manager inputs for Up down arrow keys and left right arrow keys
+            if(IsClient && !IsServer){
+                print("client not server, calling UpdateClient");
+            }
             float inputVert = Input.GetAxis("Vertical");
             float inputHoriz = Input.GetAxis("Horizontal");
             //create a object space vector3 with inputs and normalize 
             Vector3 input = new Vector3(inputHoriz, 0, inputVert).normalized;
             //transform vector3 to world space to get desired direction of translation
             input = transform.TransformDirection(input) * MOVE_SPEED;
+            print("Getting Input from client: " + NetworkManager.Singleton.ServerClientId);
 
             moveDirection = input;
+            //print("input: " + input);
             UpdateServerRpc(input);
+        }
 
+        [ClientRpc]
+        private void UpdateClientRpc(){
+            transform.position = Position.Value;
         }
 
         void Look(){
