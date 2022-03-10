@@ -17,7 +17,7 @@ namespace Spartans.Players
         
 
         //primative class variables-----
-        [SerializeField] private bool isGrounded;
+        [SerializeField] public bool isGrounded{ get; private set; }
         [SerializeField] private float MAX_SPEED = 10.0f;
         [SerializeField] private float MOVE_SPEED = 1.0f;
         [SerializeField] private float X_SENS = 1.0f;
@@ -31,9 +31,16 @@ namespace Spartans.Players
             //class variable init
             isGrounded = false;
 
-            Position.OnValueChanged += (Vector3 prev, Vector3 updated) => {
-                
-            };
+            if(IsClient && !IsServer){
+                Position.OnValueChanged += (Vector3 prev, Vector3 updated) => {
+                    if(prev != updated){
+                        transform.position = updated;
+                    }
+                    else{
+                        //print("prev and update are:" + prev + " , " + updated);
+                    }
+                };
+            }
         }
         
 
@@ -70,7 +77,7 @@ namespace Spartans.Players
                 UpdateClient();
                 //print("is client and owner");
             }
-            if(!IsLocalPlayer) return;//Ensure Each client only moves there own player,
+            //if(!IsLocalPlayer) return;//Ensure Each client only moves there own player,
             //I dont understand why this is neccessary given each player should have their own script instance for the player character and own game window in focus
             //Debug.Log("In Fixed Update");
             //EDIT DATE 3/8/2022: This is because every running .exe file has all exact same set of objects in it.
@@ -82,43 +89,49 @@ namespace Spartans.Players
             //aka layer 0 will trigger OverlapBox because 2^0 = 1
 
             //only detect objects on layer 0, "default" layer
-            Collider[] hitColliders = Physics.OverlapBox(gameObject.transform.position, new Vector3(1, 0.5f, 0.5f),
-                                                        Quaternion.identity, 1, QueryTriggerInteraction.Ignore);
-            if(hitColliders.Length == 0) isGrounded = false;
-            if(hitColliders.Length > 0) isGrounded = true;
+
+            //if(!IsLocalPlayer) return;
+            //Collider[] hitColliders = Physics.OverlapBox(gameObject.transform.position, new Vector3(1, 0.5f, 0.5f),
+            //                                            Quaternion.identity, 1, QueryTriggerInteraction.Ignore);
+            //if(hitColliders.Length == 0) isGrounded = false;
+            //if(hitColliders.Length > 0) isGrounded = true;
             
             
         }
 
         private void UpdateServer(){
+            Collider[] hitColliders = Physics.OverlapBox(gameObject.transform.position, new Vector3(1, 0.5f, 0.5f),
+                                                        Quaternion.identity, 1, QueryTriggerInteraction.Ignore);
+            if(hitColliders.Length == 0) isGrounded = false;
+            if(hitColliders.Length > 0) isGrounded = true;
             if(!isGrounded){
                 print("client with gameObj ID: " + NetworkObjectId + " is not grounded");
                 return;
             }
+            print("Object: " + NetworkObjectId + " tried to move " + moveDirection);
             Position.Value += moveDirection;
         }
         [ServerRpc]
-        private void UpdateServerRpc(Vector3 dir){
+        private void UpdateServerRpc(Vector3 dir, ulong id){
             moveDirection = dir;
-            Debug.LogError("Server Rpc Called from remote client");
+            UpdateClientRpc();
+            Debug.LogError("Server is clientID: " + NetworkManager.Singleton.LocalClientId);
+            Debug.LogError("Server Rpc Called from client: " + id);
         }
 
         private void UpdateClient(){
             //Get Input manager inputs for Up down arrow keys and left right arrow keys
-            if(IsClient && !IsServer){
-                print("client not server, calling UpdateClient");
-            }
             float inputVert = Input.GetAxis("Vertical");
             float inputHoriz = Input.GetAxis("Horizontal");
             //create a object space vector3 with inputs and normalize 
             Vector3 input = new Vector3(inputHoriz, 0, inputVert).normalized;
             //transform vector3 to world space to get desired direction of translation
             input = transform.TransformDirection(input) * MOVE_SPEED;
-            print("Getting Input from client: " + NetworkManager.Singleton.ServerClientId);
+            //print("Getting Input from client: " + NetworkManager.Singleton.LocalClientId);
 
             moveDirection = input;
             //print("input: " + input);
-            UpdateServerRpc(input);
+            UpdateServerRpc(input, NetworkManager.Singleton.LocalClientId);
         }
 
         [ClientRpc]

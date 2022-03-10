@@ -12,6 +12,7 @@ namespace Spartans{
         
 
         void Start(){
+            /*
             NetworkManager.Singleton.OnClientConnectedCallback += (id) => {
                 if(NetworkManager.Singleton.IsServer){
                     Player newPlayer;
@@ -25,6 +26,7 @@ namespace Spartans{
 
                 }
             };
+            */
         }
 
         void FixedUpdate(){

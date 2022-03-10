@@ -1275,7 +1275,6 @@ GameObject:
   - component: {fileID: 324439227796420258}
   - component: {fileID: -6915281490330311222}
   - component: {fileID: 5019167942193439323}
-  - component: {fileID: 693498338290248854}
   m_Layer: 3
   m_Name: spartans
   m_TagString: Untagged
@@ -1311,7 +1310,7 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
@@ -1447,18 +1446,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &693498338290248854
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7093115869597867190}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 49643adcf6ada124da28d3084d1a1d2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &7178700922430649940
