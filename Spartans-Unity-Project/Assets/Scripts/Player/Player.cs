@@ -12,9 +12,13 @@ namespace Spartans.Players
         private PlayerMovement _playerMovement;
         private PlayerCanvasManager _HUD;
         private Camera cam;
+        private Rigidbody _rigidbody;
+        private Animator _animator;
         public string playerName{ get; private set; }
         public void Start(){
-            
+            _rigidbody = GetComponent<Rigidbody>();
+            _animator = GetComponent<Animator>();
+
             _playerMovement = GetComponent<PlayerMovement>();
             _HUD = FindObjectOfType<PlayerCanvasManager>();
             _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
@@ -27,12 +31,14 @@ namespace Spartans.Players
             //isLocalPlayer makes anything in player scripts happen only on 1 time
             if(IsLocalPlayer){
                 _mainCamera.SetActive(false);
-                _playerMovement.Init();
                 _HUD.Init();
             }else{
                 //All players have a camera object on the prefab, disable all other cameras if its not ours
                 cam.gameObject.SetActive(false);
             }
+            //Do in the case of any type of user
+            //initialize all players on spawn
+            _playerMovement.Init(_rigidbody, _animator);
         }
 
         // Update is called once per frame

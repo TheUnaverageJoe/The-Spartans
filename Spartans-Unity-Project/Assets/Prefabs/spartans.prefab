@@ -1387,11 +1387,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31bd639c62623d445a13c85f25d39394, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Position:
+  userInput:
     m_InternalValue: {x: 0, y: 0, z: 0}
-  moveDirection: {x: 0, y: 0, z: 0}
-  isGrounded: 0
-  MAX_SPEED: 10
+  MAX_SPEED: 0.1
   MOVE_SPEED: 0.1
   X_SENS: 1
 --- !u!114 &324439227796420258
@@ -1412,9 +1410,9 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
