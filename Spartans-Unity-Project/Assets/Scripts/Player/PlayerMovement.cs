@@ -119,39 +119,18 @@ namespace Spartans.Players
                 //print("client with gameObj ID: " + NetworkObjectId + " is not grounded");
                 return;
             }
-            //print("rb.velocity.x: " + rb.velocity.x);
-            //print("rb.velocity.y: " + rb.velocity.y);
-            //print("rb.velocity.z: " + rb.velocity.z);
-
-            //isolate x and z components for check against MAX_SPEED
-            //if we consider the y component then falling fast could prevent movement
-            //on second thought it doesnt matter because we cant move when falling anyway     
-            Vector2 rbVelocityXZ = new Vector2(rb.velocity.x, rb.velocity.z);
-            Vector3 converter = new Vector3 (rbVelocityXZ.x, 0.0f , rbVelocityXZ.y);
-            float rbVelocityY = rb.velocity.y;
-
-            Vector3 newMove = new Vector3();
-            //if speed <= Max speed allow more input
-            //<= is important for when we are already moving max speed and want to change dir
-            if((rbVelocityXZ + _inputDirection).magnitude <= MAX_SPEED){
-                _inputDirection = _inputDirection.normalized;
-                newMove = new Vector3(_inputDirection.x*MAX_SPEED, rbVelocityY, _inputDirection.y*MAX_SPEED);
-            }else{
-                newMove = Vector3.negativeInfinity;
-                print("MAX SPEED HIT");
-            }
+            
             //print("Object: " + NetworkObjectId + " tried to move " + inputDirection);
-            userInput.Value = newMove;
+            userInput.Value = _inputDirection;
         }
 
         [ServerRpc]
-        private void UpdateServerRpc(Vector3 input){
+        private void UpdateServerRpc(Vector2 input){
             //need to update _inputDirection so that local version of obj on server side knows what the inputs were to work from
-            _inputDirection = input;
+            _inputDirection = new Vector3(input.x, 0 , input.y);
 
-            Vector3 vec = new Vector3(input.x, 0, input.y);
             if(isGrounded){
-                UpdateClientRpc(vec);
+                UpdateClientRpc(input);
             }
         }
 
@@ -160,38 +139,34 @@ namespace Spartans.Players
             //Get Input manager inputs for Up down arrow keys and left right arrow keys
             float inputVert = Input.GetAxisRaw("Vertical");
             float inputHoriz = Input.GetAxisRaw("Horizontal");
+
             //create a object space vector3 with inputs and normalize 
             Vector2 input = new Vector2(inputHoriz, inputVert).normalized;
-            Vector3 input3D = new Vector3(input.x, 0, input.y);
 
-            //transform vector3 to world space to get desired direction of translation
-
-            //issue with below line, of type Vector3 UpdateServerRpc takes Vector2
-            input3D = transform.TransformDirection(input3D);
-
-
-            //client side _inputDirection is only updated with server respones to initial move request
-            // if the input is different than what the server has for us then
-            // we want to resend and update the server with our current input
-            UpdateServerRpc(input3D);
+            UpdateServerRpc(input);
         }
 
         [ClientRpc]
-        private void UpdateClientRpc(Vector3 moveDir){
-            /*
-            //if we arent grounded we cant change our movement
-            if(!isGrounded) return;
+        private void UpdateClientRpc(Vector2 moveDir){
+            //isolate x and z components for check against MAX_SPEED
+            //if we consider the y component then falling fast could prevent movement
+            //on second thought it doesnt matter because we cant move when falling anyway     
+            Vector2 rbVelocityXZ = new Vector2(rb.velocity.x, rb.velocity.z);
+            Vector3 converter = new Vector3 (rbVelocityXZ.x, 0.0f , rbVelocityXZ.y);
+            float rbVelocityY = rb.velocity.y;
 
-            if(input == Vector2.negativeInfinity){
-                //if we are here then we must be already moving at max speed
+            if(isGrounded)
 
-            }else if(input == Vector2.zero){
-                rb.velocity = Vector3.zero;
+            //if speed <= Max speed allow more input
+            //<= is important for when we are already moving max speed and want to change dir
+            if((rbVelocityXZ + moveDir).magnitude < MAX_SPEED){
+                rb.velocity += new Vector3(moveDir.x*MOVE_SPEED, rbVelocityY, moveDir.y*MOVE_SPEED);
             }else{
-                
+                //print("MAX SPEED HIT");
+                if(Vector2.Dot(rbVelocityXZ.normalized, moveDir) > 0.95f){
+                    
+                } 
             }
-            */
-            rb.velocity += moveDir;
         }
 
         void Look(){

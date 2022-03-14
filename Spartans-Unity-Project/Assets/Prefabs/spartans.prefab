@@ -1389,7 +1389,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   userInput:
     m_InternalValue: {x: 0, y: 0, z: 0}
-  MAX_SPEED: 0.1
+  MAX_SPEED: 5
   MOVE_SPEED: 0.1
   X_SENS: 1
 --- !u!114 &324439227796420258
