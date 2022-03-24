@@ -82,7 +82,7 @@ namespace Spartans.Players
         private void OnDrawGizmos() {
             Gizmos.color = Color.red;
             //Use the same vars you use to draw your Overlap SPhere to draw your Wire Sphere.
-            Gizmos.DrawWireCube(transform.position-Vector3.down*0.1f, new Vector3(1, 0.5f, 0.5f));
+            Gizmos.DrawWireCube(transform.position-Vector3.down*0.1f, new Vector3(1, 0.4f, 0.4f));
         }
     }
 }

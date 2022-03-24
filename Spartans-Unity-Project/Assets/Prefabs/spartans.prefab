@@ -1394,6 +1394,7 @@ MonoBehaviour:
   MAX_SPEED: 10
   MOVE_SPEED: 1
   X_SENS: 2
+  JUMP_FORCE: 100
 --- !u!114 &324439227796420258
 MonoBehaviour:
   m_ObjectHideFlags: 0
