@@ -12,8 +12,9 @@ namespace Spartans.Players
         
         //Network Variable neccessary for syncing with server,
         //because we must update client side from the info on server side
-        public NetworkVariable<Vector3> userInput = new NetworkVariable<Vector3>();
-        private Vector2 _inputDirection = new Vector2(0,0);
+        public NetworkVariable<Vector3> networkVelocity = new NetworkVariable<Vector3>();
+        public NetworkVariable<float> networkRotationAroundY = new NetworkVariable<float>();
+        private Vector3 _inputDirection = new Vector3(0, 0, 0);
         
 
         //primative class variables-----
@@ -27,55 +28,23 @@ namespace Spartans.Players
         public void Init(Rigidbody rigidbody, Animator animator){
             rb = rigidbody;
             anim = animator;
-            /*
-            if(rb == null || anim == null){
-                Debug.LogError("FROM PlayerMovement: rb =" + rb + " anim = " + anim);
-            }else{
-                print("All G");
-            }
-            */
 
             //class variable init
             isGrounded = false;
 
-            //print("init called from player movement");
-
             //EXAMPLE LINE
-            userInput.OnValueChanged += (Vector3 prev, Vector3 updated) => {
-                
+            networkVelocity.OnValueChanged += (Vector3 prev, Vector3 updated) => {
+                //updated.y = rb.velocity.y;
+                rb.velocity = updated;
+                //rb.AddForce(networkVelocity.Value, ForceMode.VelocityChange);
             };
-                    
+            networkRotationAroundY.OnValueChanged += (float prev, float updated) => {
+                transform.rotation = Quaternion.Euler(0, updated, 0);
+            };
         }
         
-
-        // Update is called once per frame
-        void Update()
-        {
-            /*
-            if(!IsLocalPlayer) return; //Ensure Each client only moves there own player, 
-            //I dont understand why this is neccessary given each player should have their own script instance for the player character and own game window in focus
-
-            if((Input.GetAxis("Horizontal")!=0 || Input.GetAxis("Vertical")!=0) && rb.velocity != Vector3.zero){
-                anim.SetBool("isWalking", true);//change animator variable for walking and Idle
-            }else{
-                anim.SetBool("isWalking", false);//change animator variable for walking and Idle
-            }
-
-            if(Input.GetKeyDown("f")){
-                anim.SetBool("throw", true);
-                StartCoroutine("throwAnimationTime");
-            }
-            */
-
-            //print("transform of: " + NetworkObject.NetworkObjectId + " is " + userInput.Value);
-            //if(IsClient) transform.position = userInput.Value;
-            //rb.velocity += userInput.Value;
-            //print("Transform pos is: " + transform.position + "from player " +  NetworkObjectId);
-        }
-
         void FixedUpdate(){
             if(IsClient && IsOwner){
-                Look();
                 UpdateClientInput();
                 //print("is client and owner");
             }     
@@ -87,7 +56,7 @@ namespace Spartans.Players
             
             //if(!IsLocalPlayer) return;//Ensure Each client only moves there own player,
             //I dont understand why this is neccessary given each player should have their own script instance for the player character and own game window in focus
-            //Debug.Log("In Fixed Update");
+            
             //EDIT DATE 3/8/2022: This is because every running .exe file has all exact same set of objects in it.
             //Thus each client has multiple player objects in the hierarchy
 
@@ -97,17 +66,9 @@ namespace Spartans.Players
             //aka layer 0 will trigger OverlapBox because 2^0 = 1
 
             //only detect objects on layer 0, "default" layer
-
-            //if(!IsLocalPlayer) return;
-            //Collider[] hitColliders = Physics.OverlapBox(gameObject.transform.position, new Vector3(1, 0.5f, 0.5f),
-            //                                            Quaternion.identity, 1, QueryTriggerInteraction.Ignore);
-            //if(hitColliders.Length == 0) isGrounded = false;
-            //if(hitColliders.Length > 0) isGrounded = true;
-            
-            
         }
 
-        //UpdateServer is only called from Server in fixedUpdate
+        //UpdateServer is only called from Server in fixedUpdate, every fixedUpdate tick on server
         private void UpdateServer(){
             //make each player obj update their isGrounded var
             Collider[] hitColliders = Physics.OverlapBox(gameObject.transform.position, new Vector3(1, 0.5f, 0.5f),
@@ -119,19 +80,6 @@ namespace Spartans.Players
                 //print("client with gameObj ID: " + NetworkObjectId + " is not grounded");
                 return;
             }
-            
-            //print("Object: " + NetworkObjectId + " tried to move " + inputDirection);
-            userInput.Value = _inputDirection;
-        }
-
-        [ServerRpc]
-        private void UpdateServerRpc(Vector2 input){
-            //need to update _inputDirection so that local version of obj on server side knows what the inputs were to work from
-            _inputDirection = new Vector3(input.x, 0 , input.y);
-
-            if(isGrounded){
-                UpdateClientRpc(input);
-            }
         }
 
         //Take in local user input and send it to the server version of that player obj
@@ -139,38 +87,56 @@ namespace Spartans.Players
             //Get Input manager inputs for Up down arrow keys and left right arrow keys
             float inputVert = Input.GetAxisRaw("Vertical");
             float inputHoriz = Input.GetAxisRaw("Horizontal");
+            float mouseX = Input.GetAxis("Mouse X")*X_SENS;
 
-            //create a object space vector3 with inputs and normalize 
+            //create a object space vector3 with inputs and normalize
             Vector2 input = new Vector2(inputHoriz, inputVert).normalized;
+            //Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
 
-            UpdateServerRpc(input);
+            UpdateMoveServerRpc(input);
+            if(mouseX!=0) UpdateRotationServerRpc(mouseX);
         }
 
-        [ClientRpc]
-        private void UpdateClientRpc(Vector2 moveDir){
-            //isolate x and z components for check against MAX_SPEED
-            //if we consider the y component then falling fast could prevent movement
-            //on second thought it doesnt matter because we cant move when falling anyway     
-            Vector2 rbVelocityXZ = new Vector2(rb.velocity.x, rb.velocity.z);
-            Vector3 converter = new Vector3 (rbVelocityXZ.x, 0.0f , rbVelocityXZ.y);
-            float rbVelocityY = rb.velocity.y;
+        [ServerRpc]
+        private void UpdateMoveServerRpc(Vector2 input){
+            //need to update _inputDirection so that local version of obj on server side knows what the inputs were to work from
+            Vector3 worldSpaceDir = new Vector3(input.x, 0, input.y);
+            //store player input converted to object space coords
+            _inputDirection = transform.TransformDirection(worldSpaceDir);
+            //_inputDirection = worldSpaceDir;
 
-            if(isGrounded)
+            if(!isGrounded){
+                return;
+            }
 
-            //if speed <= Max speed allow more input
-            //<= is important for when we are already moving max speed and want to change dir
-            if((rbVelocityXZ + moveDir).magnitude < MAX_SPEED){
-                rb.velocity += new Vector3(moveDir.x*MOVE_SPEED, rbVelocityY, moveDir.y*MOVE_SPEED);
-            }else{
-                //print("MAX SPEED HIT");
-                if(Vector2.Dot(rbVelocityXZ.normalized, moveDir) > 0.95f){
-                    
-                } 
+            if(input == Vector2.zero){
+                networkVelocity.Value = Vector3.zero;
+            }
+            else if((networkVelocity.Value + _inputDirection * MOVE_SPEED).magnitude < MAX_SPEED)
+            {
+                networkVelocity.Value += _inputDirection * MOVE_SPEED;
+            }
+            else if((networkVelocity.Value + _inputDirection * MOVE_SPEED).magnitude >= MAX_SPEED)
+            {
+                //Dot product to determine if direction of motion is same/similar to inputDirection
+                if(Vector3.Dot(networkVelocity.Value.normalized, _inputDirection.normalized) < 0){
+                    networkVelocity.Value = Vector3.zero;
+                    networkVelocity.Value += _inputDirection*MOVE_SPEED;
+                }else{
+                    networkVelocity.Value = _inputDirection*MAX_SPEED;
+                }
             }
         }
 
-        void Look(){
-            transform.Rotate(0,Input.GetAxis("Mouse X")*X_SENS,0);
+        [ServerRpc]
+        void UpdateRotationServerRpc(float xRot){
+            networkRotationAroundY.Value += xRot;
+        }
+
+        public override void OnNetworkSpawn(){
+            Vector3 temp = transform.position;
+            temp.y += 3;
+            transform.position = temp;
         }
 
         private IEnumerator throwAnimationTime(){
