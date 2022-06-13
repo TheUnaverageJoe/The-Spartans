@@ -1393,8 +1393,8 @@ MonoBehaviour:
     m_InternalValue: 0
   MAX_SPEED: 10
   MOVE_SPEED: 1
-  X_SENS: 2
-  JUMP_FORCE: 100
+  X_SENS: 10
+  JUMP_FORCE: 10
 --- !u!114 &324439227796420258
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1420,7 +1420,7 @@ MonoBehaviour:
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   InLocalSpace: 0
-  Interpolate: 1
+  Interpolate: 0
   CanCommitToTransform: 0
 --- !u!114 &-6915281490330311222
 MonoBehaviour:

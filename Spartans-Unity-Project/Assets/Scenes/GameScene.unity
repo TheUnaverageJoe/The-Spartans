@@ -467,9 +467,9 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 691130837}
-    PlayerPrefab: {fileID: 7093115869597867190, guid: 4aba11c15318aef42b8f761a9935d390, type: 3}
+    PlayerPrefab: {fileID: 1642613163398324905, guid: 5c042a244584624469e2abcc6c98be81, type: 3}
     NetworkPrefabs: []
-    TickRate: 30
+    TickRate: 60
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
     ConnectionData: 
@@ -726,7 +726,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 954746857}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 159b6bea14cb1844aa63b6129ed52c63, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -1077,7 +1077,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1402268063}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 159b6bea14cb1844aa63b6129ed52c63, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2

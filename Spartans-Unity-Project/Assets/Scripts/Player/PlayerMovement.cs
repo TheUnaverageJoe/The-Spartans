@@ -15,6 +15,7 @@ namespace Spartans.Players
         public NetworkVariable<Vector3> networkVelocity = new NetworkVariable<Vector3>();
         public NetworkVariable<float> networkRotationAroundY = new NetworkVariable<float>();
         private Vector3 _inputDirection = new Vector3(0, 0, 0);
+        private bool _tryJump;
         private bool _jumping;
         
 
@@ -33,7 +34,7 @@ namespace Spartans.Players
 
             //class variable init
             isGrounded = false;
-            _jumping = false;
+            _tryJump = false;
 
             //EXAMPLE LINE
             networkVelocity.OnValueChanged += (Vector3 prev, Vector3 updated) => {
@@ -44,13 +45,15 @@ namespace Spartans.Players
             };
         }
         void Update(){
+            if(!IsClient || !IsOwner) return;
             if(Input.GetKeyDown(KeyCode.Space)) {
-                _jumping = true;
+                _tryJump = true;
                 print("Jumping...");
             }
         }
         void FixedUpdate(){
             if(IsClient && IsOwner){
+                UpdateGrounded();
                 UpdateClientInput();
                 //print("is client and owner");
             }     
@@ -76,15 +79,16 @@ namespace Spartans.Players
 
         //UpdateServer is only called from Server in fixedUpdate, every fixedUpdate tick on server
         private void UpdateServer(){
-            if(_jumping){
-                isGrounded = false;
-                return;
-            }
+            UpdateGrounded();
+        }
+
+        private void UpdateGrounded(){
             //make each player obj update their isGrounded var
-            Collider[] hitColliders = Physics.OverlapBox(gameObject.transform.position, new Vector3(0.5f, 0.2f, 0.2f),
+            Collider[] hitColliders = Physics.OverlapBox(gameObject.transform.position, new Vector3(0.7f, 0.05f, 0.7f),
                                                         Quaternion.identity, 1, QueryTriggerInteraction.Ignore);
             if(hitColliders.Length == 0) isGrounded = false;
             if(hitColliders.Length > 0) isGrounded = true;
+
             //use isGrounded to determine if we are allowed to move
         }
 
@@ -101,9 +105,9 @@ namespace Spartans.Players
 
             UpdateMoveServerRpc(input);
             if(mouseX!=0) UpdateRotationServerRpc(mouseX);
-            if(_jumping) {
+            if(_tryJump) {
                 RequestJumpServerRpc();
-                //_jumping = false;
+                _tryJump = false;
             }
         }
 
@@ -114,7 +118,7 @@ namespace Spartans.Players
             //store player input converted to object space coords
             _inputDirection = transform.TransformDirection(localSpaceDir);
 
-            if(!isGrounded || _jumping){
+            if(!isGrounded){
                 return;
             }
             if(input == Vector2.zero){
@@ -127,7 +131,7 @@ namespace Spartans.Players
             else if((networkVelocity.Value + _inputDirection * MOVE_SPEED).magnitude >= MAX_SPEED)
             {
                 //Dot product to determine if direction of motion is same/similar to inputDirection
-                if(Vector3.Dot(networkVelocity.Value.normalized, _inputDirection.normalized) < 0){
+                if(Vector3.Dot(networkVelocity.Value.normalized, _inputDirection.normalized) <= 0){
                     networkVelocity.Value = Vector3.zero;
                     networkVelocity.Value += _inputDirection*MOVE_SPEED;
                 }else{
@@ -143,18 +147,11 @@ namespace Spartans.Players
 
         [ServerRpc]
         private void RequestJumpServerRpc(){
-            _jumping = true;
-            JumpClientRpc();
             if(!isGrounded) return;
-            Vector3 temp = networkVelocity.Value;
-            temp += Vector3.up*JUMP_FORCE;
-            //rb.AddForce(Vector3.up*JUMP_FORCE , ForceMode.VelocityChange);
-            print("Rb.velocity is: " + temp);
-            networkVelocity.Value = temp;
-        }
-        [ClientRpc]
-        void JumpClientRpc(){
-            _jumping = false;
+
+            rb.AddForce(Vector3.up*JUMP_FORCE , ForceMode.VelocityChange);
+            //print("Rb.velocity is: " + rb.velocity);
+            networkVelocity.Value = rb.velocity;
         }
         public override void OnNetworkSpawn(){
             Vector3 temp = transform.position;

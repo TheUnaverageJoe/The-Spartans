@@ -28,7 +28,7 @@ namespace Spartans.Players
             playerName = NetworkObject.NetworkObjectId.ToString();
             //print("playerName: " + playerName);
 
-            //isLocalPlayer makes anything in player scripts happen only on 1 time
+            //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             if(IsLocalPlayer){
                 _mainCamera.SetActive(false);
                 _HUD.Init();
@@ -82,7 +82,7 @@ namespace Spartans.Players
         private void OnDrawGizmos() {
             Gizmos.color = Color.red;
             //Use the same vars you use to draw your Overlap SPhere to draw your Wire Sphere.
-            Gizmos.DrawWireCube(transform.position-Vector3.down*0.1f, new Vector3(1, 0.4f, 0.4f));
+            Gizmos.DrawWireCube(transform.position, new Vector3(1.4f, 0.1f, 1.4f));
         }
     }
 }
