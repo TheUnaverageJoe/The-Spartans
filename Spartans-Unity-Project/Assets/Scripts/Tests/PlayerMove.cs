@@ -3,141 +3,170 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class PlayerMove : NetworkBehaviour
-{
-    private Rigidbody _rigidbody;
-    //private Vector3 _input;
-    private Camera _camera;
-    [SerializeField] private bool canJump = true;
-    [SerializeField] private bool grounded = false;
-    [SerializeField] private float jumpForce = 8.0f;
-    [SerializeField] private float moveSpeed = 0.05f;
-    [SerializeField] private float MAX_SPEED = 3.0f;
-    [SerializeField] private float mouseSens = 1.0f;
-    [SerializeField] private bool timed = false;
-    [SerializeField] private Coroutine groundingTimer;
-
-    // Start is called before the first frame update
-    void Start()
+namespace Spartans.Players{
+    public class PlayerMove : NetworkBehaviour
     {
-        _camera = GetComponentInChildren<Camera>();
-        _rigidbody = GetComponent<Rigidbody>();
-        //print(_input);
+        private Rigidbody _rigidbody;
+        private Animator _animator;
+        //private Vector3 _input;
+        private Camera _camera;
+        [SerializeField] private bool canJump = true;
+        [SerializeField] private bool grounded = false;
+        [SerializeField] private float jumpForce = 8.0f;
+        [SerializeField] private float moveSpeed = 0.05f;
+        [SerializeField] private float MAX_SPEED = 3.0f;
+        [SerializeField] private float mouseSens = 1.0f;
+        [SerializeField] private bool timer = false;
+        private Coroutine groundingTimer;
+        private int previousState = -1;
+        private int currentState = -1;
 
-        if(!IsLocalPlayer){
-            _camera.gameObject.SetActive(false);
-        }
-    }
+        enum States{Grounded, Airborn}
 
-    // Update is called once per frame
-    void Update()
-    {
-        //Not player character of this client session
-        if(!IsLocalPlayer){
-            return;
-        }
-        //CheckGrounded();
-        //Jump
-        if(Input.GetButtonDown("Jump") && canJump && grounded){
-            RequestJumpServerRpc();
-            canJump = false;
-        }
-        //Update rotation
-        float mouseX = Input.GetAxis("Mouse X");
-        if (mouseX != 0){
-            requestRotationServerRpc(mouseX*mouseSens);
-        }
-        //Update movement
-        if(grounded){
-            Vector3 input = new Vector3(Input.GetAxis("Horizontal"), 0 , Input.GetAxis("Vertical"));
-            //print(input);
-            requestMoveServerRpc(input);
-        }
-    }
-    void FixedUpdate(){
-        CheckGrounded();
-    }
 
-    [ServerRpc]
-    public void RequestJumpServerRpc(){
-        if(!grounded) return;
-        _rigidbody.AddForce(transform.up * jumpForce, ForceMode.VelocityChange);
-        JumpResponseClientRpc();
-    }
+        public void Init(Rigidbody rigidbody, Animator animator){
+            _rigidbody = rigidbody;
+            _animator = animator;
 
-    [ClientRpc]
-    public void JumpResponseClientRpc(){
-        _rigidbody.AddForce(transform.up * jumpForce, ForceMode.VelocityChange);
-        canJump = false;
-        grounded = false;
-        StartCoroutine(ResetJump());
-    }
+            previousState = -1;
+            currentState = -1;
 
-    IEnumerator ResetJump(){
-        yield return new WaitForSeconds(1);
-        canJump = true;
-    }
+            Physics.gravity = new Vector3(0, -20f, 0);
+            //previously in start
+            _camera = GetComponentInChildren<Camera>();
 
-    [ServerRpc]
-    public void requestRotationServerRpc(float rotX){
-        transform.Rotate(new Vector3(0, rotX, 0));
-    }
-    [ServerRpc]
-    public void requestMoveServerRpc(Vector3 dir){
-        Vector3 moveDir = dir.normalized;
-        if (moveDir == Vector3.zero && grounded && canJump){
-            _rigidbody.velocity = Vector3.zero;
-        }
-        if(_rigidbody.velocity.magnitude > MAX_SPEED){
-            print("TOO FAST");
-            _rigidbody.velocity = _rigidbody.velocity.normalized*MAX_SPEED;
-            return;
+            if(!IsLocalPlayer){
+                _camera.gameObject.SetActive(false);
+            }
         }
 
-        if(_rigidbody.velocity.magnitude <= MAX_SPEED){
-            moveDir = transform.TransformDirection(moveDir);
-            _rigidbody.AddForce(moveDir*moveSpeed, ForceMode.VelocityChange);
+        // Update is called once per frame
+        void Update()
+        {
+            //Not player character of this client session
+            if(!IsLocalPlayer){
+                return;
+            }
+            //CheckGrounded();
+            //Jump
+            if(Input.GetButtonDown("Jump") && canJump && grounded){
+                RequestJumpServerRpc();
+                canJump = false;
+                grounded = false;
+                //print(_rigidbody.velocity);
+            }
+            //Update rotation
+            float mouseX = Input.GetAxis("Mouse X");
+            if (mouseX != 0){
+                requestRotationServerRpc(mouseX*mouseSens);
+            }
+            //Update movement
+            if(grounded){
+                Vector3 input = new Vector3(Input.GetAxis("Horizontal"), 0 , Input.GetAxis("Vertical"));
+                //print(input);
+                requestMoveServerRpc(input);
+                //print("After Move: " + _rigidbody.velocity);
+            }
+        }
+        void FixedUpdate(){
+            CheckGrounded();
         }
 
-    }
+        [ServerRpc]
+        public void RequestJumpServerRpc(){
+            print("Server and client grounded var out of sync");
+            if(!grounded) return;
+            //_rigidbody.AddForce(transform.up * jumpForce, ForceMode.VelocityChange);
+            JumpResponseClientRpc();
+        }
 
-    void OnCollisionEnter(Collision collision){
-        grounded = true;
-        canJump = true;
-        print("Breached");
-    }
-    void OnCollisionExit(Collision collision){
-        grounded = false;
-        canJump = false;
-        print("pullout");
-    }
-    void CheckGrounded(){
-        Debug.DrawRay(transform.position, Vector3.down * 1.25f, Color.blue);
-        if(grounded) return;
-        RaycastHit hit;
-        bool hitOccured = Physics.Raycast(transform.position, Vector3.down, out hit, 1.25f, 3);
-        print("Debug phyics line stuff");
-        if(timed == true){
-            if(!hitOccured){
-                timed = false;
-                StopCoroutine(groundingTimer);
-            }else{
-                if(groundingTimer==null){
-                    timed = false;
+        [ClientRpc]
+        public void JumpResponseClientRpc(){
+            _rigidbody.AddForce(transform.up * jumpForce, ForceMode.VelocityChange);
+            StartCoroutine(ResetJump());
+        }
+
+        IEnumerator ResetJump(){
+            yield return new WaitForSeconds(0.5f);
+            canJump = true;
+        }
+
+        [ServerRpc]
+        public void requestRotationServerRpc(float rotX){
+            transform.Rotate(new Vector3(0, rotX, 0));
+        }
+        [ServerRpc]
+        public void requestMoveServerRpc(Vector3 dir){
+            Vector3 moveDir = dir.normalized;
+            if (moveDir == Vector3.zero && grounded && canJump){
+                _rigidbody.velocity = Vector3.zero;
+            }
+
+            Vector2 horizPlane = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.z);
+            float velocityComponentY = _rigidbody.velocity.y;
+
+            if(horizPlane.magnitude > MAX_SPEED){
+                //print("TOO FAST" + horizPlane.magnitude);
+                horizPlane = horizPlane.normalized*MAX_SPEED;
+                Vector3 normalized = new Vector3(horizPlane.x, velocityComponentY, horizPlane.y);
+                _rigidbody.velocity = _rigidbody.velocity.normalized*MAX_SPEED;
+                return;
+            }
+
+            if(horizPlane.magnitude < MAX_SPEED){
+                moveDir = transform.TransformDirection(moveDir);
+                _rigidbody.AddForce(moveDir*moveSpeed, ForceMode.VelocityChange);
+            }
+            if(horizPlane.magnitude == MAX_SPEED){
+                //check if vectors point same direction
+                if(Vector3.Dot(moveDir, new Vector3(horizPlane.x,0,horizPlane.y).normalized) == 1){
+                    print("denied movement change, cant accelerate further");
+                    return;
+                }else{
+                    moveDir = transform.TransformDirection(moveDir);
+                    _rigidbody.AddForce(moveDir*moveSpeed, ForceMode.VelocityChange);
                 }
             }
-        }else{
-            if(hitOccured){
-                timed = true;
-                groundingTimer = StartCoroutine(checkGrounded());
-            }
+
         }
-        //print(hit);
-    }
-    private IEnumerator checkGrounded(){
-        yield return new WaitForSeconds(0.25f);
-        grounded = true;
-        canJump = true;
-        timed = false;
+
+        void CheckGrounded(){
+            
+            RaycastHit hit;
+            bool hitOccured = Physics.Raycast(transform.position, Vector3.down, out hit, 1.15f, 1);
+            Debug.DrawRay(transform.position, Vector3.down * 1.15f, Color.blue);
+            
+            if (hitOccured){
+                currentState = (int)States.Grounded;
+            }else{
+                currentState=(int)States.Airborn;
+            }
+            
+            if(previousState == (int)States.Grounded && currentState == (int)States.Grounded && timer==false){
+                StartCoroutine(checkGrounded());
+                timer=true;
+                grounded = true;
+            }else if(previousState == (int)States.Grounded && currentState == (int)States.Grounded && timer==true){
+                //do nothing while we wait for timer to see if we detected the ground 2 times while trying to jump
+                //
+                //print("DId the unexpected");
+            }else if(previousState == (int)States.Grounded && currentState==(int)States.Airborn){
+                grounded = false;
+            }else if(previousState==(int)States.Airborn && currentState==(int)States.Grounded){
+                grounded=true;
+            }else if(previousState == (int)States.Airborn && currentState == (int)States.Airborn){
+                grounded = false;
+            }
+
+            previousState=currentState;
+        }
+        private IEnumerator checkGrounded(){
+            yield return new WaitForSeconds(0.15f);
+            if(currentState==(int)States.Airborn){
+                grounded=false;
+                _rigidbody.AddForce(transform.up*4,ForceMode.VelocityChange);
+            }
+            timer = false;
+        }
     }
 }

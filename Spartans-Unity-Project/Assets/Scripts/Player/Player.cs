@@ -9,7 +9,7 @@ namespace Spartans.Players
     public class Player : NetworkBehaviour
     {
         private GameObject _mainCamera;
-        private PlayerMovement _playerMovement;
+        private PlayerMove _playerMovement;
         private PlayerCanvasManager _HUD;
         private Camera cam;
         private Rigidbody _rigidbody;
@@ -19,7 +19,7 @@ namespace Spartans.Players
             _rigidbody = GetComponent<Rigidbody>();
             _animator = GetComponent<Animator>();
 
-            _playerMovement = GetComponent<PlayerMovement>();
+            _playerMovement = GetComponent<PlayerMove>();
             _HUD = FindObjectOfType<PlayerCanvasManager>();
             _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             cam = GetComponentInChildren<Camera>();

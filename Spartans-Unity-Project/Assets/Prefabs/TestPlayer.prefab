@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6747882812849040487}
   - component: {fileID: 7896349977543512554}
   - component: {fileID: 4515680438469381961}
+  - component: {fileID: -7487361041085179215}
   - component: {fileID: 4626702300553820823}
   - component: {fileID: 4930972153745163863}
   - component: {fileID: -3581852013418749291}
@@ -96,7 +97,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1642613163398324905}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 159b6bea14cb1844aa63b6129ed52c63, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
@@ -119,6 +120,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &-7487361041085179215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1642613163398324905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2b6f5d37aac3c74c94f3889c4f2835c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4626702300553820823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,11 +146,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canJump: 1
   grounded: 0
-  jumpForce: 8
+  jumpForce: 12
   moveSpeed: 0.5
   MAX_SPEED: 8
   mouseSens: 1
-  timed: 0
+  timer: 0
 --- !u!114 &4930972153745163863
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -179,7 +192,7 @@ MonoBehaviour:
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   InLocalSpace: 0
-  Interpolate: 1
+  Interpolate: 0
   CanCommitToTransform: 0
 --- !u!114 &-1073335540608204333
 MonoBehaviour:
