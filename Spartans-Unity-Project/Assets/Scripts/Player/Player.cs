@@ -27,7 +27,7 @@ namespace Spartans.Players
             
             playerName = NetworkObject.NetworkObjectId.ToString();
             //print("playerName: " + playerName);
-
+            
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             if(IsLocalPlayer){
                 _mainCamera.SetActive(false);

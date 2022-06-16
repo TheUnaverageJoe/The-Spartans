@@ -35,9 +35,10 @@ namespace Spartans.Players{
             //previously in start
             _camera = GetComponentInChildren<Camera>();
 
-            if(!IsLocalPlayer){
-                _camera.gameObject.SetActive(false);
-            }
+            //This is already being done in Player on line 35
+            //if(!IsLocalPlayer){
+            //    _camera.gameObject.SetActive(false);
+            //}
         }
 
         // Update is called once per frame
@@ -82,6 +83,8 @@ namespace Spartans.Players{
 
         [ClientRpc]
         public void JumpResponseClientRpc(){
+            Vector3 horizPlane = new Vector3(_rigidbody.velocity.x, 0, _rigidbody.velocity.z);
+            _rigidbody.velocity = horizPlane;
             _rigidbody.AddForce(transform.up * jumpForce, ForceMode.VelocityChange);
             StartCoroutine(ResetJump());
         }
@@ -142,14 +145,12 @@ namespace Spartans.Players{
                 currentState=(int)States.Airborn;
             }
             
-            if(previousState == (int)States.Grounded && currentState == (int)States.Grounded && timer==false){
+            if(previousState == (int)States.Grounded && currentState == (int)States.Grounded && canJump){
+                grounded = true;
+            }else if(previousState == (int)States.Grounded && currentState == (int)States.Grounded && !canJump){
                 StartCoroutine(checkGrounded());
                 timer=true;
-                grounded = true;
-            }else if(previousState == (int)States.Grounded && currentState == (int)States.Grounded && timer==true){
-                //do nothing while we wait for timer to see if we detected the ground 2 times while trying to jump
-                //
-                //print("DId the unexpected");
+                grounded=false;
             }else if(previousState == (int)States.Grounded && currentState==(int)States.Airborn){
                 grounded = false;
             }else if(previousState==(int)States.Airborn && currentState==(int)States.Grounded){
@@ -161,10 +162,11 @@ namespace Spartans.Players{
             previousState=currentState;
         }
         private IEnumerator checkGrounded(){
-            yield return new WaitForSeconds(0.15f);
-            if(currentState==(int)States.Airborn){
-                grounded=false;
-                _rigidbody.AddForce(transform.up*4,ForceMode.VelocityChange);
+            yield return new WaitForSeconds(0.2f);
+            if(currentState==(int)States.Grounded){
+                print("We have been cleared for take off");
+                grounded=true;
+                _rigidbody.AddForce(transform.up*(jumpForce),ForceMode.VelocityChange);
             }
             timer = false;
         }

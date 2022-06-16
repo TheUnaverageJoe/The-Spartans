@@ -9,14 +9,16 @@ namespace Spartans{
     public class GameManager : MonoBehaviour
     {
         private List<Player> _players = new List<Player>();
-        
 
         void Start(){
-            /*
+            
             NetworkManager.Singleton.OnClientConnectedCallback += (id) => {
                 if(NetworkManager.Singleton.IsServer){
                     Player newPlayer;
                     NetworkManager.Singleton.ConnectedClients[id].PlayerObject.TryGetComponent<Player>(out newPlayer);
+                    //if(NetworkManager.Singleton.IsServer){
+                    //    newPlayer.Start();
+                    //}
                     _players.Add(newPlayer);
                     print("----Players----- ");
                     foreach(Player client in _players){
@@ -26,7 +28,7 @@ namespace Spartans{
 
                 }
             };
-            */
+            
         }
 
         void FixedUpdate(){
