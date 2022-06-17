@@ -16,7 +16,7 @@ namespace Spartans.Players{
         [SerializeField] private float moveSpeed = 0.05f;
         [SerializeField] private float MAX_SPEED = 3.0f;
         [SerializeField] private float mouseSens = 1.0f;
-        [SerializeField] private bool timer = false;
+        //[SerializeField] private bool timer = false;
         private Coroutine groundingTimer;
         private int previousState = -1;
         private int currentState = -1;
@@ -149,7 +149,7 @@ namespace Spartans.Players{
                 grounded = true;
             }else if(previousState == (int)States.Grounded && currentState == (int)States.Grounded && !canJump){
                 StartCoroutine(checkGrounded());
-                timer=true;
+                //timer=true;
                 grounded=false;
             }else if(previousState == (int)States.Grounded && currentState==(int)States.Airborn){
                 grounded = false;
@@ -168,7 +168,7 @@ namespace Spartans.Players{
                 grounded=true;
                 _rigidbody.AddForce(transform.up*(jumpForce),ForceMode.VelocityChange);
             }
-            timer = false;
+            //timer = false;
         }
     }
 }
