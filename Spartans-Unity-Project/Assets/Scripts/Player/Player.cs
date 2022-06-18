@@ -9,6 +9,7 @@ namespace Spartans.Players
     public class Player : NetworkBehaviour
     {
         private GameObject _mainCamera;
+        private GameManager _gameManager;
         private PlayerMove _playerMovement;
         private PlayerCanvasManager _HUD;
         private Camera cam;
@@ -20,7 +21,8 @@ namespace Spartans.Players
             _animator = GetComponent<Animator>();
 
             _playerMovement = GetComponent<PlayerMove>();
-            _HUD = FindObjectOfType<PlayerCanvasManager>();
+            _gameManager = FindObjectOfType<GameManager>();
+            _HUD = _gameManager.GetComponent<PlayerCanvasManager>();
             _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             cam = GetComponentInChildren<Camera>();
 
@@ -31,7 +33,7 @@ namespace Spartans.Players
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             if(IsLocalPlayer){
                 _mainCamera.SetActive(false);
-                _HUD.Init();
+                //_HUD.Init();
             }else{
                 //All players have a camera object on the prefab, disable all other cameras if its not ours
                 cam.gameObject.SetActive(false);
@@ -51,7 +53,7 @@ namespace Spartans.Players
                 }
 
                 if(Input.GetKeyDown(KeyCode.Tab)){
-                    _HUD.GetPanelManager().gameObject.SetActive(!_HUD.GetPanelManager().gameObject.activeSelf);
+                    PlayerCanvasManager.GetPanelManager().gameObject.SetActive(!PlayerCanvasManager.GetPanelManager().gameObject.activeSelf);
                 }
             }
         }

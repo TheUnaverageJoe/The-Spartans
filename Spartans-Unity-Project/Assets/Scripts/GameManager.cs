@@ -12,21 +12,21 @@ using Spartans.Players;
 namespace Spartans{
     public class GameManager : NetworkBehaviour
     {
+        PlayerCanvasManager _playerCanvasManager;
         private List<Player> _players = new List<Player>();
         private bool _pregame = true;
         private bool _inGame = false;
         [SerializeField] private GameObject connectionUI;
         private TMP_InputField _input;
         private UNetTransport connection;
+        private PanelManager.ConnectionInfo info;
 
         void Start(){
+            NetworkManager.Singleton.OnClientConnectedCallback += AddPlayer;
+            //NetworkManager.Singleton.OnClientConnectedCallback += RequestAddPlayerServerRPC;
 
-            if(NetworkManager.Singleton.IsServer){
-                NetworkManager.Singleton.OnClientConnectedCallback += AddPlayer;
-            }else if(!NetworkManager.Singleton.IsServer && NetworkManager.Singleton.IsClient){
-                NetworkManager.Singleton.OnClientConnectedCallback += RequestAddPlayerServerRPC;
-            }
-
+            _playerCanvasManager = FindObjectOfType<PlayerCanvasManager>();
+            _playerCanvasManager.Init();
             _input = connectionUI.GetComponentInChildren<TMP_InputField>();
             connection = NetworkManager.Singleton.GetComponent<UNetTransport>();
         }
@@ -41,20 +41,26 @@ namespace Spartans{
         }
 
         private void AddPlayer(ulong id){
-            {
+            print("add player called");
+            if(NetworkManager.Singleton.IsServer){
                 Player newPlayer;
                 NetworkManager.Singleton.ConnectedClients[id].PlayerObject.TryGetComponent<Player>(out newPlayer);
                 //if(NetworkManager.Singleton.IsServer){
                 //    newPlayer.Start();
                 //}
                 _players.Add(newPlayer);
-                PanelManager.ConnectionInfo info = new PanelManager.ConnectionInfo(newPlayer.name, 8, "Client");
-                PanelManager.NewConnection.Invoke(info);
+                info = new PanelManager.ConnectionInfo(newPlayer.name, 8, "Client");
+                //print(_playerCanvasManager);
+                //print(info.name + " " + info.ping + " " + info.connectedAs);
+                PlayerCanvasManager.GetPanelManager().AddActiveConnection(info);
+                //PanelManager.NewConnection.Invoke(info);
                 print("----Players----- ");
                 foreach(Player client in _players){
                     print("Player: " + client.playerName);
                 }
                 print("-----------------");
+            }else if(!NetworkManager.Singleton.IsServer && NetworkManager.Singleton.IsClient){
+                RequestAddPlayerServerRPC(id);
             }
         }
         [ServerRpc]
@@ -62,13 +68,15 @@ namespace Spartans{
             Player newPlayer;
             NetworkManager.Singleton.ConnectedClients[id].PlayerObject.TryGetComponent<Player>(out newPlayer);
             PanelManager.ConnectionInfo info = new PanelManager.ConnectionInfo(newPlayer.name, 8, "Client");
+            print("Got this far");
 
             ReplyAddPlayerClientRpc(info);
         }
         [ClientRpc]
         private void ReplyAddPlayerClientRpc(PanelManager.ConnectionInfo info){//Player player parameter 
             //_players.Add(player);  if we pass Player
-            PanelManager.NewConnection.Invoke(info);
+            //PanelManager.NewConnection.Invoke(info);
+            PlayerCanvasManager.GetPanelManager().AddActiveConnection(info);
         }
         public void StartServer(){
             NetworkManager.Singleton.StartServer();

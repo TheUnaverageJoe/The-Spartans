@@ -36,8 +36,10 @@ namespace Spartans.UI{
             connectionInfoObjects = new List<GameObject>();
             NewConnection = new UnityEvent<ConnectionInfo>();
             NewConnection.AddListener(AddActiveConnection);
+            //print("Finished Init");
         }
         public void AddActiveConnection(ConnectionInfo connection){
+            //print("Debug info AddingConnection");
             activeConnections.Add(connection);
 
             GameObject temp = Instantiate(connectionTextPrefab, Vector3.zero, Quaternion.identity,transform);
@@ -46,17 +48,17 @@ namespace Spartans.UI{
             
         }
         private string FormatConnectionText(string name, float ping, string type){
-            const int lineSpace = 40;
+            //const int lineSpace = 40;
             const int nameSpace = 20;
             const int pingSpace = 8;
-            const int typeSpace = 12;
+            //const int typeSpace = 12;
             int nameLen = name.Length;
             int pingDigits = ping.ToString().Length;
             int typeLen = type.Length;
 
             string output = "";
             for(int k=0; k<nameSpace; k++){
-                if(name[k]!=null){
+                if(k<nameLen){
                     output+=name[k];
                 }
                 output += " ";

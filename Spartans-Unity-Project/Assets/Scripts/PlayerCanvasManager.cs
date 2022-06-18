@@ -8,7 +8,7 @@ using Spartans.UI;
 namespace Spartans.UI{
     public class PlayerCanvasManager : MonoBehaviour
     {
-        private PanelManager _connectionsRegion;
+        private static PanelManager _connectionsRegion;
         private PopUpText _alert;
         public void Init(){
             //get rectangular region at top of screen
@@ -19,7 +19,7 @@ namespace Spartans.UI{
             //_alert.gameObject.SetActive(false);
         }
 
-        public PanelManager GetPanelManager(){
+        public static PanelManager GetPanelManager(){
             return _connectionsRegion;
         }
     }
