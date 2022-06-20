@@ -39,7 +39,7 @@ namespace Spartans.UI{
             //print("Finished Init");
         }
         public void AddActiveConnection(ConnectionInfo connection){
-            //print("Debug info AddingConnection");
+            print("Debug info AddingConnection");
             activeConnections.Add(connection);
 
             GameObject temp = Instantiate(connectionTextPrefab, Vector3.zero, Quaternion.identity,transform);
