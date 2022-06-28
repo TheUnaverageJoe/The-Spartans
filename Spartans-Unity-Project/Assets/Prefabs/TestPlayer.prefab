@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 4930972153745163863}
   - component: {fileID: -3581852013418749291}
   - component: {fileID: -1073335540608204333}
-  m_Layer: 2
+  m_Layer: 6
   m_Name: TestPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,7 +150,6 @@ MonoBehaviour:
   moveSpeed: 0.5
   MAX_SPEED: 8
   mouseSens: 1
-  timer: 0
 --- !u!114 &4930972153745163863
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -218,7 +217,7 @@ GameObject:
   - component: {fileID: 1687447006534482245}
   - component: {fileID: 4791942336994241637}
   - component: {fileID: 7185165598506637737}
-  m_Layer: 2
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -312,7 +311,7 @@ GameObject:
   - component: {fileID: 4093922656247475690}
   - component: {fileID: 3324306706304905170}
   - component: {fileID: 2155830238024122567}
-  m_Layer: 2
+  m_Layer: 6
   m_Name: playerCam
   m_TagString: Untagged
   m_Icon: {fileID: 0}

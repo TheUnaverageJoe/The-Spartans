@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Netcode.Transports.UNET;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine.UI;
 using TMPro;
 
@@ -10,7 +10,7 @@ using Spartans.UI;
 using Spartans.Players;
 
 namespace Spartans{
-    public class GameManager : NetworkBehaviour
+    public class GameManager : MonoBehaviour
     {
         PlayerCanvasManager _playerCanvasManager;
         private List<Player> _players = new List<Player>();
@@ -18,7 +18,7 @@ namespace Spartans{
         private bool _inGame = false;
         [SerializeField] private GameObject connectionUI;
         private TMP_InputField _input;
-        private UNetTransport connection;
+        private UnityTransport connection;
         private PanelManager.ConnectionInfo info;
 
         void Start(){
@@ -28,7 +28,7 @@ namespace Spartans{
             _playerCanvasManager = FindObjectOfType<PlayerCanvasManager>();
             _playerCanvasManager.Init();
             _input = connectionUI.GetComponentInChildren<TMP_InputField>();
-            connection = NetworkManager.Singleton.GetComponent<UNetTransport>();
+            connection = NetworkManager.Singleton.GetComponent<UnityTransport>();
         }
 
         void FixedUpdate(){
@@ -90,9 +90,9 @@ namespace Spartans{
         }
         public void JoinGame(){
             if(_input.text.Length < 7 || _input.text == null){
-                connection.ConnectAddress = "127.0.0.1";
+                connection.ConnectionData.Address = "127.0.0.1";
             }else{
-                connection.ConnectAddress = _input.text;
+                connection.ConnectionData.Address = _input.text;
             }
             NetworkManager.Singleton.StartClient();
             _pregame = false;

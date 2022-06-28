@@ -82,9 +82,9 @@ namespace Spartans.Players
         }
         //OnDrawGizmos is being usec purly for debugging  purposes to see where the hitbox is in world space
         private void OnDrawGizmos() {
-            Gizmos.color = Color.red;
+            //Gizmos.color = Color.red;
             //Use the same vars you use to draw your Overlap SPhere to draw your Wire Sphere.
-            Gizmos.DrawWireCube(transform.position, new Vector3(1.4f, 0.1f, 1.4f));
+            //Gizmos.DrawWireCube(transform.position, new Vector3(1.4f, 0.1f, 1.4f));
         }
     }
 }

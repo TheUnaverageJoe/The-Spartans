@@ -70,6 +70,7 @@ namespace Spartans.Players{
             }
         }
         void FixedUpdate(){
+            if(!IsOwner) return;
             CheckGrounded();
         }
 
@@ -130,14 +131,13 @@ namespace Spartans.Players{
                     _rigidbody.AddForce(moveDir*moveSpeed, ForceMode.VelocityChange);
                 }
             }
-
         }
 
         void CheckGrounded(){
             
             RaycastHit hit;
-            bool hitOccured = Physics.Raycast(transform.position, Vector3.down, out hit, 1.15f, 1);
-            Debug.DrawRay(transform.position, Vector3.down * 1.15f, Color.blue);
+            bool hitOccured = Physics.Raycast(transform.position-Vector3.down*0.5f, Vector3.down, out hit, 1.15f, 1);
+            Debug.DrawRay(transform.position-Vector3.down*0.5f, Vector3.down * 1.15f, Color.blue);
             
             if (hitOccured){
                 currentState = (int)States.Grounded;
