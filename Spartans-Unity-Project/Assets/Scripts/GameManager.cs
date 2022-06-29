@@ -19,10 +19,10 @@ namespace Spartans{
         [SerializeField] private GameObject connectionUI;
         private TMP_InputField _input;
         private UnityTransport connection;
-        private PanelManager.ConnectionInfo info;
+        //private PanelManager.ConnectionInfo info;
 
         void Start(){
-            NetworkManager.Singleton.OnClientConnectedCallback += AddPlayer;
+            //NetworkManager.Singleton.OnClientConnectedCallback += AddPlayer;
             //NetworkManager.Singleton.OnClientConnectedCallback += RequestAddPlayerServerRPC;
 
             _playerCanvasManager = FindObjectOfType<PlayerCanvasManager>();
@@ -49,10 +49,10 @@ namespace Spartans{
                 //    newPlayer.Start();
                 //}
                 _players.Add(newPlayer);
-                info = new PanelManager.ConnectionInfo(newPlayer.name, 8, "Client");
+                ////info = new PanelManager.ConnectionInfo(newPlayer.name, 8, "Client");
                 //print(_playerCanvasManager);
                 //print(info.name + " " + info.ping + " " + info.connectedAs);
-                PlayerCanvasManager.GetPanelManager().AddActiveConnection(info);
+                ////PlayerCanvasManager.GetPanelManager().AddActiveConnection(info);
                 //PanelManager.NewConnection.Invoke(info);
                 print("----Players----- ");
                 foreach(Player client in _players){

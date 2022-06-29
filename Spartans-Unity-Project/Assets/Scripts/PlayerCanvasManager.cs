@@ -9,6 +9,7 @@ namespace Spartans.UI{
     public class PlayerCanvasManager : MonoBehaviour
     {
         private static PanelManager _connectionsRegion;
+        private Healthbar _healthBar;
         private PopUpText _alert;
         public void Init(){
             //get rectangular region at top of screen
@@ -17,6 +18,9 @@ namespace Spartans.UI{
             _connectionsRegion.Init();
             _connectionsRegion.gameObject.SetActive(false);
             //_alert.gameObject.SetActive(false);
+
+            _healthBar = GetComponentInChildren<Healthbar>();
+            _healthBar.Init();
         }
 
         public static PanelManager GetPanelManager(){
