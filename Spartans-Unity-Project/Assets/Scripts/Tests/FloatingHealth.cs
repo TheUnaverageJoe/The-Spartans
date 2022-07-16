@@ -18,7 +18,7 @@ public class FloatingHealth : MonoBehaviour
         }else{
             //keep health bar next to player in the world space
             this.transform.rotation = _player.transform.rotation;
-            this.transform.position = _player.transform.position + (Vector3.up * 4);
+            this.transform.position = _player.transform.position + (Vector3.up * 4.5f);
         }
     }
 }
