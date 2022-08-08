@@ -20,12 +20,15 @@ namespace Spartans.UI{
             //_alert.gameObject.SetActive(false);
 
             _healthBar = GetComponentInChildren<Healthbar>();
-            _healthBar.Init();
-            _healthBar.gameObject.SetActive(false);
+            if(_healthBar != null){
+                _healthBar.Init();
+                _healthBar.gameObject.SetActive(false);
+            }
         }
 
         public void OnJoinGame(){
-            _healthBar.gameObject.SetActive(true);
+            if(_healthBar != null)
+                _healthBar.gameObject.SetActive(true);
         }
 
         public static PanelManager GetPanelManager(){

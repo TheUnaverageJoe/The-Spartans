@@ -1,14 +1,16 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+
 
 namespace Spartans.Players{
     public class PlayerMove : NetworkBehaviour
     {
         private Rigidbody _rigidbody;
         private Animator _animator;
-        //private Vector3 _input;
+        private Vector3 _lastSentInput;
         private Camera _camera;
         [SerializeField] private bool canJump = true;
         [SerializeField] private bool grounded = false;
@@ -20,6 +22,8 @@ namespace Spartans.Players{
         private Coroutine groundingTimer;
         private int previousState = -1;
         private int currentState = -1;
+
+        public event Action onSpacePress;
 
         enum States{Grounded, Airborn}
 
@@ -65,7 +69,10 @@ namespace Spartans.Players{
             if(grounded){
                 Vector3 input = new Vector3(Input.GetAxis("Horizontal"), 0 , Input.GetAxis("Vertical"));
                 //print(input);
-                requestMoveServerRpc(input);
+                if(input != _lastSentInput){
+                    requestMoveServerRpc(input);
+                    _lastSentInput = input;
+                }
                 //print("After Move: " + _rigidbody.velocity);
             }
         }
@@ -76,7 +83,7 @@ namespace Spartans.Players{
 
         [ServerRpc]
         public void RequestJumpServerRpc(){
-            print("Server and client grounded var out of sync");
+            //print("Server and client grounded var out of sync");
             if(!grounded) return;
             //_rigidbody.AddForce(transform.up * jumpForce, ForceMode.VelocityChange);
             JumpResponseClientRpc();

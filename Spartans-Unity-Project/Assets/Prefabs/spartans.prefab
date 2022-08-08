@@ -1409,9 +1409,9 @@ MonoBehaviour:
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
-  SyncRotAngleX: 1
+  SyncRotAngleX: 0
   SyncRotAngleY: 1
-  SyncRotAngleZ: 1
+  SyncRotAngleZ: 0
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
@@ -1420,7 +1420,6 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 0
-  CanCommitToTransform: 0
 --- !u!114 &-6915281490330311222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1434,8 +1433,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Animator: {fileID: 7975495182481887495}
-  m_ParameterSendBits: 0
-  m_SendRate: 0.1
 --- !u!114 &5019167942193439323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1462,6 +1459,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   handRef: {fileID: 352204241832676489}
   objRef: {fileID: 3934991392530521227, guid: 6e1c3c82face58b4f8ec3ff23a97ac45, type: 3}
+  parentObj: {fileID: 0}
 --- !u!1 &7178700922430649940
 GameObject:
   m_ObjectHideFlags: 0

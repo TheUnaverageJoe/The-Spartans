@@ -55,8 +55,8 @@ namespace Spartans{
         }
 
         private void JoinGameCallback(){
-            _playerCanvasManager.OnJoinGame();
             connectionUI.gameObject.SetActive(false);
+            _playerCanvasManager.OnJoinGame();
         }
     }
 }

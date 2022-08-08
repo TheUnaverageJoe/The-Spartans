@@ -10,6 +10,8 @@ public class WeaponHit : MonoBehaviour
     [SerializeField] private GameObject objRef;
     [SerializeField] private GameObject parentObj;
 
+    public event System.Action<int> onWeaponHit;
+
     // Start is called before the first frame update
     void Start()
     {
