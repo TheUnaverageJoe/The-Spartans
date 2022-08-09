@@ -10,12 +10,20 @@ namespace Spartans.Players{
 
 
         //int param is new health value
-        public event System.Action<int> onHealthChanged;
+        public static event System.Action<int, Health> onHealthChanged;
 
         private void Start(){
             _maxHitpoints = 3;
             _hitpoints = _maxHitpoints;
             
+            
+        }
+
+        public int GetMaxHitpoints(){
+            return _maxHitpoints;
+        }
+        public int GetHitpoints(){
+            return _hitpoints;
         }
     }
 }

@@ -171,7 +171,7 @@ namespace Spartans.Players{
         private IEnumerator checkGrounded(){
             yield return new WaitForSeconds(0.2f);
             if(currentState==(int)States.Grounded){
-                print("We have been cleared for take off");
+                //print("We have been cleared for take off");
                 grounded=true;
                 _rigidbody.AddForce(transform.up*(jumpForce),ForceMode.VelocityChange);
             }

@@ -4,42 +4,46 @@ using UnityEngine;
 
 using Unity.Netcode;
 
-public class WeaponHit : MonoBehaviour
+public class WeaponHit : NetworkBehaviour
 {
     [SerializeField] private Transform handRef;
     [SerializeField] private GameObject objRef;
     [SerializeField] private GameObject parentObj;
+    GameObject newObj;
 
-    public event System.Action<int> onWeaponHit;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        parentObj = GameObject.Find("Testing");   
-    }
+    public static event System.Action<int, WeaponHit> onWeaponHit;
 
     // Update is called once per frame
     void Update()
     {
+        if(!IsLocalPlayer) return;
         Debug.DrawRay(handRef.transform.position, transform.TransformDirection(handRef.transform.up), Color.magenta, 1);
 
         if(Input.GetKeyDown(KeyCode.Space)){
-            if(NetworkManager.Singleton.IsServer)
-                Instantiate(objRef,Vector3.zero,Quaternion.identity,parentObj.transform);
+            if(NetworkManager.Singleton.IsServer){
+                newObj = NetworkManager.Instantiate(objRef,Vector3.zero,Quaternion.identity);
+                newObj.GetComponent<NetworkObject>().Spawn();
+            }
             else
                 connectedServerRpc();
 
         }
     }
 
+    //Proof of concept for spawning objects
     [ServerRpc]
     public void connectedServerRpc(){
-        connectedClientRpc();
+        //connectedClientRpc();
+        newObj = NetworkManager.Instantiate(objRef,Vector3.zero,Quaternion.identity);
+        newObj.GetComponent<NetworkObject>().Spawn();
     }
+
+    //NOT IN USE ATM
+    //_____________________________________________________
     [ClientRpc]
     public void connectedClientRpc(){
         print("called from server");
         if(!NetworkManager.Singleton.IsServer)
-        Instantiate(objRef,Vector3.zero,Quaternion.identity,parentObj.transform);
+        NetworkManager.Instantiate(objRef,Vector3.zero,Quaternion.identity);
     }
 }
