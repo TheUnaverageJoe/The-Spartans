@@ -16,7 +16,8 @@ namespace Spartans.Players
         private Rigidbody _rigidbody;
         private Animator _animator;
         public string playerName{ get; private set; }
-        public void Start(){
+
+        public void Awake(){
             _rigidbody = GetComponent<Rigidbody>();
             _animator = GetComponent<Animator>();
 
@@ -25,11 +26,14 @@ namespace Spartans.Players
             _HUD = _gameManager.GetComponent<PlayerCanvasManager>();
             _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             cam = GetComponentInChildren<Camera>();
-
-            
             playerName = NetworkObject.NetworkObjectId.ToString();
-            //print("playerName: " + playerName);
+        }
+        public void OnEnable(){
             
+        }
+        public void Start(){
+            print("Player name is: " + playerName);
+            print("Is local player: " + IsLocalPlayer);
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             if(IsLocalPlayer){
                 _mainCamera.SetActive(false);

@@ -11,6 +11,7 @@ namespace Spartans.Players{
         private Rigidbody _rigidbody;
         private Animator _animator;
         private Vector3 _lastSentInput;
+        private Vector3 input;
         private Camera _camera;
         [SerializeField] private bool canJump = true;
         [SerializeField] private bool grounded = false;
@@ -23,7 +24,7 @@ namespace Spartans.Players{
         private int previousState = -1;
         private int currentState = -1;
 
-        public event Action onSpacePress;
+        //public event Action onSpacePress;
 
         enum States{Grounded, Airborn}
 
@@ -35,7 +36,7 @@ namespace Spartans.Players{
             previousState = -1;
             currentState = -1;
 
-            Physics.gravity = new Vector3(0, -20f, 0);
+            //Physics.gravity = new Vector3(0, -20f, 0);
             //previously in start
             _camera = GetComponentInChildren<Camera>();
 
@@ -52,13 +53,11 @@ namespace Spartans.Players{
             if(!IsLocalPlayer){
                 return;
             }
-            //CheckGrounded();
             //Jump
             if(Input.GetButtonDown("Jump") && canJump && grounded){
                 RequestJumpServerRpc();
                 canJump = false;
                 grounded = false;
-                //print(_rigidbody.velocity);
             }
             //Update rotation
             float mouseX = Input.GetAxis("Mouse X");
@@ -67,24 +66,30 @@ namespace Spartans.Players{
             }
             //Update movement
             if(grounded){
-                Vector3 input = new Vector3(Input.GetAxis("Horizontal"), 0 , Input.GetAxis("Vertical"));
-                //print(input);
+                input = new Vector3(Input.GetAxisRaw("Horizontal"), 0 , Input.GetAxisRaw("Vertical"));
                 if(input != _lastSentInput){
-                    requestMoveServerRpc(input);
                     _lastSentInput = input;
                 }
-                //print("After Move: " + _rigidbody.velocity);
             }
         }
+        //server needs to update grounded state for all players on server side
+        //if not the server or a local player object, aka the player spawned when join game, dont update
         void FixedUpdate(){
-            if(!IsOwner) return;
-            CheckGrounded();
+            if(IsServer){
+                CheckGrounded();
+            }
+            if(IsLocalPlayer){
+                CheckGrounded();
+                requestMoveServerRpc(input);
+            }
         }
 
         [ServerRpc]
         public void RequestJumpServerRpc(){
             //print("Server and client grounded var out of sync");
             if(!grounded) return;
+            canJump = false;
+            grounded = false;
             //_rigidbody.AddForce(transform.up * jumpForce, ForceMode.VelocityChange);
             JumpResponseClientRpc();
         }
@@ -92,7 +97,7 @@ namespace Spartans.Players{
         [ClientRpc]
         public void JumpResponseClientRpc(){
             Vector3 horizPlane = new Vector3(_rigidbody.velocity.x, 0, _rigidbody.velocity.z);
-            _rigidbody.velocity = horizPlane;
+            _rigidbody.velocity = horizPlane.normalized;
             _rigidbody.AddForce(transform.up * jumpForce, ForceMode.VelocityChange);
             StartCoroutine(ResetJump());
         }
@@ -108,6 +113,7 @@ namespace Spartans.Players{
         }
         [ServerRpc]
         public void requestMoveServerRpc(Vector3 dir){
+            //if(!canJump) return;
             Vector3 moveDir = dir.normalized;
             if (moveDir == Vector3.zero && grounded && canJump){
                 _rigidbody.velocity = Vector3.zero;
@@ -134,17 +140,18 @@ namespace Spartans.Players{
                     print("denied movement change, cant accelerate further");
                     return;
                 }else{
+                    if(!grounded) return;
                     moveDir = transform.TransformDirection(moveDir);
-                    _rigidbody.AddForce(moveDir*moveSpeed, ForceMode.VelocityChange);
+                    _rigidbody.AddForce(moveDir.normalized*moveSpeed, ForceMode.VelocityChange);
                 }
             }
         }
 
         void CheckGrounded(){
-            
+            //if(!canJump) return;
             RaycastHit hit;
-            bool hitOccured = Physics.Raycast(transform.position-Vector3.down*0.5f, Vector3.down, out hit, 1.15f, 1);
-            Debug.DrawRay(transform.position-Vector3.down*0.5f, Vector3.down * 1.15f, Color.blue);
+            bool hitOccured = Physics.Raycast(transform.position-(Vector3.down*0.5f), Vector3.down, out hit, 0.6f, 1);
+            Debug.DrawRay(transform.position-(Vector3.down*0.6f), Vector3.down * 0.5f, Color.blue);
             
             if (hitOccured){
                 currentState = (int)States.Grounded;
@@ -156,7 +163,6 @@ namespace Spartans.Players{
                 grounded = true;
             }else if(previousState == (int)States.Grounded && currentState == (int)States.Grounded && !canJump){
                 StartCoroutine(checkGrounded());
-                //timer=true;
                 grounded=false;
             }else if(previousState == (int)States.Grounded && currentState==(int)States.Airborn){
                 grounded = false;
@@ -173,7 +179,7 @@ namespace Spartans.Players{
             if(currentState==(int)States.Grounded){
                 //print("We have been cleared for take off");
                 grounded=true;
-                _rigidbody.AddForce(transform.up*(jumpForce),ForceMode.VelocityChange);
+                
             }
             //timer = false;
         }

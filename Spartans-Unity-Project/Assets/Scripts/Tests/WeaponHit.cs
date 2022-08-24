@@ -19,7 +19,7 @@ public class WeaponHit : NetworkBehaviour
         if(!IsLocalPlayer) return;
         Debug.DrawRay(handRef.transform.position, transform.TransformDirection(handRef.transform.up), Color.magenta, 1);
 
-        if(Input.GetKeyDown(KeyCode.Space)){
+        if(Input.GetKeyDown(KeyCode.F)){
             if(NetworkManager.Singleton.IsServer){
                 newObj = NetworkManager.Instantiate(objRef,Vector3.zero,Quaternion.identity);
                 newObj.GetComponent<NetworkObject>().Spawn();
