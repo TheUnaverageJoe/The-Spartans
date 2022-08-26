@@ -28,8 +28,8 @@ namespace Spartans{
             _joinedGame = new UnityEvent();
             _joinedGame.AddListener(JoinGameCallback);
 
-            _playerCanvasManager = FindObjectOfType<PlayerCanvasManager>();
-            _playerCanvasManager.Init();
+            //_playerCanvasManager = FindObjectOfType<PlayerCanvasManager>();
+            //_playerCanvasManager.Init();
             
             _input = connectionUI.GetComponentInChildren<TMP_InputField>();
             connection = NetworkManager.Singleton.GetComponent<UnityTransport>();
@@ -58,7 +58,7 @@ namespace Spartans{
 
         private void JoinGameCallback(){
             connectionUI.gameObject.SetActive(false);
-            _playerCanvasManager.OnJoinGame();
+            //_playerCanvasManager.OnJoinGame();
         }
     }
 }

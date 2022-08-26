@@ -97,7 +97,7 @@ namespace Spartans.Players{
         [ClientRpc]
         public void JumpResponseClientRpc(){
             Vector3 horizPlane = new Vector3(_rigidbody.velocity.x, 0, _rigidbody.velocity.z);
-            _rigidbody.velocity = horizPlane.normalized;
+            //_rigidbody.velocity = horizPlane.normalized;
             _rigidbody.AddForce(transform.up * jumpForce, ForceMode.VelocityChange);
             StartCoroutine(ResetJump());
         }
@@ -171,7 +171,6 @@ namespace Spartans.Players{
             }else if(previousState == (int)States.Airborn && currentState == (int)States.Airborn){
                 grounded = false;
             }
-
             previousState=currentState;
         }
         private IEnumerator checkGrounded(){
@@ -179,7 +178,6 @@ namespace Spartans.Players{
             if(currentState==(int)States.Grounded){
                 //print("We have been cleared for take off");
                 grounded=true;
-                
             }
             //timer = false;
         }

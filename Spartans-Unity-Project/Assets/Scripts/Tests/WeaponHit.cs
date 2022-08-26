@@ -40,6 +40,10 @@ public class WeaponHit : NetworkBehaviour
             if(Physics.Raycast(handRef.transform.position, transform.TransformDirection(handRef.transform.up), out _lastAttackedObject, 1, attackMask)){
                 if(!_hitPlayers.Contains(_lastAttackedObject.transform)){
                     Health _healthAffected = _lastAttackedObject.transform.gameObject.GetComponent<Health>();
+                    if(_healthAffected == GetComponent<Health>()){
+                        print("You cant hit yourself silly");
+                        return;
+                    }
                     _healthAffected.TakeDamage(_playerDamage);
                     print("Did damage to: " + _healthAffected.GetHitpoints());
                     _hitPlayers.Add(_healthAffected.transform);
