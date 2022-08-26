@@ -43,6 +43,7 @@ namespace Spartans.Players{
             //if(!IsLocalPlayer){
             //    _camera.gameObject.SetActive(false);
             //}
+            Health.onDie += OnDieCallback;
         }
 
         // Update is called once per frame
@@ -181,6 +182,14 @@ namespace Spartans.Players{
                 
             }
             //timer = false;
+        }
+
+        private void OnDieCallback(Health reference){
+            if(GetComponent<Health>() == reference){
+                this.GetComponent<Rigidbody>().useGravity = false;
+                Destroy(this.GetComponent<BoxCollider>());
+                Destroy(this);
+            }
         }
     }
 }

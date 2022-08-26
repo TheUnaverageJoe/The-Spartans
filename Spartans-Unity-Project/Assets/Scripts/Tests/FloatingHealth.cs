@@ -19,6 +19,7 @@ namespace Spartans.UI{
             _slider = GetComponent<Slider>();
             _nameText = GetComponentInChildren<Text>();
             Health.onHealthChanged += HandleOnHealthChange;
+            Health.onDie += OnDieCallback;
         }
         public void Start(){
             Camera[] temp = FindObjectsOfType<Camera>(false);
@@ -66,7 +67,10 @@ namespace Spartans.UI{
         }
         public void OnDisable(){
             Health.onHealthChanged -= HandleOnHealthChange;
-            //print("Removed Listener");
+            print("Removed Listener");
+        }
+        private void OnDieCallback(Health reference){
+            this.gameObject.SetActive(false);
         }
 
     }

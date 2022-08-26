@@ -26,13 +26,13 @@ namespace Spartans.Players
             _HUD = _gameManager.GetComponent<PlayerCanvasManager>();
             _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             cam = GetComponentInChildren<Camera>();
+            
         }
         public void OnEnable(){
-            
         }
         public void Start(){
             playerName = "Player " + NetworkObjectId;
-            print("Player name is: " + playerName);
+            //print("Player name is: " + playerName);
             //print("Is local player: " + IsLocalPlayer);
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             if(IsLocalPlayer){
