@@ -36,7 +36,6 @@ namespace Spartans.Players{
             previousState = -1;
             currentState = -1;
 
-            //Physics.gravity = new Vector3(0, -20f, 0);
             //previously in start
             _camera = GetComponentInChildren<Camera>();
 
@@ -113,7 +112,7 @@ namespace Spartans.Players{
         }
         [ServerRpc]
         public void requestMoveServerRpc(Vector3 dir){
-            //if(!canJump) return;
+            if(!grounded) return;
             Vector3 moveDir = dir.normalized;
             if (moveDir == Vector3.zero && grounded && canJump){
                 _rigidbody.velocity = Vector3.zero;

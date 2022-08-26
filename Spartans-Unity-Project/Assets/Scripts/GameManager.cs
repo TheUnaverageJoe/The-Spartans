@@ -33,6 +33,8 @@ namespace Spartans{
             
             _input = connectionUI.GetComponentInChildren<TMP_InputField>();
             connection = NetworkManager.Singleton.GetComponent<UnityTransport>();
+            
+            Physics.gravity = new Vector3(0, -20f, 0);
         }
 
         public void StartServer(){

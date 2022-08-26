@@ -3,39 +3,40 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Spartans.Players;
+using Unity.Netcode;
 
 namespace Spartans.UI{
     public class FloatingHealth : MonoBehaviour
     {
         private GameObject _player;
-        private Transform camTransform;
+        [SerializeField]private Transform camTransform;
         private Slider _slider;
-        private string _name;
+        private Text _nameText;
 
         public void Awake(){
             _player =   GetComponentInParent<Canvas>().gameObject
                         .GetComponentInParent<Rigidbody>().gameObject;
             _slider = GetComponent<Slider>();
-
-            //camTransform = Camera.allCameras[0].transform;
-            //foreach(Camera cam in Camera.allCameras){
-            //    print("cam pos: " + cam.transform.position);
-            //}
-            //print("Num Cams: " + Camera.allCameras.Length);
+            _nameText = GetComponentInChildren<Text>();
             Health.onHealthChanged += HandleOnHealthChange;
-            //print("_player's name: " + _player.name);
         }
         public void Start(){
             Camera[] temp = FindObjectsOfType<Camera>(false);
-            print("enabled cams: " + temp.Length);
-            foreach(Camera cam in temp){
-                print("Name: " + cam.name);
+            /*print("enabled cams: " + temp.Length);
+            if(_player.GetComponent<NetworkObject>().IsLocalPlayer){
+                int x = 0;
+                foreach(Camera cam in temp){
+                    ++x;
+                    print("Cam " + x + ": " + cam.name);
+                }
             }
+            */
             camTransform = temp[0].transform;
+            _nameText.text = _player.GetComponent<Player>().playerName.ToString();
         }
 
-        // Update is called once per frame
-        void Update()
+        // LateUpdate is called once per frame, Called after Update but before render cycle
+        void LateUpdate()
         {
             //keep health bar next to player in the world space
             this.transform.rotation = camTransform.rotation;
@@ -44,7 +45,7 @@ namespace Spartans.UI{
 
         private void HandleOnHealthChange(Health reference, int value){
             if(_player.GetComponent<Health>() != null && reference != _player.GetComponent<Health>()){
-                print("Not my update");
+                //print("Not my update");
                 return;
             }else{
                 //print("ref val: " + _player.GetComponent<Health>().name);
@@ -60,7 +61,7 @@ namespace Spartans.UI{
             }
             float returnVal = (float)value / maxHP;
             _slider.value = returnVal;
-            print("Set slider to: " + _slider.value);
+            //print("Set slider to: " + _slider.value);
             
         }
         public void OnDisable(){

@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class EventHandler : MonoBehaviour
-{
-    
+namespace Spartans.Events{
+    public class EventHandler : MonoBehaviour
+    {
+        
+
+    }
 }
