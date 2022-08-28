@@ -30,8 +30,7 @@ namespace Spartans.Players
             cam = GetComponentInChildren<Camera>();
             
         }
-        public void OnEnable(){
-        }
+
         public void Start(){
             playerName = "Player " + NetworkObjectId;
             //print("Player name is: " + playerName);
@@ -86,6 +85,15 @@ namespace Spartans.Players
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
             }
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            if(!IsServer) return;
+            print("HI MY NAME IS: " + playerName);
+            base.OnNetworkSpawn();
+            transform.position = new Vector3(Random.Range(-25,25), 1, Random.Range(-25,25));
+            print("MOVE MMEEEEE");
         }
         //OnDrawGizmos is being usec purly for debugging  purposes to see where the hitbox is in world space
         private void OnDrawGizmos() {

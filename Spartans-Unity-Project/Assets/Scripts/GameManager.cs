@@ -9,6 +9,7 @@ using UnityEngine.Events;
 
 using Spartans.UI;
 using Spartans.Players;
+using System;
 
 namespace Spartans{
     public class GameManager : MonoBehaviour
@@ -22,7 +23,8 @@ namespace Spartans{
         public UnityEvent _joinedGame;
 
         void Start(){
-            //NetworkManager.Singleton.OnClientConnectedCallback += AddPlayer;
+            //if(NetworkManager.Singleton.IsServer)
+                //NetworkManager.Singleton.OnClientConnectedCallback += RandomizeSpawn;
             //NetworkManager.Singleton.OnClientConnectedCallback += RequestAddPlayerServerRPC;
 
             _joinedGame = new UnityEvent();
@@ -36,6 +38,7 @@ namespace Spartans{
             
             Physics.gravity = new Vector3(0, -20f, 0);
         }
+
 
         public void StartServer(){
             NetworkManager.Singleton.StartServer();
