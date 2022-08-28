@@ -68,12 +68,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.netcode.gameobjects": {
-      "version": "1.0.0-pre.10",
+      "version": "1.0.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.nuget.mono-cecil": "1.10.1",
-        "com.unity.transport": "1.1.0"
+        "com.unity.transport": "1.2.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -126,8 +126,8 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.transport": {
-      "version": "1.1.0",
-      "depth": 0,
+      "version": "1.2.0",
+      "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.collections": "1.2.4",

@@ -13,6 +13,7 @@ namespace Spartans.Players{
         private Vector3 _lastSentInput;
         private Vector3 input;
         private Camera _camera;
+        private Health _myHealth;
         [SerializeField] private bool canJump = true;
         [SerializeField] private bool grounded = false;
         [SerializeField] private float jumpForce = 8.0f;
@@ -38,12 +39,13 @@ namespace Spartans.Players{
 
             //previously in start
             _camera = GetComponentInChildren<Camera>();
+            _myHealth = GetComponent<Health>();
 
             //This is already being done in Player on line 35
             //if(!IsLocalPlayer){
             //    _camera.gameObject.SetActive(false);
             //}
-            Health.onDie += OnDieCallback;
+            _myHealth.onDie += OnDieCallback;
         }
 
         // Update is called once per frame
@@ -182,12 +184,10 @@ namespace Spartans.Players{
             //timer = false;
         }
 
-        private void OnDieCallback(Health reference){
-            if(GetComponent<Health>() == reference){
-                this.GetComponent<Rigidbody>().useGravity = false;
-                Destroy(this.GetComponent<BoxCollider>());
-                Destroy(this);
-            }
+        private void OnDieCallback(){
+            this.GetComponent<Rigidbody>().useGravity = false;
+            Destroy(this.GetComponent<BoxCollider>());
+            Destroy(this);
         }
     }
 }

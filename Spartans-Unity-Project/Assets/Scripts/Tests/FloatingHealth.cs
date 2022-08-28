@@ -12,16 +12,19 @@ namespace Spartans.UI{
         [SerializeField]private Transform camTransform;
         private Slider _slider;
         private Text _nameText;
+        private Health _myHealth;
 
-        public void Awake(){
+        //stand in for start and awake, initiallization method, called from Health.cs
+        public void Init(){
             _player =   GetComponentInParent<Canvas>().gameObject
                         .GetComponentInParent<Rigidbody>().gameObject;
             _slider = GetComponent<Slider>();
             _nameText = GetComponentInChildren<Text>();
-            Health.onHealthChanged += HandleOnHealthChange;
-            Health.onDie += OnDieCallback;
-        }
-        public void Start(){
+            _myHealth = _player.GetComponent<Health>();
+
+            _myHealth.onHealthChanged += HandleOnHealthChange;
+            _myHealth.onDie += OnDieCallback;
+
             Camera[] temp = FindObjectsOfType<Camera>(false);
             /*print("enabled cams: " + temp.Length);
             if(_player.GetComponent<NetworkObject>().IsLocalPlayer){
@@ -44,19 +47,14 @@ namespace Spartans.UI{
             //this.transform.position = _player.transform.position + (Vector3.up * 4.5f);
         }
 
-        private void HandleOnHealthChange(Health reference, int value){
-            if(_player.GetComponent<Health>() != null && reference != _player.GetComponent<Health>()){
-                //print("Not my update");
-                return;
-            }else{
-                //print("ref val: " + _player.GetComponent<Health>().name);
-                //print("Player val: " + _player.GetComponent<Health>().name);
-                if(_player.GetComponent<Health>() == null){
-                    //print(_player.GetComponent<Health>());
-                    Debug.LogError("might not have Health component?");
-                }
+        private void HandleOnHealthChange(int value){
+            
+            if(_player.GetComponent<Health>() == null){
+                //print(_player.GetComponent<Health>());
+                Debug.LogError("might not have Health component?");
             }
-            float maxHP = (float)reference.GetMaxHitpoints();
+
+            float maxHP = (float)_myHealth.GetMaxHitpoints();
             if(value > maxHP){
                 Debug.LogError("ISSUE, HP higher than MAX HP");
             }
@@ -66,10 +64,11 @@ namespace Spartans.UI{
             
         }
         public void OnDisable(){
-            Health.onHealthChanged -= HandleOnHealthChange;
+            _myHealth.onHealthChanged -= HandleOnHealthChange;
+            _myHealth.onDie -= OnDieCallback;
             print("Removed Listener");
         }
-        private void OnDieCallback(Health reference){
+        private void OnDieCallback(){
             this.gameObject.SetActive(false);
         }
 

@@ -15,11 +15,13 @@ namespace Spartans.Players
         private Camera cam;
         private Rigidbody _rigidbody;
         private Animator _animator;
+        private Health _myHealth;
         public string playerName{ get; private set; }
 
         public void Awake(){
             _rigidbody = GetComponent<Rigidbody>();
             _animator = GetComponent<Animator>();
+            _myHealth = GetComponent<Health>();
 
             _playerMovement = GetComponent<PlayerMove>();
             _gameManager = FindObjectOfType<GameManager>();
@@ -44,6 +46,7 @@ namespace Spartans.Players
             }
             //Do in the case of any type of user
             //initialize all players on spawn
+            _myHealth.Init();
             _playerMovement.Init(_rigidbody, _animator);
         }
 

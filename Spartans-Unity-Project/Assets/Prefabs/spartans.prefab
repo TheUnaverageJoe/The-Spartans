@@ -1147,7 +1147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35f708a893461ca4da86f8abe9a7e924, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camTransform: {fileID: 0}
+  camTransform: {fileID: 292656612811812711}
 --- !u!1 &4970157346100178779
 GameObject:
   m_ObjectHideFlags: 0
@@ -1740,6 +1740,7 @@ GameObject:
   - component: {fileID: 7975495182481887495}
   - component: {fileID: 7975495182481887483}
   - component: {fileID: 324439227796420258}
+  - component: {fileID: -5050399124127822921}
   - component: {fileID: -4236820893792881773}
   - component: {fileID: 7167338817175085449}
   - component: {fileID: -8968419939583623080}
@@ -1860,6 +1861,19 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 0
+--- !u!114 &-5050399124127822921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7093115869597867190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Animator: {fileID: 7975495182481887495}
 --- !u!114 &-4236820893792881773
 MonoBehaviour:
   m_ObjectHideFlags: 0

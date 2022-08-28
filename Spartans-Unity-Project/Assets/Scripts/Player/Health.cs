@@ -2,40 +2,52 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Spartans.UI;
+using Unity.Netcode;
 
 namespace Spartans.Players{
-    public class Health : MonoBehaviour
+    public class Health : NetworkBehaviour
     {
         [SerializeField]private int _maxHitpoints;
         [SerializeField] private int _currentHitpoints;
         Animator _animator;
+        FloatingHealth _healthDisplay;
         private int _previousHitpoints;
         //[SerializeField] private GameObject _floatingHealthPrefab;
         //private GameObject hpDisplay;
 
 
         //int param is new health value
-        public static event System.Action<Health, int> onHealthChanged;
-        public static event System.Action<Health> onDie;
+        public event System.Action<int> onHealthChanged;
+        public event System.Action onDie;
 
-        private void Awake(){
+
+        //Stand in for Awake and Start, Initialization method called from Player.cs
+        public void Init(){
             //_maxHitpoints = 3;
             //_currentHitpoints = _maxHitpoints;
             //hpDisplay = Instantiate(_floatingHealthPrefab, GetComponentInChildren<Canvas>().transform);
             _animator = GetComponent<Animator>();
-        }
-        private void Start(){
+            _healthDisplay = GetComponentInChildren<FloatingHealth>();
+
             onDie += OnDieCallback;
-            onHealthChanged?.Invoke(this, _maxHitpoints);
-            //StartCoroutine(WaitThenDo());
+
+            if(_healthDisplay == null){
+                print("floating health not ready!");
+                return;
+            }
+            _healthDisplay.Init();
+
+            //need to invoke after healthDisplay is setup to get it to update
+            onHealthChanged?.Invoke(_maxHitpoints);
         }
+
         public void FixedUpdate(){
             //if()
         }
         public void TakeDamage(int damage){
             _currentHitpoints -= damage;
-            onHealthChanged?.Invoke(this, _currentHitpoints);
-            if(_currentHitpoints <= 0) onDie?.Invoke(this);
+            onHealthChanged?.Invoke(_currentHitpoints);
+            if(_currentHitpoints <= 0) onDie?.Invoke();
         }
 
         public int GetMaxHitpoints(){
@@ -45,10 +57,9 @@ namespace Spartans.Players{
             return _currentHitpoints;
         }
 
-        private void OnDieCallback(Health reference){
-            if(this != reference) return;
+        private void OnDieCallback(){
             _animator.SetBool("dead", true);
-            print("Killed Player " + this.GetComponent<Player>().playerName.ToString());
+            print("Killed: " + this.GetComponent<Player>().playerName.ToString());
         }
 
 
@@ -57,7 +68,7 @@ namespace Spartans.Players{
         //Below method only used for debugging
         IEnumerator WaitThenDo(){
             yield return new WaitForSeconds(2);
-            onHealthChanged?.Invoke(this, _maxHitpoints);
+            onHealthChanged?.Invoke(_maxHitpoints);
         }
     }
 }
