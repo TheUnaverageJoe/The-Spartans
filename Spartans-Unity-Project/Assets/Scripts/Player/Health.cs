@@ -11,6 +11,8 @@ namespace Spartans.Players{
         [SerializeField] private int _currentHitpoints;
         Animator _animator;
         FloatingHealth _healthDisplay;
+        [SerializeField]private float _respawnTime = 4;
+        private float timeOfDeath = 0;
         private int _previousHitpoints;
         //[SerializeField] private GameObject _floatingHealthPrefab;
         //private GameObject hpDisplay;
@@ -19,6 +21,7 @@ namespace Spartans.Players{
         //int param is new health value
         public event System.Action<int> onHealthChanged;
         public event System.Action onDie;
+        public event System.Action onRespawn;
 
 
         //Stand in for Awake and Start, Initialization method called from Player.cs
@@ -42,9 +45,24 @@ namespace Spartans.Players{
         }
 
         public void FixedUpdate(){
-            //if()
+            if(!IsServer)return;
+            if(timeOfDeath != 0){
+                timeOfDeath -= Time.fixedDeltaTime;
+                if(timeOfDeath <= 0){
+                    Respawn();
+                }
+            }
         }
-        public void TakeDamage(int damage){
+        [ServerRpc]
+        public void TakeDamageServerRpc(int damage){
+            updateHealthClientRpc(damage);
+            _currentHitpoints -= damage;
+            onHealthChanged?.Invoke(_currentHitpoints);
+            if(_currentHitpoints <= 0) onDie?.Invoke();
+        }
+        [ClientRpc]
+        public void updateHealthClientRpc(int damage){
+            if(IsServer) return;
             _currentHitpoints -= damage;
             onHealthChanged?.Invoke(_currentHitpoints);
             if(_currentHitpoints <= 0) onDie?.Invoke();
@@ -58,17 +76,25 @@ namespace Spartans.Players{
         }
 
         private void OnDieCallback(){
-            _animator.SetBool("dead", true);
-            print("Killed: " + this.GetComponent<Player>().playerName.ToString());
+            if(IsServer){
+                timeOfDeath = _respawnTime;
+                _animator.SetBool("dead", true);
+                print("Killed: " + this.GetComponent<Player>().playerName.ToString());
+            }
         }
-
-
-
-        //***Currently Unused***
-        //Below method only used for debugging
-        IEnumerator WaitThenDo(){
-            yield return new WaitForSeconds(2);
+        private void Respawn(){
+            _healthDisplay.gameObject.SetActive(true);
+            _animator.SetBool("dead", false);
             onHealthChanged?.Invoke(_maxHitpoints);
+            onRespawn.Invoke();
+            RespawnClientRpc();
+        }
+        [ClientRpc]
+        public void RespawnClientRpc(){
+            if(IsServer) return;
+            _healthDisplay.gameObject.SetActive(true);
+            onHealthChanged?.Invoke(_maxHitpoints);
+            onRespawn.Invoke();
         }
     }
 }

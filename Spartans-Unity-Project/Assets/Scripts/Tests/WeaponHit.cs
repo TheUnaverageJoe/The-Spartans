@@ -18,7 +18,8 @@ public class WeaponHit : NetworkBehaviour
     private List<Transform> _hitPlayers;
 
     //public static event System.Action<int, WeaponHit> onWeaponHit;
-    public static event System.Action<WeaponHit> onAttackStart;
+
+    public event System.Action onAttackStart;
 
     public void Awake(){
         onAttackStart += Attack;
@@ -32,7 +33,13 @@ public class WeaponHit : NetworkBehaviour
         Debug.DrawRay(handRef.transform.position, transform.TransformDirection(handRef.transform.up), Color.magenta, 0.25f);
 
         if(Input.GetButtonDown("Fire1") && !_attackOnCooldown){
-            onAttackStart.Invoke(this);
+            //call rpc to invoke event
+            if(IsServer){
+                onAttackStart.Invoke();
+            }
+            else
+                notifyAttackingServerRpc();
+            
         }
     }
     void FixedUpdate(){
@@ -44,7 +51,7 @@ public class WeaponHit : NetworkBehaviour
                         print("You cant hit yourself silly");
                         return;
                     }
-                    _healthAffected.TakeDamage(_playerDamage);
+                    _healthAffected.TakeDamageServerRpc(_playerDamage);
                     print("Did damage to: " + _healthAffected.GetHitpoints());
                     _hitPlayers.Add(_healthAffected.transform);
                 }
@@ -52,13 +59,12 @@ public class WeaponHit : NetworkBehaviour
         }
     }
 
-    private void Attack(WeaponHit reference){
-        if(this != reference) return;
+    private void Attack(){
         _animator.SetBool("attack", true);
         _attackOnCooldown = true;
         StartCoroutine(ResetAttackCooldown());
-        print(_animator.GetNextAnimatorStateInfo(1).fullPathHash + "\n" + 
-        _animator.GetNextAnimatorStateInfo(1).normalizedTime);
+        //print(_animator.GetNextAnimatorStateInfo(1).fullPathHash + "\n" + 
+        //_animator.GetNextAnimatorStateInfo(1).normalizedTime);
     }
 
     IEnumerator ResetAttackCooldown(){
@@ -66,5 +72,11 @@ public class WeaponHit : NetworkBehaviour
         _animator.SetBool("attack", false);
         _attackOnCooldown = false;
         _hitPlayers.Clear();
+    }
+
+    [ServerRpc]
+    public void notifyAttackingServerRpc(){
+        
+        onAttackStart.Invoke();
     }
 }

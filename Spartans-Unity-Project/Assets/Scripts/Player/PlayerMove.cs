@@ -46,6 +46,7 @@ namespace Spartans.Players{
             //    _camera.gameObject.SetActive(false);
             //}
             _myHealth.onDie += OnDieCallback;
+            _myHealth.onRespawn += OnRespawnCallback;
         }
 
         // Update is called once per frame
@@ -186,8 +187,15 @@ namespace Spartans.Players{
 
         private void OnDieCallback(){
             this.GetComponent<Rigidbody>().useGravity = false;
-            Destroy(this.GetComponent<BoxCollider>());
-            Destroy(this);
+            this.GetComponent<BoxCollider>().enabled = false;
+            this.enabled = false;
+        }
+
+        private void OnRespawnCallback()
+        {
+           this.GetComponent<Rigidbody>().useGravity = true;
+            this.GetComponent<BoxCollider>().enabled = true;
+            this.enabled = true;
         }
     }
 }
