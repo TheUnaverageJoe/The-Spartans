@@ -46,16 +46,14 @@ namespace Spartans.Players{
 
         public void FixedUpdate(){
             if(!IsServer)return;
-            if(timeOfDeath != 0){
+            if(timeOfDeath > 0){
                 timeOfDeath -= Time.fixedDeltaTime;
                 if(timeOfDeath <= 0){
                     Respawn();
                 }
             }
         }
-        public void TakeDamage(int damage){
-            TakeDamageServerRpc(damage);
-        }
+        
         [ServerRpc(RequireOwnership = false)]
         public void TakeDamageServerRpc(int damage){
             updateHealthClientRpc(damage);
@@ -87,6 +85,7 @@ namespace Spartans.Players{
         }
         private void Respawn(){
             _healthDisplay.gameObject.SetActive(true);
+            _currentHitpoints = _maxHitpoints;
             _animator.SetBool("dead", false);
             onHealthChanged?.Invoke(_maxHitpoints);
             onRespawn.Invoke();
@@ -97,6 +96,7 @@ namespace Spartans.Players{
         public void RespawnClientRpc(){
             if(IsServer) return;
             _healthDisplay.gameObject.SetActive(true);
+            _currentHitpoints = _maxHitpoints;
             onHealthChanged?.Invoke(_maxHitpoints);
             onRespawn.Invoke();
         }
