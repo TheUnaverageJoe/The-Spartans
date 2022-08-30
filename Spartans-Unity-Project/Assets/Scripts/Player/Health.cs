@@ -53,7 +53,10 @@ namespace Spartans.Players{
                 }
             }
         }
-        [ServerRpc]
+        public void TakeDamage(int damage){
+            TakeDamageServerRpc(damage);
+        }
+        [ServerRpc(RequireOwnership = false)]
         public void TakeDamageServerRpc(int damage){
             updateHealthClientRpc(damage);
             _currentHitpoints -= damage;
@@ -87,6 +90,7 @@ namespace Spartans.Players{
             _animator.SetBool("dead", false);
             onHealthChanged?.Invoke(_maxHitpoints);
             onRespawn.Invoke();
+
             RespawnClientRpc();
         }
         [ClientRpc]

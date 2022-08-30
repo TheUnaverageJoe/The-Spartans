@@ -63,11 +63,19 @@ namespace Spartans.UI{
             //print("Set slider to: " + _slider.value);
             
         }
+        /*
+        public void OnEnable(){
+            _myHealth.onHealthChanged += HandleOnHealthChange;
+            _myHealth.onDie += OnDieCallback;
+           print("re-enabled listeners for updating");
+        }
+        
         public void OnDisable(){
             _myHealth.onHealthChanged -= HandleOnHealthChange;
             _myHealth.onDie -= OnDieCallback;
             print("Removed Listener");
         }
+        */
         private void OnDieCallback(){
             this.gameObject.SetActive(false);
         }

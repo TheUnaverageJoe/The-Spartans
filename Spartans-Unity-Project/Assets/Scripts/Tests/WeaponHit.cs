@@ -43,6 +43,9 @@ public class WeaponHit : NetworkBehaviour
         }
     }
     void FixedUpdate(){
+        if(!IsServer){
+            return;
+        }
         if(_attackOnCooldown){
             if(Physics.Raycast(handRef.transform.position, transform.TransformDirection(handRef.transform.up), out _lastAttackedObject, 1, attackMask)){
                 if(!_hitPlayers.Contains(_lastAttackedObject.transform)){
@@ -51,7 +54,7 @@ public class WeaponHit : NetworkBehaviour
                         print("You cant hit yourself silly");
                         return;
                     }
-                    _healthAffected.TakeDamageServerRpc(_playerDamage);
+                    _healthAffected.TakeDamage(_playerDamage);
                     print("Did damage to: " + _healthAffected.GetHitpoints());
                     _hitPlayers.Add(_healthAffected.transform);
                 }
