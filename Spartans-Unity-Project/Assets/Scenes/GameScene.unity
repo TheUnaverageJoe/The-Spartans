@@ -897,7 +897,7 @@ MonoBehaviour:
   ConnectionData:
     Address: 127.0.0.1
     Port: 25559
-    ServerListenAddress: 
+    ServerListenAddress: 127.0.0.1
   DebugSimulator:
     PacketDelayMS: 0
     PacketJitterMS: 0
