@@ -8,6 +8,7 @@ using Unity.Netcode;
 namespace Spartans.Players{
     public class PlayerMove : NetworkBehaviour
     {
+        [SerializeField] public Transform lookAtPoint;
         private Rigidbody _rigidbody;
         private Animator _animator;
         private Vector3 _lastSentInput;
@@ -67,13 +68,20 @@ namespace Spartans.Players{
             if (mouseX != 0){
                 requestRotationServerRpc(mouseX*mouseSens);
             }
-            //Update movement
-            if(grounded){
-                input = new Vector3(Input.GetAxisRaw("Horizontal"), 0 , Input.GetAxisRaw("Vertical"));
-                if(input != _lastSentInput){
-                    _lastSentInput = input;
-                }
+
+            float mouseY = Input.GetAxis("Mouse Y");
+            
+            if (mouseY != 0){
+                lookAtPoint.eulerAngles = new Vector3(lookAtPoint.eulerAngles.x - mouseY*mouseSens,
+                                    lookAtPoint.eulerAngles.y ,lookAtPoint.eulerAngles.z);
             }
+            //Update movement
+            //if(grounded){
+            input = new Vector3(Input.GetAxisRaw("Horizontal"), 0 , Input.GetAxisRaw("Vertical"));
+            if(input != _lastSentInput){
+                _lastSentInput = input;
+            }
+            //}
         }
         //server needs to update grounded state for all players on server side
         //if not the server or a local player object, aka the player spawned when join game, dont update

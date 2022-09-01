@@ -92,7 +92,15 @@ namespace Spartans.Players
             if(!IsServer) return;
             //print("HI MY NAME IS: " + playerName);
             base.OnNetworkSpawn();
-            transform.position = new Vector3(Random.Range(-25,25), 1, Random.Range(-25,25));
+
+
+            GameObject spawnpoint = GameObject.FindGameObjectsWithTag("Spawn1")[0];
+            float xSpawnPos = spawnpoint.transform.position.x;
+            float zSpawnPos = spawnpoint.transform.position.z;
+            float xLength = spawnpoint.GetComponent<BoxCollider>().size.x;
+            float zLength = spawnpoint.GetComponent<BoxCollider>().size.z;
+            transform.position = new Vector3(Random.Range(xSpawnPos - xLength,xSpawnPos + xLength), 
+                                            1, Random.Range(zSpawnPos - zLength, zSpawnPos + zLength));
             //print("MOVE MMEEEEE");
         }
         //OnDrawGizmos is being usec purly for debugging  purposes to see where the hitbox is in world space

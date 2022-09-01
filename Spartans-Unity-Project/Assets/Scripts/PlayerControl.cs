@@ -14,8 +14,13 @@ public class PlayerControl : NetworkBehaviour
     private float oldLeftRightPosition;
 
     private void Start(){
-        transform.position = new Vector3(Random.Range(defaultPostionRange.x, defaultPostionRange.y), 0,
-            Random.Range(defaultPostionRange.x, defaultPostionRange.y));
+        if(IsClient && IsOwner){
+            transform.position = new Vector3(Random.Range(defaultPostionRange.x, defaultPostionRange.y), 0,
+                Random.Range(defaultPostionRange.x, defaultPostionRange.y));
+
+        }
+        
+        
     }
 
     private void Update(){
