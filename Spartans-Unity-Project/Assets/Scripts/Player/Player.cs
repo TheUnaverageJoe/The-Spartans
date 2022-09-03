@@ -40,8 +40,8 @@ namespace Spartans.Players
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             if(IsLocalPlayer){
                 _mainCamera = Instantiate(cameraPrefab, transform.position, transform.rotation) as GameObject; 
-                _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.Find("LookAtPoint");
-                _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform;
+                _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
+                _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
                 transform.GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
                 //_mainCamera.SetActive(false);
                 //_HUD.Init();
@@ -104,10 +104,9 @@ namespace Spartans.Players
             GameObject spawnpoint = GameObject.FindGameObjectsWithTag("Spawn1")[0];
             float xSpawnPos = spawnpoint.transform.position.x;
             float zSpawnPos = spawnpoint.transform.position.z;
-            float xLength = spawnpoint.GetComponent<BoxCollider>().size.x;
-            float zLength = spawnpoint.GetComponent<BoxCollider>().size.z;
-            transform.position = new Vector3(Random.Range(xSpawnPos - xLength,xSpawnPos + xLength), 
-                                            1, Random.Range(zSpawnPos - zLength, zSpawnPos + zLength));
+            
+            transform.position = new Vector3(Random.Range(xSpawnPos - 3,xSpawnPos + 3), 
+                                            1, Random.Range(zSpawnPos - 3, zSpawnPos + 3));
             //print("MOVE MMEEEEE");
         }
         //OnDrawGizmos is being usec purly for debugging  purposes to see where the hitbox is in world space

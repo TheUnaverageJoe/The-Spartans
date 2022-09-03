@@ -79,6 +79,7 @@ namespace Spartans.Players{
             //if(grounded){
             input = new Vector3(Input.GetAxisRaw("Horizontal"), 0 , Input.GetAxisRaw("Vertical"));
             if(input != _lastSentInput){
+                _animator.SetFloat( "speed",input.magnitude);
                 _lastSentInput = input;
             }
             //}
@@ -166,8 +167,10 @@ namespace Spartans.Players{
             
             if (hitOccured){
                 currentState = (int)States.Grounded;
+                _animator.SetBool("grounded", true);
             }else{
                 currentState=(int)States.Airborn;
+                _animator.SetBool("grounded", false);
             }
             
             if(previousState == (int)States.Grounded && currentState == (int)States.Grounded && canJump){
