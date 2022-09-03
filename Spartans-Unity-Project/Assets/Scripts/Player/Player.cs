@@ -10,11 +10,11 @@ namespace Spartans.Players
     public class Player : NetworkBehaviour
     {
         [SerializeField] GameObject cameraPrefab;
-        private GameObject _mainCamera;
+        [SerializeField] private GameObject _mainCamera;
         private GameManager _gameManager;
         private PlayerMove _playerMovement;
         private PlayerCanvasManager _HUD;
-        private Camera cam;
+        [SerializeField] private GameObject cam;
         private Rigidbody _rigidbody;
         private Animator _animator;
         private Health _myHealth;
@@ -28,22 +28,23 @@ namespace Spartans.Players
             _playerMovement = GetComponent<PlayerMove>();
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager.GetComponent<PlayerCanvasManager>();
-            //_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+            _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             // cam = GetComponentInChildren<Camera>();
             
         }
 
         public void Start(){
+            if(_mainCamera.activeSelf == true)
+                _mainCamera.SetActive(false);
+                cam = Instantiate(cameraPrefab, transform.position, transform.rotation) as GameObject; 
             playerName = "Player " + NetworkObjectId;
             //print("Player name is: " + playerName);
             //print("Is local player: " + IsLocalPlayer);
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             if(IsLocalPlayer){
-                _mainCamera = Instantiate(cameraPrefab, transform.position, transform.rotation) as GameObject; 
-                _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
-                _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
-                transform.GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
-                //_mainCamera.SetActive(false);
+                cam.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
+                cam.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
+                //transform.GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
                 //_HUD.Init();
             }
             //else{

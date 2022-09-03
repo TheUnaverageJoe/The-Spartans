@@ -31,7 +31,7 @@ public class WeaponHit : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.DrawRay(handRef.transform.position, handRef.transform.up, Color.magenta, 0.25f);
+        Debug.DrawRay(handRef.transform.position, handRef.transform.forward*3, Color.magenta, 0.25f);
         if(!IsLocalPlayer) return;
 
         if(Input.GetButtonDown("Fire1") && !_attackOnCooldown){
@@ -50,7 +50,7 @@ public class WeaponHit : NetworkBehaviour
         }
         //allHit = Physics.RaycastAll(handRef.transform.position, transform.TransformDirection(handRef.transform.up), 3, attackMask);
         if(_attackOnCooldown){
-            if(Physics.Raycast(handRef.transform.position, handRef.transform.up, out _lastAttackedObject, 1, attackMask)){
+            if(Physics.Raycast(handRef.transform.position, handRef.transform.forward, out _lastAttackedObject, 3, attackMask)){
                 if(!_hitPlayers.Contains(_lastAttackedObject.transform)){
                     Health _healthAffected = _lastAttackedObject.transform.gameObject.GetComponent<Health>();
                     if(_healthAffected == GetComponent<Health>()){

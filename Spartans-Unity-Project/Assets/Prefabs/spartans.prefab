@@ -1925,7 +1925,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e51ac9028fed5f49a2058f6e71792f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handRef: {fileID: 352204241832676489}
+  handRef: {fileID: 6119443467649203717}
   attackMask:
     serializedVersion: 2
     m_Bits: 64
@@ -2609,5 +2609,10 @@ PrefabInstance:
 --- !u!4 &3184729428180220424 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b459fc5c2889394448230468656c89ed, type: 3}
+  m_PrefabInstance: {fileID: 3150505398941212131}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6119443467649203717 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9175088765034030054, guid: b459fc5c2889394448230468656c89ed, type: 3}
   m_PrefabInstance: {fileID: 3150505398941212131}
   m_PrefabAsset: {fileID: 0}
