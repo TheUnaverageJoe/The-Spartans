@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Cinemachine;
 
 using Spartans.UI;
 namespace Spartans.Players
 {
     public class Player : NetworkBehaviour
     {
+        [SerializeField] GameObject cameraPrefab;
         private GameObject _mainCamera;
         private GameManager _gameManager;
         private PlayerMove _playerMovement;
@@ -26,8 +28,8 @@ namespace Spartans.Players
             _playerMovement = GetComponent<PlayerMove>();
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager.GetComponent<PlayerCanvasManager>();
-            _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-            cam = GetComponentInChildren<Camera>();
+            //_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+            // cam = GetComponentInChildren<Camera>();
             
         }
 
@@ -37,12 +39,17 @@ namespace Spartans.Players
             //print("Is local player: " + IsLocalPlayer);
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             if(IsLocalPlayer){
-                _mainCamera.SetActive(false);
+                _mainCamera = Instantiate(cameraPrefab, transform.position, transform.rotation) as GameObject; 
+                _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.Find("LookAtPoint");
+                _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform;
+                transform.GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
+                //_mainCamera.SetActive(false);
                 //_HUD.Init();
-            }else{
-                //All players have a camera object on the prefab, disable all other cameras if its not ours
-                cam.gameObject.SetActive(false);
             }
+            //else{
+                //All players have a camera object on the prefab, disable all other cameras if its not ours
+            //    cam.gameObject.SetActive(false);
+            //}
             //Do in the case of any type of user
             //initialize all players on spawn
             _myHealth.Init();

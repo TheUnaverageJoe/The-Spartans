@@ -9,7 +9,7 @@ namespace Spartans.UI{
     public class FloatingHealth : MonoBehaviour
     {
         private GameObject _player;
-        [SerializeField]private Transform camTransform;
+        [SerializeField]public Transform camTransform;
         private Slider _slider;
         private Text _nameText;
         private Health _myHealth;
