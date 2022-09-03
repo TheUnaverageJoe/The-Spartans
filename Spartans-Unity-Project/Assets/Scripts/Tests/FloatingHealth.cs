@@ -9,7 +9,7 @@ namespace Spartans.UI{
     public class FloatingHealth : MonoBehaviour
     {
         private GameObject _player;
-        [SerializeField]public Transform camTransform;
+        [SerializeField] Transform camTransform;
         private Slider _slider;
         private Text _nameText;
         private Health _myHealth;
@@ -35,8 +35,10 @@ namespace Spartans.UI{
                 }
             }
             */
+            
             camTransform = temp[0].transform;
             _nameText.text = _player.GetComponent<Player>().playerName.ToString();
+            print($"{_nameText.text} ran Init()");
         }
 
         // LateUpdate is called once per frame, Called after Update but before render cycle

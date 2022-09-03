@@ -13,7 +13,7 @@ namespace Spartans.Players{
         private Animator _animator;
         private Vector3 _lastSentInput;
         private Vector3 input;
-        private Camera _camera;
+        //private Camera _camera;
         private Health _myHealth;
         [SerializeField] private bool canJump = true;
         [SerializeField] private bool grounded = false;
@@ -39,7 +39,7 @@ namespace Spartans.Players{
             currentState = -1;
 
             //previously in start
-            _camera = GetComponentInChildren<Camera>();
+            //_camera = GetComponentInChildren<Camera>();
             _myHealth = GetComponent<Health>();
 
             //This is already being done in Player on line 35
@@ -79,7 +79,6 @@ namespace Spartans.Players{
             //if(grounded){
             input = new Vector3(Input.GetAxisRaw("Horizontal"), 0 , Input.GetAxisRaw("Vertical"));
             if(input != _lastSentInput){
-                _animator.SetFloat( "speed",input.magnitude);
                 _lastSentInput = input;
             }
             //}
@@ -127,10 +126,12 @@ namespace Spartans.Players{
         public void requestMoveServerRpc(Vector3 dir){
             if(!grounded) return;
             Vector3 moveDir = dir.normalized;
+
+            _animator.SetFloat( "speed", dir.magnitude);
             if (moveDir == Vector3.zero && grounded && canJump){
                 _rigidbody.velocity = Vector3.zero;
             }
-
+            
             Vector2 horizPlane = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.z);
             float velocityComponentY = _rigidbody.velocity.y;
 
