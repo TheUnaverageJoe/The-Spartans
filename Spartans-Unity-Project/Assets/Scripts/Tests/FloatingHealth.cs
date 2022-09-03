@@ -43,7 +43,7 @@ namespace Spartans.UI{
         void LateUpdate()
         {
             //keep health bar next to player in the world space
-            this.transform.rotation = camTransform.rotation;
+            //this.transform.rotation = camTransform.rotation;
             //this.transform.position = _player.transform.position + (Vector3.up * 4.5f);
         }
 

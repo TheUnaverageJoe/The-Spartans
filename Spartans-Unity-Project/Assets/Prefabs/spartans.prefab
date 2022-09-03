@@ -26,7 +26,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1258845699}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -38,7 +38,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1920, y: 1080}
+  m_SizeDelta: {x: 2, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &1258845702
 Canvas:
@@ -1894,6 +1894,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraPrefab: {fileID: 6566532239938505393, guid: 3ea986e08f4b2a44bb1934c5a1cec700, type: 3}
+  worldSpaceCanvas: {fileID: 1258845699}
 --- !u!114 &-8968419939583623080
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1925,7 +1926,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e51ac9028fed5f49a2058f6e71792f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handRef: {fileID: 352204241832676489}
+  handRef: {fileID: 6119443467649203717}
   attackMask:
     serializedVersion: 2
     m_Bits: 64
@@ -2609,5 +2610,10 @@ PrefabInstance:
 --- !u!4 &3184729428180220424 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b459fc5c2889394448230468656c89ed, type: 3}
+  m_PrefabInstance: {fileID: 3150505398941212131}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6119443467649203717 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9175088765034030054, guid: b459fc5c2889394448230468656c89ed, type: 3}
   m_PrefabInstance: {fileID: 3150505398941212131}
   m_PrefabAsset: {fileID: 0}

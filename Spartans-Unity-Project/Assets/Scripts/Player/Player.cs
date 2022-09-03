@@ -10,6 +10,7 @@ namespace Spartans.Players
     public class Player : NetworkBehaviour
     {
         [SerializeField] GameObject cameraPrefab;
+        [SerializeField] public GameObject worldSpaceCanvas;
         private GameObject _mainCamera;
         private GameManager _gameManager;
         private PlayerMove _playerMovement;
@@ -38,11 +39,14 @@ namespace Spartans.Players
             //print("Player name is: " + playerName);
             //print("Is local player: " + IsLocalPlayer);
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
+            
             if(IsLocalPlayer){
                 _mainCamera = Instantiate(cameraPrefab, transform.position, transform.rotation) as GameObject; 
                 _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
                 _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
                 transform.GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
+                worldSpaceCanvas.GetComponent<Canvas>().worldCamera = _mainCamera.GetComponent<Camera>();
+                worldSpaceCanvas.GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
                 //_mainCamera.SetActive(false);
                 //_HUD.Init();
             }
