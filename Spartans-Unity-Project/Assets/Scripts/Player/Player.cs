@@ -19,6 +19,7 @@ namespace Spartans.Players
         private Rigidbody _rigidbody;
         private Animator _animator;
         private Health _myHealth;
+        private int players_in_lobby;
         public string playerName{ get; private set; }
 
         public void Awake(){
@@ -29,6 +30,7 @@ namespace Spartans.Players
             _playerMovement = GetComponent<PlayerMove>();
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager.GetComponent<PlayerCanvasManager>();
+            players_in_lobby = 0;
             //_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             // cam = GetComponentInChildren<Camera>();
             
@@ -71,6 +73,16 @@ namespace Spartans.Players
 
                 if(Input.GetKeyDown(KeyCode.Tab)){
                     PlayerCanvasManager.GetPanelManager().gameObject.SetActive(!PlayerCanvasManager.GetPanelManager().gameObject.activeSelf);
+                }
+
+                if(GameObject.FindGameObjectsWithTag("Player").Length != players_in_lobby){
+                    var players = GameObject.FindGameObjectsWithTag("Player");
+                    for(int i = 0; i<players.Length; i++){
+                        players[i].transform.Find("WorldSpaceUI").GetComponent<Canvas>().worldCamera = _mainCamera.GetComponent<Camera>();
+                        players[i].GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
+                    }
+                    
+                    players_in_lobby = players.Length;
                 }
             }
         }
