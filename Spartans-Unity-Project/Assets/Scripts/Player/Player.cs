@@ -10,14 +10,16 @@ namespace Spartans.Players
     public class Player : NetworkBehaviour
     {
         [SerializeField] GameObject cameraPrefab;
-        [SerializeField] private GameObject _mainCamera;
+        [SerializeField] public GameObject worldSpaceCanvas;
+        private GameObject _mainCamera;
         private GameManager _gameManager;
         private PlayerMove _playerMovement;
         private PlayerCanvasManager _HUD;
-        [SerializeField] private GameObject cam;
+        private Camera cam;
         private Rigidbody _rigidbody;
         private Animator _animator;
         private Health _myHealth;
+        private int players_in_lobby;
         public string playerName{ get; private set; }
 
         public void Awake(){
@@ -28,23 +30,26 @@ namespace Spartans.Players
             _playerMovement = GetComponent<PlayerMove>();
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager.GetComponent<PlayerCanvasManager>();
-            _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+            players_in_lobby = 0;
+            //_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             // cam = GetComponentInChildren<Camera>();
             
         }
 
         public void Start(){
-            if(_mainCamera.activeSelf == true)
-                _mainCamera.SetActive(false);
-                cam = Instantiate(cameraPrefab, transform.position, transform.rotation) as GameObject; 
             playerName = "Player " + NetworkObjectId;
             //print("Player name is: " + playerName);
             //print("Is local player: " + IsLocalPlayer);
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
+            
             if(IsLocalPlayer){
-                cam.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
-                cam.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
-                //transform.GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
+                _mainCamera = Instantiate(cameraPrefab, transform.position, transform.rotation) as GameObject; 
+                _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
+                _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
+                transform.GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
+                worldSpaceCanvas.GetComponent<Canvas>().worldCamera = _mainCamera.GetComponent<Camera>();
+                worldSpaceCanvas.GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
+                //_mainCamera.SetActive(false);
                 //_HUD.Init();
             }
             //else{
@@ -68,6 +73,16 @@ namespace Spartans.Players
 
                 if(Input.GetKeyDown(KeyCode.Tab)){
                     PlayerCanvasManager.GetPanelManager().gameObject.SetActive(!PlayerCanvasManager.GetPanelManager().gameObject.activeSelf);
+                }
+
+                if(GameObject.FindGameObjectsWithTag("Player").Length != players_in_lobby){
+                    var players = GameObject.FindGameObjectsWithTag("Player");
+                    for(int i = 0; i<players.Length; i++){
+                        players[i].transform.Find("WorldSpaceUI").GetComponent<Canvas>().worldCamera = _mainCamera.GetComponent<Camera>();
+                        players[i].GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
+                    }
+                    
+                    players_in_lobby = players.Length;
                 }
             }
         }
