@@ -24,7 +24,7 @@ namespace Spartans.Players
 
         public void Awake(){
             _rigidbody = GetComponent<Rigidbody>();
-            _animator = GetComponent<Animator>();
+            _animator = GetComponentInChildren<Animator>();
             _myHealth = GetComponent<Health>();
 
             _playerMovement = GetComponent<PlayerMove>();
@@ -65,7 +65,13 @@ namespace Spartans.Players
         // Update is called once per frame
         void Update()
         {
+            if(_animator == null){
+
+                print("Assign an animator dummy!!!");
+                return;
+            }
             if(IsLocalPlayer){
+                
                 if(Input.GetKeyDown(KeyCode.Escape)){
                     if(Cursor.visible) MouseLock(true);
                     else MouseLock(false);
