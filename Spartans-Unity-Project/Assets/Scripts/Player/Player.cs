@@ -24,7 +24,7 @@ namespace Spartans.Players
 
         public void Awake(){
             _rigidbody = GetComponent<Rigidbody>();
-            _animator = GetComponent<Animator>();
+            _animator = GetComponentInChildren<Animator>();
             _myHealth = GetComponent<Health>();
 
             _playerMovement = GetComponent<PlayerMove>();
