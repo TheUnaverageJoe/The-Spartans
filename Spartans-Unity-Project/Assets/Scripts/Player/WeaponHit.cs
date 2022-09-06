@@ -25,7 +25,7 @@ public class WeaponHit : NetworkBehaviour
 
     public void Awake(){
         onAttackStart += Attack;
-        _animator = GetComponent<Animator>();
+        _animator = GetComponentInChildren<Animator>();
         _hitPlayers = new List<Transform>();
     }
     // Update is called once per frame

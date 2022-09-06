@@ -33,7 +33,7 @@ namespace Spartans.Players{
 
         public void Init(Rigidbody rigidbody, Animator animator){
             _rigidbody = rigidbody;
-            _animator = animator;
+            _animator = GetComponentInChildren<Animator>();
 
             previousState = -1;
             currentState = -1;
@@ -55,6 +55,11 @@ namespace Spartans.Players{
         {
             //Not player character of this client session
             if(!IsLocalPlayer){
+                return;
+            }
+            if(_animator == null){
+
+                print("Assign an animator dummy!!!");
                 return;
             }
             //Jump
