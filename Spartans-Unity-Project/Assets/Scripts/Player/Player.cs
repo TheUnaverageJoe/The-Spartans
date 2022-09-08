@@ -13,21 +13,23 @@ namespace Spartans.Players
         [SerializeField] public GameObject worldSpaceCanvas;
         private GameObject _mainCamera;
         private GameManager _gameManager;
-        private PlayerMove _playerMovement;
+        private PlayerMove _playerMove;
         private PlayerCanvasManager _HUD;
         private Camera cam;
         private Rigidbody _rigidbody;
-        private Animator _animator;
+        //private Animator _animator;
+        [SerializeField] public AnimationManager _animationManager;
         private Health _myHealth;
         private int players_in_lobby;
         public string playerName{ get; private set; }
 
         public void Awake(){
             _rigidbody = GetComponent<Rigidbody>();
-            _animator = GetComponentInChildren<Animator>();
+            //_animator = GetComponentInChildren<Animator>();
             _myHealth = GetComponent<Health>();
+            _animationManager = GetComponent<AnimationManager>();
 
-            _playerMovement = GetComponent<PlayerMove>();
+            _playerMove = GetComponent<PlayerMove>();
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager.GetComponent<PlayerCanvasManager>();
             players_in_lobby = 0;
@@ -59,13 +61,13 @@ namespace Spartans.Players
             //Do in the case of any type of user
             //initialize all players on spawn
             _myHealth.Init();
-            _playerMovement.Init(_rigidbody, _animator);
+            _playerMove.Init(_rigidbody);
         }
 
         // Update is called once per frame
         void Update()
         {
-            if(_animator == null){
+            if(_animationManager == null){
 
                 print("Assign an animator dummy!!!");
                 return;

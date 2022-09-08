@@ -9,6 +9,7 @@ namespace Spartans.Players{
     public class PlayerMove : NetworkBehaviour
     {
         [SerializeField] public Transform lookAtPoint;
+        private Player _player;
         private Rigidbody _rigidbody;
         private Animator _animator;
         private Vector3 _lastSentInput;
@@ -31,7 +32,7 @@ namespace Spartans.Players{
         enum States{Grounded, Airborn}
 
 
-        public void Init(Rigidbody rigidbody, Animator animator){
+        public void Init(Rigidbody rigidbody){
             _rigidbody = rigidbody;
             _animator = GetComponentInChildren<Animator>();
 
@@ -41,6 +42,7 @@ namespace Spartans.Players{
             //previously in start
             //_camera = GetComponentInChildren<Camera>();
             _myHealth = GetComponent<Health>();
+            _player = GetComponent<Player>();
 
             //This is already being done in Player on line 35
             //if(!IsLocalPlayer){
@@ -57,9 +59,9 @@ namespace Spartans.Players{
             if(!IsLocalPlayer){
                 return;
             }
-            if(_animator == null){
+            if(_animator == null || _player._animationManager == null){
 
-                print("Assign an animator dummy!!!");
+                print("Assign an animator/animationManager dummy!!!");
                 return;
             }
             //Jump
@@ -91,7 +93,7 @@ namespace Spartans.Players{
         //server needs to update grounded state for all players on server side
         //if not the server or a local player object, aka the player spawned when join game, dont update
         void FixedUpdate(){
-            if(IsServer){
+            if(IsServer && !IsLocalPlayer){
                 CheckGrounded();
             }
             if(IsLocalPlayer){
@@ -131,8 +133,8 @@ namespace Spartans.Players{
         public void requestMoveServerRpc(Vector3 dir){
             if(!grounded) return;
             Vector3 moveDir = dir.normalized;
-
-            _animator.SetFloat( "speed", dir.magnitude);
+            _animator.SetFloat("speed", dir.magnitude);
+            //_player._animationManager.SetParameter("speed", dir.magnitude);
             if (moveDir == Vector3.zero && grounded && canJump){
                 _rigidbody.velocity = Vector3.zero;
             }
@@ -173,9 +175,11 @@ namespace Spartans.Players{
             
             if (hitOccured){
                 currentState = (int)States.Grounded;
+                //_player._animationManager.SetParameter("grounded", true);
                 _animator.SetBool("grounded", true);
             }else{
                 currentState=(int)States.Airborn;
+                //_player._animationManager.SetParameter("grounded", false);
                 _animator.SetBool("grounded", false);
             }
             

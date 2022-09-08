@@ -9,7 +9,8 @@ namespace Spartans.Players{
     {
         [SerializeField]private int _maxHitpoints;
         [SerializeField] private int _currentHitpoints;
-        Animator _animator;
+        //Animator _animator;
+        Player _player;
         FloatingHealth _healthDisplay;
         [SerializeField]private float _respawnTime = 4;
         private float timeOfDeath = 0;
@@ -29,8 +30,9 @@ namespace Spartans.Players{
             //_maxHitpoints = 3;
             //_currentHitpoints = _maxHitpoints;
             //hpDisplay = Instantiate(_floatingHealthPrefab, GetComponentInChildren<Canvas>().transform);
-            _animator = GetComponent<Animator>();
+            //_animator = GetComponentInChildren<Animator>();
             _healthDisplay = GetComponentInChildren<FloatingHealth>();
+            _player = GetComponent<Player>();
 
             onDie += OnDieCallback;
 
@@ -79,14 +81,18 @@ namespace Spartans.Players{
         private void OnDieCallback(){
             if(IsServer){
                 timeOfDeath = _respawnTime;
-                _animator.SetBool("dead", true);
+                //_animator.SetBool("dead", true);
+                _player._animationManager.SetParameter("dead", true);
                 print("Killed: " + this.GetComponent<Player>().playerName.ToString());
             }
         }
+        //Respawn is only called by the server hence why only a 
+        //  clientRpc exists for respawning and not a serverRpc
         private void Respawn(){
             _healthDisplay.gameObject.SetActive(true);
             _currentHitpoints = _maxHitpoints;
-            _animator.SetBool("dead", false);
+            //_animator.SetBool("dead", false);
+            _player._animationManager.SetParameter("dead", false);
             onHealthChanged?.Invoke(_maxHitpoints);
             onRespawn.Invoke();
 

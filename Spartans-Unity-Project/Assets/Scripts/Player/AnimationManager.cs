@@ -5,30 +5,12 @@ using Unity.Netcode;
 
 public class AnimationManager : NetworkBehaviour
 {
-    /*
-    ///We Could have used this custom class but a dictionary is inbuilt and achieves similar functionality
-    private class Param{
-        protected string _name;
-        protected string _type;
-        public Param(string name, string type){
-            this._name = name;
-            this._type = type;
-        }
-        public override string ToString(){
-            string var = $"Parameter '{_name}' is of type {_type}";
-            return var;
-        }
-        public string GetName(){
-            return _name;
-        }
-        public string GetValueType(){
-            return _type;
-        }
-    }
-    */
+    //NEED TO ADD
+    //--state memory to stop, duplicate parameter updates being sent--
+    //----------------------------------------------------------------
     Dictionary<string, string> _animatorParameters = new Dictionary<string, string>();
     private Animator _animator;
-    //List<Param> _animatorParameters = new List<Param>();
+    //List<Param> _animatorParameters = new List<Param>();s
     public void Awake(){
         _animator = GetComponentInChildren<Animator>();
     }
@@ -43,25 +25,108 @@ public class AnimationManager : NetworkBehaviour
 
         //Just to see which parameters got added
         //and to test overridden ToString() method
+        
+        /*
         foreach(string key in _animatorParameters.Keys){
-            print(key);
+            string value;
+            _animatorParameters.TryGetValue(key, out value);
+            print(key + " is a " + value);
+        }
+        
+
+        // -------------Unit tests--------------
+        SetParameter("dead", false);
+        SetParameter("speed", 1.2f);
+        SetParameter("player", 1);
+        */
+    }
+
+    [ServerRpc]
+    public void UpdateAnimatorServerRpc(string name, string value, string type){
+        print("recieved rpc to Update Animator");
+        bool _bool;
+        float _float;
+        int _int;
+        if(type == "Bool"){
+            _bool = bool.Parse(value);
+            /*if(value == "True"){
+                _bool = true;
+            }else if(value == "False"){
+                _bool = false;
+            }else{
+                Debug.LogError("value field should only be True or False");
+                _bool = false;
+            }*/
+            _animator.SetBool(name, _bool);
+        }else if(type == "Float"){
+            _float = float.Parse(value);
+            _animator.SetFloat(name, _float);
+
+        }else if(type == "Int"){
+            _int = int.Parse(value);
+            _animator.SetInteger(name, _int);
+        }else{
+            Debug.Log("ONLY int bool float TYPES SHOULD HAVE BEEN PASSED");
         }
     }
 
-/*
     public bool SetParameter(string name, bool value){
-        //first step is to verify that a valid input was passed for this parameter
-        foreach(Param parameter in _animatorParameters){
-            if(parameter.)
+        //first step is to verify that a valid inputs were passed
+        string val;
+        if(_animatorParameters.ContainsKey(name)){
+            print("found parameter");
+            _animatorParameters.TryGetValue(name, out val);
+            if(val == "Bool"){
+                _animator.SetBool(name, value);
+            }else{
+                Debug.LogError($"Parameter {name} is not of type Bool");
+                return false;
+            }
+        }else{
+            print("Parameter not found");
+            return false;
         }
+        print($"{name} set to {value}");
+        if(!IsServer) UpdateAnimatorServerRpc(name, value.ToString(), val);
+        return true;
     }
     public bool SetParameter(string name, float value){
         //first step is to verify that a valid input was passed for this parameter
-        
+        //first step is to verify that a valid inputs were passed
+        if(_animatorParameters.ContainsKey(name)){
+            print("found parameter");
+            string val;
+            _animatorParameters.TryGetValue(name, out val);
+            if(val == "Float"){
+                _animator.SetFloat(name, value);
+            }else{
+                Debug.LogError($"Parameter {name} is not of type Float");
+                return false;
+            }
+        }else{
+            print("Parameter not found");
+            return false;
+        }
+        print($"{name} set to {value}");
+        return true;
     }
     public bool SetParameter(string name, int value){
         //first step is to verify that a valid input was passed for this parameter
-        
+        if(_animatorParameters.ContainsKey(name)){
+            print("found parameter");
+            string val;
+            _animatorParameters.TryGetValue(name, out val);
+            if(val == "Int"){
+                _animator.SetInteger(name, value);
+            }else{
+                Debug.LogError($"Parameter {name} is not of type Int");
+                return false;
+            }
+        }else{
+            print("Parameter not found");
+            return false;
+        }
+        print($"{name} set to {value}");
+        return true;
     }
-    */
 }

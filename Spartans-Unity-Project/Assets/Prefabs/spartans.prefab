@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 1258845703}
   - component: {fileID: 1258845702}
   - component: {fileID: 1258845701}
-  - component: {fileID: 1258845700}
   m_Layer: 5
   m_Name: WorldSpaceUI
   m_TagString: Untagged
@@ -84,23 +83,6 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 1
---- !u!114 &1258845700
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1258845699}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!1 &1288190898803889
 GameObject:
   m_ObjectHideFlags: 0
@@ -1736,6 +1718,7 @@ GameObject:
   - component: {fileID: -8968419939583623080}
   - component: {fileID: 7146745241015769666}
   - component: {fileID: 8564504367815281176}
+  - component: {fileID: 1854636324971009952}
   m_Layer: 6
   m_Name: spartans
   m_TagString: Player
@@ -1911,6 +1894,18 @@ MonoBehaviour:
   _maxHitpoints: 5
   _currentHitpoints: 5
   _respawnTime: 4
+--- !u!114 &1854636324971009952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7093115869597867190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 490fbe1eec18c664da075a29d4b73788, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7178700922430649940
 GameObject:
   m_ObjectHideFlags: 0
