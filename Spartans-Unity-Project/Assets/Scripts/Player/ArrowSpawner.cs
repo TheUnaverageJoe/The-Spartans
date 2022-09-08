@@ -23,8 +23,10 @@ public class ArrowSpawner : NetworkBehaviour
         //Quaternion facingDirection = Quaternion.Euler(transform.rotation.x, transform.rotation.y, transform.rotation.z);
         if(IsServer){
             GameObject newProjectile = NetworkManager.Instantiate(_arrowPrefab, _lookAt.position, _lookAt.rotation);
+            newProjectile.GetComponent<Projectile>().sourceCollider = GetComponent<Collider>();
             newProjectile.GetComponent<NetworkObject>().Spawn();
-            //newProjectile.GetComponent<Rigidbody>().AddForce(-transform.forward * speedModifier, ForceMode.VelocityChange);
+            newProjectile.GetComponent<Rigidbody>().AddForce(transform.forward * speedModifier, ForceMode.VelocityChange);
+            
         }else{
             SecondaryAttackServerRpc();
         }
@@ -34,7 +36,8 @@ public class ArrowSpawner : NetworkBehaviour
     public void SecondaryAttackServerRpc(){
         //Quaternion facingDirection = Quaternion.Euler(transform.rotation.x, transform.rotation.y, transform.rotation.z);
         GameObject newProjectile = NetworkManager.Instantiate(_arrowPrefab, _lookAt.position, _lookAt.rotation);
+        newProjectile.GetComponent<Projectile>().sourceCollider = GetComponent<Collider>();
         newProjectile.GetComponent<NetworkObject>().Spawn();
-        newProjectile.GetComponent<Rigidbody>().AddForce(-transform.forward * speedModifier, ForceMode.VelocityChange);
+        newProjectile.GetComponent<Rigidbody>().AddForce(transform.forward * speedModifier, ForceMode.VelocityChange);
     }
 }

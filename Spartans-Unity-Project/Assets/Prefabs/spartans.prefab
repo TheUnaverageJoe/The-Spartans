@@ -4437,7 +4437,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _arrowPrefab: {fileID: 1933142501969207380, guid: ab7e0d36d32692846a6d1d3bc8647ce8, type: 3}
-  speedModifier: 10
+  speedModifier: 50
   _lookAt: {fileID: 5333111037838627753}
 --- !u!1 &7178700922430649940
 GameObject:

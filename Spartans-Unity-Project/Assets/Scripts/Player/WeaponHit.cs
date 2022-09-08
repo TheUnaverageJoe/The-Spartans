@@ -46,7 +46,7 @@ public class WeaponHit : NetworkBehaviour
         if(Input.GetButtonDown("Fire2") && !_secondaryAttackOnCooldown){
             onSecondaryAttackStart?.Invoke();
             _secondaryAttackOnCooldown = true;
-            ResetSecondaryAttackCooldown();
+            StartCoroutine(ResetSecondaryAttackCooldown());
         }
     }
     void FixedUpdate(){
