@@ -10,7 +10,7 @@ public class WeaponHit : NetworkBehaviour
     [SerializeField] private Transform handRef;
     Animator _animator;
     [SerializeField]LayerMask attackMask;
-    private bool _attackOnCooldown = false;
+    private bool _attackOnCooldown, _secondaryAttackOnCooldown = false;
     [SerializeField]private int _playerDamage;
     //[SerializeField] private GameObject parentObj;
 
@@ -22,6 +22,7 @@ public class WeaponHit : NetworkBehaviour
     //public static event System.Action<int, WeaponHit> onWeaponHit;
 
     public event System.Action onAttackStart;
+    public event System.Action onSecondaryAttackStart;
 
     public void Awake(){
         onAttackStart += Attack;
@@ -40,8 +41,12 @@ public class WeaponHit : NetworkBehaviour
                 onAttackStart.Invoke();
             }
             else
-                notifyAttackingServerRpc();
-            
+                AttackServerRpc();
+        }
+        if(Input.GetButtonDown("Fire2") && !_secondaryAttackOnCooldown){
+            onSecondaryAttackStart?.Invoke();
+            _secondaryAttackOnCooldown = true;
+            ResetSecondaryAttackCooldown();
         }
     }
     void FixedUpdate(){
@@ -79,10 +84,14 @@ public class WeaponHit : NetworkBehaviour
         _attackOnCooldown = false;
         _hitPlayers.Clear();
     }
+    IEnumerator ResetSecondaryAttackCooldown(){
+        yield return new WaitForSeconds(3);
+        _secondaryAttackOnCooldown = false;
+    }
 
     [ServerRpc]
-    public void notifyAttackingServerRpc(){
-        
+    public void AttackServerRpc(){
         onAttackStart.Invoke();
     }
+    
 }

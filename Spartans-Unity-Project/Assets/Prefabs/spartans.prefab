@@ -1719,6 +1719,7 @@ GameObject:
   - component: {fileID: 7146745241015769666}
   - component: {fileID: 8564504367815281176}
   - component: {fileID: 1854636324971009952}
+  - component: {fileID: 7561957944533429561}
   m_Layer: 6
   m_Name: spartans
   m_TagString: Player
@@ -1843,6 +1844,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraPrefab: {fileID: 6566532239938505393, guid: 3ea986e08f4b2a44bb1934c5a1cec700, type: 3}
   worldSpaceCanvas: {fileID: 1258845699}
+  _animationManager: {fileID: 0}
 --- !u!114 &-8968419939583623080
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1906,6 +1908,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 490fbe1eec18c664da075a29d4b73788, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7561957944533429561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7093115869597867190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7636e378675dfc445836f3c6fe5a52a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _arrowPrefab: {fileID: 1933142501969207380, guid: ab7e0d36d32692846a6d1d3bc8647ce8, type: 3}
+  speedModifier: 10
+  _lookAt: {fileID: 5333111037838627753}
 --- !u!1 &7178700922430649940
 GameObject:
   m_ObjectHideFlags: 0

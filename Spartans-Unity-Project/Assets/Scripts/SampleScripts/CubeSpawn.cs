@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class CubeSpawn : NetworkBehaviour
+public class CubeSpawn : MonoBehaviour
 {
     [SerializeField] private GameObject objRef;
     

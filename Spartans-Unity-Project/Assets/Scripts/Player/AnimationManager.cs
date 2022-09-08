@@ -49,14 +49,6 @@ public class AnimationManager : NetworkBehaviour
         int _int;
         if(type == "Bool"){
             _bool = bool.Parse(value);
-            /*if(value == "True"){
-                _bool = true;
-            }else if(value == "False"){
-                _bool = false;
-            }else{
-                Debug.LogError("value field should only be True or False");
-                _bool = false;
-            }*/
             _animator.SetBool(name, _bool);
         }else if(type == "Float"){
             _float = float.Parse(value);
@@ -93,9 +85,9 @@ public class AnimationManager : NetworkBehaviour
     public bool SetParameter(string name, float value){
         //first step is to verify that a valid input was passed for this parameter
         //first step is to verify that a valid inputs were passed
+        string val;
         if(_animatorParameters.ContainsKey(name)){
-            print("found parameter");
-            string val;
+            print("found parameter " + name);
             _animatorParameters.TryGetValue(name, out val);
             if(val == "Float"){
                 _animator.SetFloat(name, value);
@@ -108,13 +100,14 @@ public class AnimationManager : NetworkBehaviour
             return false;
         }
         print($"{name} set to {value}");
+        if(!IsServer) UpdateAnimatorServerRpc(name, value.ToString(), val);
         return true;
     }
     public bool SetParameter(string name, int value){
         //first step is to verify that a valid input was passed for this parameter
+        string val;
         if(_animatorParameters.ContainsKey(name)){
             print("found parameter");
-            string val;
             _animatorParameters.TryGetValue(name, out val);
             if(val == "Int"){
                 _animator.SetInteger(name, value);
@@ -127,6 +120,7 @@ public class AnimationManager : NetworkBehaviour
             return false;
         }
         print($"{name} set to {value}");
+        if(!IsServer) UpdateAnimatorServerRpc(name, value.ToString(), val);
         return true;
     }
 }
