@@ -29,7 +29,7 @@ namespace Spartans.Players{
             //_maxHitpoints = 3;
             //_currentHitpoints = _maxHitpoints;
             //hpDisplay = Instantiate(_floatingHealthPrefab, GetComponentInChildren<Canvas>().transform);
-            _animator = GetComponent<Animator>();
+            _animator = GetComponentInChildren<Animator>();
             _healthDisplay = GetComponentInChildren<FloatingHealth>();
 
             onDie += OnDieCallback;

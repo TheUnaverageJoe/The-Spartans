@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: Archer
   m_EditorClassIdentifier: Assembly-CSharp::SpawnManagerScriptableObject
-  prefabName: 
-  prefab: {fileID: 0}
-  health: 0
-  damage: 0
+  prefabName: Archer
+  prefab: {fileID: 7093115869597867190, guid: c414461f035f2bb46a1d6692bf8c5a37, type: 3}
+  health: 2
+  damage: 3

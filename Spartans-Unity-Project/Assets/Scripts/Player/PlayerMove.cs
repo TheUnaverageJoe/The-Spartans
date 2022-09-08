@@ -9,6 +9,7 @@ namespace Spartans.Players{
     public class PlayerMove : NetworkBehaviour
     {
         [SerializeField] public Transform lookAtPoint;
+        [SerializeField] public Transform spine;
         private Rigidbody _rigidbody;
         private Animator _animator;
         private Vector3 _lastSentInput;
@@ -70,16 +71,14 @@ namespace Spartans.Players{
             }
             //Update rotation
             float mouseX = Input.GetAxis("Mouse X");
-            if (mouseX != 0){
-                requestRotationServerRpc(mouseX*mouseSens);
-            }
-
             float mouseY = Input.GetAxis("Mouse Y");
-            
-            if (mouseY != 0){
-                lookAtPoint.eulerAngles = new Vector3(lookAtPoint.eulerAngles.x - mouseY*mouseSens,
-                                    lookAtPoint.eulerAngles.y ,lookAtPoint.eulerAngles.z);
+            requestRotationServerRpc(mouseX*mouseSens, -mouseY*mouseSens);
+            float rotMouseY = -mouseY*mouseSens;
+            if (rotMouseY != 0){
+                lookAtPoint.Rotate(new Vector3(rotMouseY, 0, 0));
+                //lookAtPoint.eulerAngles = new Vector3(Mathf.Clamp(lookAtPoint.eulerAngles.x, -75.0f, 75.0f),lookAtPoint.eulerAngles.y ,lookAtPoint.eulerAngles.z );
             }
+            
             //Update movement
             //if(grounded){
             input = new Vector3(Input.GetAxisRaw("Horizontal"), 0 , Input.GetAxisRaw("Vertical"));
@@ -124,9 +123,19 @@ namespace Spartans.Players{
         }
 
         [ServerRpc]
-        public void requestRotationServerRpc(float rotX){
-            transform.Rotate(new Vector3(0, rotX, 0));
+        public void requestRotationServerRpc(float rotX, float rotY){
+           
+            if (rotX != 0){
+                transform.Rotate(new Vector3(0, rotX, 0));
+            }
+            if (rotY != 0){
+                
+                lookAtPoint.Rotate(new Vector3(rotY, 0, 0));
+                //lookAtPoint.eulerAngles = new Vector3(Mathf.Clamp(lookAtPoint.eulerAngles.x, -75.0f, 75.0f),lookAtPoint.eulerAngles.y ,lookAtPoint.eulerAngles.z );
+            }
         }
+
+
         [ServerRpc]
         public void requestMoveServerRpc(Vector3 dir){
             if(!grounded) return;
