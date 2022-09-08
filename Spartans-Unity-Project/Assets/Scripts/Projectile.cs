@@ -1,33 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 using Spartans.Players;
 
-public class Projectile : MonoBehaviour
+public class Projectile : NetworkBehaviour
 {
     [SerializeField] private int _damage;
     [SerializeField] private float _maxLifeSpanTime;//in seconds
     public Collider sourceCollider;
-    //private float _lifeSpanTime = 0;
+    private float _lifeSpanTime = 0;
     //private Collider _collider;
 
-    void Awake(){
-        //_collider = GetComponent<BoxCollider>();
-        Destroy(this.gameObject, _maxLifeSpanTime);
-    }
-    /*
     void FixedUpdate()
     {
+        if(!IsServer) return;
         if(_lifeSpanTime >= _maxLifeSpanTime){
             print("Projectile lifespan terminated");
-            Destroy(this.gameObject);
+            //Destroy(this.gameObject);
+            this.gameObject.GetComponent<NetworkObject>().Despawn();
         }else{
             _lifeSpanTime += Time.fixedDeltaTime;
         }
-        
     }
-    */
+    
     void OnTriggerEnter(Collider other){
+        if(!IsServer){
+            return;
+        }
         if(sourceCollider == null){
             print("PROBLEM");
         }
@@ -39,6 +39,6 @@ public class Projectile : MonoBehaviour
             hitTarget.TakeDamageServerRpc(_damage);
         }
         print($"Projectile hit {other.name}");
-        Destroy(this.gameObject);
+        this.gameObject.GetComponent<NetworkObject>().Despawn();
     }
 }

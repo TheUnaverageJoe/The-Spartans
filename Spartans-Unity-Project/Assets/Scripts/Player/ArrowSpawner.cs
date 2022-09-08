@@ -25,7 +25,7 @@ public class ArrowSpawner : NetworkBehaviour
             GameObject newProjectile = NetworkManager.Instantiate(_arrowPrefab, _lookAt.position, _lookAt.rotation);
             newProjectile.GetComponent<Projectile>().sourceCollider = GetComponent<Collider>();
             newProjectile.GetComponent<NetworkObject>().Spawn();
-            newProjectile.GetComponent<Rigidbody>().AddForce(transform.forward * speedModifier, ForceMode.VelocityChange);
+            newProjectile.GetComponent<Rigidbody>().AddForce(newProjectile.transform.forward * speedModifier, ForceMode.VelocityChange);
             
         }else{
             SecondaryAttackServerRpc();
@@ -38,6 +38,6 @@ public class ArrowSpawner : NetworkBehaviour
         GameObject newProjectile = NetworkManager.Instantiate(_arrowPrefab, _lookAt.position, _lookAt.rotation);
         newProjectile.GetComponent<Projectile>().sourceCollider = GetComponent<Collider>();
         newProjectile.GetComponent<NetworkObject>().Spawn();
-        newProjectile.GetComponent<Rigidbody>().AddForce(transform.forward * speedModifier, ForceMode.VelocityChange);
+        newProjectile.GetComponent<Rigidbody>().AddForce(newProjectile.transform.forward * speedModifier, ForceMode.VelocityChange);
     }
 }
