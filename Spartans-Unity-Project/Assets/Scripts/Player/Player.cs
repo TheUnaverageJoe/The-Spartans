@@ -13,7 +13,8 @@ namespace Spartans.Players
         [SerializeField] public GameObject worldSpaceCanvas;
         private GameObject _mainCamera;
         private GameManager _gameManager;
-        private PlayerMove _playerMove;
+        //private PlayerMove _playerMove;
+        private PlayerMoveRefactor _playerMove;
         private PlayerCanvasManager _HUD;
         private Camera cam;
         private Rigidbody _rigidbody;
@@ -29,7 +30,7 @@ namespace Spartans.Players
             _myHealth = GetComponent<Health>();
             _animationManager = GetComponent<AnimationManager>();
 
-            _playerMove = GetComponent<PlayerMove>();
+            _playerMove = GetComponent<PlayerMoveRefactor>();
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager.GetComponent<PlayerCanvasManager>();
             players_in_lobby = 0;

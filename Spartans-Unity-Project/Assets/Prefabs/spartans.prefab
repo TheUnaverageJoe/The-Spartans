@@ -4230,6 +4230,7 @@ GameObject:
   - component: {fileID: 324439227796420258}
   - component: {fileID: -4236820893792881773}
   - component: {fileID: 7167338817175085449}
+  - component: {fileID: 6866820073139171994}
   - component: {fileID: -8968419939583623080}
   - component: {fileID: 7146745241015769666}
   - component: {fileID: 8564504367815281176}
@@ -4360,7 +4361,7 @@ MonoBehaviour:
   cameraPrefab: {fileID: 6566532239938505393, guid: 3ea986e08f4b2a44bb1934c5a1cec700, type: 3}
   worldSpaceCanvas: {fileID: 1258845699}
   _animationManager: {fileID: 0}
---- !u!114 &-8968419939583623080
+--- !u!114 &6866820073139171994
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4368,6 +4369,26 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7093115869597867190}
   m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 862f3cea03ec58f4b9ba8577bf5df602, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lookAtPoint: {fileID: 5333111037838627753}
+  spine: {fileID: 7208791380157409551}
+  _canJump: 1
+  _grounded: 0
+  _jumpForce: 12
+  _moveSpeed: 5
+  _MAX_SPEED: 8
+  _mouseSens: 1
+--- !u!114 &-8968419939583623080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7093115869597867190}
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 11f101fcd2dcb9b4383236fe65826778, type: 3}
   m_Name: 

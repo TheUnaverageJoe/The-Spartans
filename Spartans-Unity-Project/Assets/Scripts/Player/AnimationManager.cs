@@ -66,7 +66,7 @@ public class AnimationManager : NetworkBehaviour
         //first step is to verify that a valid inputs were passed
         string val;
         if(_animatorParameters.ContainsKey(name)){
-            print("found parameter");
+            //print("found parameter");
             _animatorParameters.TryGetValue(name, out val);
             if(val == "Bool"){
                 _animator.SetBool(name, value);
@@ -78,7 +78,7 @@ public class AnimationManager : NetworkBehaviour
             print("Parameter not found");
             return false;
         }
-        print($"{name} set to {value}");
+        //print($"{name} set to {value}");
         if(!IsServer) UpdateAnimatorServerRpc(name, value.ToString(), val);
         return true;
     }
@@ -87,7 +87,7 @@ public class AnimationManager : NetworkBehaviour
         //first step is to verify that a valid inputs were passed
         string val;
         if(_animatorParameters.ContainsKey(name)){
-            print("found parameter " + name);
+            //print("found parameter " + name);
             _animatorParameters.TryGetValue(name, out val);
             if(val == "Float"){
                 _animator.SetFloat(name, value);
@@ -99,7 +99,7 @@ public class AnimationManager : NetworkBehaviour
             print("Parameter not found");
             return false;
         }
-        print($"{name} set to {value}");
+        //print($"{name} set to {value}");
         if(!IsServer) UpdateAnimatorServerRpc(name, value.ToString(), val);
         return true;
     }
@@ -107,7 +107,7 @@ public class AnimationManager : NetworkBehaviour
         //first step is to verify that a valid input was passed for this parameter
         string val;
         if(_animatorParameters.ContainsKey(name)){
-            print("found parameter");
+            //print("found parameter");
             _animatorParameters.TryGetValue(name, out val);
             if(val == "Int"){
                 _animator.SetInteger(name, value);
@@ -119,7 +119,7 @@ public class AnimationManager : NetworkBehaviour
             print("Parameter not found");
             return false;
         }
-        print($"{name} set to {value}");
+        //print($"{name} set to {value}");
         if(!IsServer) UpdateAnimatorServerRpc(name, value.ToString(), val);
         return true;
     }
