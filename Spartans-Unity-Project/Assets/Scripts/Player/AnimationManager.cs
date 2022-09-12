@@ -43,7 +43,7 @@ public class AnimationManager : NetworkBehaviour
 
     [ServerRpc]
     public void UpdateAnimatorServerRpc(string name, string value, string type){
-        print("recieved rpc to Update Animator");
+        print("recieved rpc to Update Animator param: " + name);
         bool _bool;
         float _float;
         int _int;

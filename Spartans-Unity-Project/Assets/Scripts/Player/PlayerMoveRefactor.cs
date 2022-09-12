@@ -120,12 +120,10 @@ namespace Spartans.Players{
 
         [ServerRpc]
         public void requestRotationServerRpc(float rotX, float rotY){
-           
             if (rotX != 0){
                 transform.Rotate(new Vector3(0, rotX, 0));
             }
             if (rotY != 0){
-                
                 lookAtPoint.Rotate(new Vector3(rotY, 0, 0));
                 //lookAtPoint.eulerAngles = new Vector3(Mathf.Clamp(lookAtPoint.eulerAngles.x, -75.0f, 75.0f),lookAtPoint.eulerAngles.y ,lookAtPoint.eulerAngles.z );
             }
@@ -135,37 +133,20 @@ namespace Spartans.Players{
         public void requestMoveServerRpc(Vector3 dir){
             if(!_grounded) return;
             Vector3 moveDir = dir.normalized;
-            _animator.SetFloat("speed", dir.magnitude);
-            //_player._animationManager.SetParameter("speed", dir.magnitude);
-            if (moveDir == Vector3.zero && _grounded && _canJump){
+            //_animator.SetFloat("speed", dir.magnitude);
+            _player._animationManager.SetParameter("speed", dir.magnitude);
+            if (moveDir == Vector3.zero && _grounded){
                 _rigidbody.velocity = Vector3.zero;
             }
             
             Vector2 horizPlane = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.z);
             float velocityComponentY = _rigidbody.velocity.y;
-
-            if(horizPlane.magnitude > _MAX_SPEED){
-                //print("TOO FAST" + horizPlane.magnitude);
-                horizPlane = horizPlane.normalized*_MAX_SPEED;
-                Vector3 normalized = new Vector3(horizPlane.x, velocityComponentY, horizPlane.y);
-                _rigidbody.velocity = _rigidbody.velocity.normalized*_MAX_SPEED;
-                return;
-            }
-
             if(horizPlane.magnitude < _MAX_SPEED){
                 moveDir = transform.TransformDirection(moveDir);
                 _rigidbody.AddForce(moveDir*_moveSpeed, ForceMode.VelocityChange);
-            }
-            if(horizPlane.magnitude == _MAX_SPEED){
-                //check if vectors point same direction
-                if(Vector3.Dot(moveDir, new Vector3(horizPlane.x,0,horizPlane.y).normalized) == 1){
-                    print("denied movement change, cant accelerate further");
-                    return;
-                }else{
-                    if(!_grounded) return;
-                    moveDir = transform.TransformDirection(moveDir);
-                    _rigidbody.AddForce(moveDir.normalized*_moveSpeed, ForceMode.VelocityChange);
-                }
+            }else if(horizPlane.magnitude >= _MAX_SPEED){
+                _rigidbody.velocity = _rigidbody.velocity.normalized*_MAX_SPEED;
+                return;
             }
         }
 
