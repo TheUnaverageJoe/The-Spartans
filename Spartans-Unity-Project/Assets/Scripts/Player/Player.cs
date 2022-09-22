@@ -11,7 +11,7 @@ namespace Spartans.Players
     {
         [SerializeField] GameObject cameraPrefab;
         [SerializeField] public GameObject worldSpaceCanvas;
-        private GameObject _mainCamera;
+        [SerializeField] public GameObject mainCamera;
         private GameManager _gameManager;
         private PlayerMove _playerMove;
         private PlayerCanvasManager _HUD;
@@ -45,12 +45,13 @@ namespace Spartans.Players
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             
             if(IsLocalPlayer){
-                _mainCamera = Instantiate(cameraPrefab, transform.position, transform.rotation) as GameObject; 
-                _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
-                _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
-                transform.GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
-                worldSpaceCanvas.GetComponent<Canvas>().worldCamera = _mainCamera.GetComponent<Camera>();
-                worldSpaceCanvas.GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
+                mainCamera = Instantiate(cameraPrefab, transform.position, transform.rotation) as GameObject; 
+                mainCamera.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
+                mainCamera.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
+                transform.GetComponentInChildren<FloatingHealth>().camTransform = mainCamera.transform;
+                worldSpaceCanvas.GetComponent<Canvas>().worldCamera = mainCamera.GetComponent<Camera>();
+                worldSpaceCanvas.GetComponentInChildren<FloatingHealth>().camTransform = mainCamera.transform;
+                transform.GetComponent<ArrowSpawner>().mainCamera = mainCamera;
                 //_mainCamera.SetActive(false);
                 //_HUD.Init();
             }
@@ -86,8 +87,8 @@ namespace Spartans.Players
                 if(GameObject.FindGameObjectsWithTag("Player").Length != players_in_lobby){
                     var players = GameObject.FindGameObjectsWithTag("Player");
                     for(int i = 0; i<players.Length; i++){
-                        players[i].transform.Find("WorldSpaceUI").GetComponent<Canvas>().worldCamera = _mainCamera.GetComponent<Camera>();
-                        players[i].GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
+                        players[i].transform.Find("WorldSpaceUI").GetComponent<Canvas>().worldCamera = mainCamera.GetComponent<Camera>();
+                        players[i].GetComponentInChildren<FloatingHealth>().camTransform = mainCamera.transform;
                     }
                     
                     players_in_lobby = players.Length;
