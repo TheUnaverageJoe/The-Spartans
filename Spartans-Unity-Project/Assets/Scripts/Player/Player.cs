@@ -32,7 +32,7 @@ namespace Spartans.Players
 
             _playerMove = GetComponent<PlayerMoveRefactor>();
             _gameManager = FindObjectOfType<GameManager>();
-            _HUD = _gameManager.GetComponent<PlayerCanvasManager>();
+            _HUD = _gameManager._playerCanvasManager;
             players_in_lobby = 0;
             //_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             // cam = GetComponentInChildren<Camera>();
@@ -81,7 +81,8 @@ namespace Spartans.Players
                 }
 
                 if(Input.GetKeyDown(KeyCode.Tab)){
-                    PlayerCanvasManager.GetPanelManager().gameObject.SetActive(!PlayerCanvasManager.GetPanelManager().gameObject.activeSelf);
+                    _HUD.ToggleBackButtonActive();
+                    _HUD.ToggleConnectionButtonsActive();
                 }
 
                 if(GameObject.FindGameObjectsWithTag("Player").Length != players_in_lobby){
@@ -108,7 +109,7 @@ namespace Spartans.Players
 
         //Used to handle logic when Alt Tabbing in and out of the application
         void OnApplicationFocus(bool hasFocus){
-            if(!IsLocalPlayer) return;
+            if(!IsLocalPlayer || Application.isEditor) return;
             
             if(hasFocus){
                 Cursor.lockState = CursorLockMode.Locked;
@@ -134,11 +135,11 @@ namespace Spartans.Players
             //                                1, Random.Range(zSpawnPos - 3, zSpawnPos + 3));
             //print("MOVE MMEEEEE");
         }
-        //OnDrawGizmos is being usec purly for debugging  purposes to see where the hitbox is in world space
-        private void OnDrawGizmos() {
-            //Gizmos.color = Color.red;
-            //Use the same vars you use to draw your Overlap SPhere to draw your Wire Sphere.
-            //Gizmos.DrawWireCube(transform.position, new Vector3(1.4f, 0.1f, 1.4f));
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            print("Despawned: " + playerName);
         }
+
     }
 }

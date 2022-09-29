@@ -15,42 +15,37 @@ namespace Spartans{
     public class GameManager : MonoBehaviour
     {
         private const string MENU_SCENE_NAME = "MainMenu";
-        PlayerCanvasManager _playerCanvasManager;
+        public PlayerCanvasManager _playerCanvasManager{get; private set;}
         //private List<Player> _players = new List<Player>();
         [SerializeField] private GameObject connectionUI;
         [SerializeField] private GameObject _backButton;
         private TMP_InputField _input;
         private UnityTransport connection;
+        public static States activeState{get; private set;}
         //private PanelManager.ConnectionInfo info;
-        public UnityEvent joinedGame;
+        public System.Action joinedGame;
         public System.Action onClickBack;
-        enum States{
-            Select,
-            InSession,
+        public enum States{
+            ModeSelect,
+            Connected,
+            InGame,
             PostGame
         }
-        bool connected = false;
-        States activeState = States.Select;
 
         void Start(){
-            //if(NetworkManager.Singleton.IsServer)
-                //NetworkManager.Singleton.OnClientConnectedCallback += RandomizeSpawn;
-            //NetworkManager.Singleton.OnClientConnectedCallback += RequestAddPlayerServerRPC;
-
-            joinedGame = new UnityEvent();
-            joinedGame.AddListener(JoinGameCallback);
+            joinedGame += JoinGameCallback;
             onClickBack += onClickBackCallback;
 
-            //_playerCanvasManager = FindObjectOfType<PlayerCanvasManager>();
-            //_playerCanvasManager.Init();
+            _playerCanvasManager = FindObjectOfType<PlayerCanvasManager>();
+            _playerCanvasManager.Init();
             
             _input = connectionUI.GetComponentInChildren<TMP_InputField>();
             connection = NetworkManager.Singleton.GetComponent<UnityTransport>();
 
+            activeState = States.ModeSelect;
             
             Physics.gravity = new Vector3(0, -20f, 0);
         }
-
 
         public void StartServer(){
             NetworkManager.Singleton.StartServer();
@@ -73,23 +68,28 @@ namespace Spartans{
         public void BackButtonPressed(){
             onClickBack?.Invoke();
         }
+        public void StopConnection(){
+            NetworkManager.Singleton.Shutdown();
+            activeState = States.ModeSelect;
+            //_playerCanvasManager.ToggleConnectionButtonsActive(true);
+
+        }
 
         private void JoinGameCallback(){
-            connectionUI.gameObject.SetActive(false);
-            connected = true;
-            activeState = States.InSession;
-            _backButton.SetActive(false);
+            //_playerCanvasManager.ToggleConnectionButtonsActive(false);
+            activeState = States.Connected;
+            //_playerCanvasManager.ToggleBackButtonActive(false);
             //_playerCanvasManager.OnJoinGame();
         }
         private void onClickBackCallback(){
             SceneManager.LoadScene(MENU_SCENE_NAME);
         }
 
-        private void OnDestroy(){
-            if(NetworkManager.Singleton.gameObject != null){
+        private void OnDisable(){
+            if(NetworkManager.Singleton != null){
                 Destroy(NetworkManager.Singleton.gameObject);
             }
-            joinedGame.RemoveListener(JoinGameCallback);
+            joinedGame -= JoinGameCallback;
             onClickBack -= onClickBackCallback;
         }
     }
