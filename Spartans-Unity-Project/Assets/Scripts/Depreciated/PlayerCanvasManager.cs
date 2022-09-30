@@ -19,17 +19,16 @@ namespace Spartans.UI{
         public void Init()
         {
             isOpen = true;
-            UpdateUIState();
+            GameManager.leftGame += OnLeaveGame;
+            GameManager.stateChanged += UpdateUIState;
         }
         void Update(){
             if(PlayerInput.Instance.tab){
+                print("Called OnOff");
                 ToggleHudOnOff();
             }
         }
-        public void FixedUpdate(){
-            //if(!isOpen || _connectionUI.activeSelf) return;
-            //UpdateUIState();
-        }
+
         public void ToggleHudOnOff(){
             if(isOpen){
                 _connectionUI.SetActive(false);
@@ -41,90 +40,44 @@ namespace Spartans.UI{
             }
             isOpen = !isOpen;
         }
-        public void ToggleBackButtonActive(bool state)
-        {
-            _backButton.SetActive(state);
-            if(state == true)
-            {
-                onUiOpen?.Invoke();
-            }
 
-        }
-        public void ToggleBackButtonActive()
-        {
-            _backButton.SetActive(!_backButton.activeSelf);
-            if(_backButton.activeSelf == true)
-            {
-                onUiOpen?.Invoke();
-            }
-        }
-        public void ToggleConnectionButtonsActive()
-        {
-            if(NetworkManager.Singleton.IsClient)
-            {
-                bool state = !_disconnectUI.activeSelf;
-                _disconnectUI.SetActive(state);
-                _connectionUI.SetActive(false);
-                if(_disconnectUI.activeSelf == true)
-                {
-                    onUiOpen?.Invoke();
-                }
-            }
-            else
-            {
-                _connectionUI.SetActive(!_connectionUI.activeSelf);
-                _disconnectUI.SetActive(false);
-                if(_connectionUI.activeSelf == true)
-                {
-                    onUiOpen?.Invoke();
-                }
-            }
-        }
-        public void ToggleConnectionButtonsActive(bool state)
-        {
-            if(NetworkManager.Singleton.IsClient)
-            {
-                _disconnectUI.SetActive(state);
-                _connectionUI.SetActive(false);
-            }
-            else
-            {
-                _connectionUI.SetActive(state);
-                _disconnectUI.SetActive(false);
-                
-            }
-            if(state == true)
-            {
-                onUiOpen?.Invoke();
-            }
-        }
         private void UpdateUIState(){
             switch(GameManager.activeState){
                 case GameManager.States.ModeSelect:
+                    //print("updating in ModeSelect State");
                     _connectionUI.SetActive(true);
                     _classSelect.SetActive(false);
                     _disconnectUI.SetActive(false);
                     _backButton.SetActive(true);
                     break;
                 case GameManager.States.Connected:
+                    //print("updating in Connected State");
                     _connectionUI.SetActive(false);
                     _classSelect.SetActive(true);
                     _disconnectUI.SetActive(true);
-                    _backButton.SetActive(true);
+                    _backButton.SetActive(false);
                     break;
                 case GameManager.States.InGame:
+                    //print("updating in InGame State");
                     _connectionUI.SetActive(false);
                     _classSelect.SetActive(false);
                     _disconnectUI.SetActive(true);
-                    _backButton.SetActive(true);
+                    _backButton.SetActive(false);
                     break;
                 case GameManager.States.PostGame:
-                    print("Post game not implimented");
+                    print("Post game state not implimented");
                     break;
                 default:
                     print("BUG IN PlayerCanvasManager");
                     break;
             }
+        }
+        private void OnLeaveGame(){
+            UpdateUIState();
+        }
+        private void OnDisable(){
+            GameManager.leftGame -= OnLeaveGame;
+            GameManager.stateChanged -= UpdateUIState;
         }
     }
 }

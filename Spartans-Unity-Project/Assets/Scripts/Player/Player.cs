@@ -7,6 +7,7 @@ using Cinemachine;
 using Spartans.UI;
 namespace Spartans.Players
 {
+    [RequireComponent(typeof(AnimationManager), typeof(Rigidbody))]
     public class Player : NetworkBehaviour
     {
         [SerializeField] GameObject cameraPrefab;
@@ -80,10 +81,12 @@ namespace Spartans.Players
                     else MouseLock(false);
                 }
 
+                /* **Old Code used before PlayerInput was made**
                 if(Input.GetKeyDown(KeyCode.Tab)){
                     _HUD.ToggleBackButtonActive();
                     _HUD.ToggleConnectionButtonsActive();
                 }
+                */
 
                 if(GameObject.FindGameObjectsWithTag("Player").Length != players_in_lobby){
                     var players = GameObject.FindGameObjectsWithTag("Player");
@@ -138,7 +141,7 @@ namespace Spartans.Players
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
-            print("Despawned: " + playerName);
+            //print("Despawned: " + playerName);
         }
 
     }

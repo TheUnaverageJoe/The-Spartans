@@ -13,11 +13,14 @@ namespace Spartans.Players{
         public bool jump{get; private set;}
         public bool escape{get; private set;}
         public bool tab{get; private set;}
+        public bool primary{get; private set;}
+        public bool secondary{get; private set;}
+        public bool special{get; private set;}
 
         
         void Awake(){
             if(Instance == null){
-                print("assigned instance");
+                //print("assigned instance");
                 Instance = this;
             }else{
                 Destroy(this.gameObject);
@@ -33,6 +36,10 @@ namespace Spartans.Players{
             escape = false;
             mouseX = 0;
             mouseY = 0;
+
+            primary = false;
+            secondary = false;
+            special = false;
             
         }
         //*/
@@ -47,6 +54,16 @@ namespace Spartans.Players{
             jump = Input.GetButtonDown("Jump");
             escape = Input.GetKeyDown(KeyCode.Escape);
             tab = Input.GetKeyDown(KeyCode.Tab);
+
+            primary = Input.GetButtonDown("Fire1");
+            secondary = Input.GetButtonDown("Fire2");
+            //special = Input.GetButtonDown("Fire3");
+            special = Input.GetKeyDown(KeyCode.Q);
+            
+
+        }
+        private void OnDisable(){
+            Instance = null;
         }
     }
 }

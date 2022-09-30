@@ -5,26 +5,25 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine.SceneManagement;
 using TMPro;
-using UnityEngine.Events;
 
 using Spartans.UI;
 using Spartans.Players;
-using System;
 
 namespace Spartans{
-    public class GameManager : MonoBehaviour
+    public class GameManager : NetworkBehaviour
     {
         private const string MENU_SCENE_NAME = "MainMenu";
         public PlayerCanvasManager _playerCanvasManager{get; private set;}
         //private List<Player> _players = new List<Player>();
-        [SerializeField] private GameObject connectionUI;
-        [SerializeField] private GameObject _backButton;
-        private TMP_InputField _input;
+        [SerializeField] private List<GameObject> _playerPrefabs;
+        [SerializeField] private TMP_InputField _input;
         private UnityTransport connection;
         public static States activeState{get; private set;}
         //private PanelManager.ConnectionInfo info;
-        public System.Action joinedGame;
-        public System.Action onClickBack;
+        public static System.Action stateChanged;
+        public static System.Action joinedGame;
+        public static System.Action leftGame;
+        //public System.Action onClickBack;
         public enum States{
             ModeSelect,
             Connected,
@@ -34,18 +33,19 @@ namespace Spartans{
 
         void Start(){
             joinedGame += JoinGameCallback;
-            onClickBack += onClickBackCallback;
+            //onClickBack += OnClickBackCallback;
 
             _playerCanvasManager = FindObjectOfType<PlayerCanvasManager>();
             _playerCanvasManager.Init();
-            
-            _input = connectionUI.GetComponentInChildren<TMP_InputField>();
+
             connection = NetworkManager.Singleton.GetComponent<UnityTransport>();
 
             activeState = States.ModeSelect;
+            stateChanged?.Invoke();
             
             Physics.gravity = new Vector3(0, -20f, 0);
         }
+
 
         public void StartServer(){
             NetworkManager.Singleton.StartServer();
@@ -66,22 +66,21 @@ namespace Spartans{
 
         }
         public void BackButtonPressed(){
-            onClickBack?.Invoke();
+            SceneManager.LoadScene(MENU_SCENE_NAME);
         }
         public void StopConnection(){
             NetworkManager.Singleton.Shutdown();
             activeState = States.ModeSelect;
-            //_playerCanvasManager.ToggleConnectionButtonsActive(true);
+            stateChanged?.Invoke();
+            //leftGame?.Invoke();
 
         }
 
         private void JoinGameCallback(){
-            //_playerCanvasManager.ToggleConnectionButtonsActive(false);
             activeState = States.Connected;
-            //_playerCanvasManager.ToggleBackButtonActive(false);
-            //_playerCanvasManager.OnJoinGame();
+            stateChanged?.Invoke();
         }
-        private void onClickBackCallback(){
+        private void OnClickBackCallback(){
             SceneManager.LoadScene(MENU_SCENE_NAME);
         }
 
@@ -90,7 +89,24 @@ namespace Spartans{
                 Destroy(NetworkManager.Singleton.gameObject);
             }
             joinedGame -= JoinGameCallback;
-            onClickBack -= onClickBackCallback;
+            //onClickBack -= OnClickBackCallback;
         }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void requestCharacterServerRpc(ulong clientID, int classIndex){
+            if(classIndex > _playerPrefabs.Count-1)
+            {
+                print("Client sender error: invalid classIndex");
+            }
+            //print("assigning player for client " + clientID);
+            GameObject spawningPlayer = Instantiate(_playerPrefabs[classIndex], Vector3.up*2, Quaternion.identity);
+            spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientID);
+        }
+        public void requestCharacter(int classIndex){
+            requestCharacterServerRpc(NetworkManager.Singleton.LocalClientId, classIndex);
+            activeState = States.InGame;
+            stateChanged?.Invoke();
+        }
+     
     }
 }
