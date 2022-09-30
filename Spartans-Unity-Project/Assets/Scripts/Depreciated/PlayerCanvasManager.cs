@@ -2,37 +2,82 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Netcode;
 
-using Spartans.UI;
+using Spartans.Players;
 
 namespace Spartans.UI{
     public class PlayerCanvasManager : MonoBehaviour
     {
-        private static PanelManager _connectionsRegion;
-        private Healthbar _healthBar;
-        private PopUpText _alert;
-        public void Init(){
-            //get rectangular region at top of screen
-            _connectionsRegion = GetComponentInChildren<PanelManager>();
-            _alert = GetComponentInChildren<PopUpText>();
-            _connectionsRegion.Init();
-            _connectionsRegion.gameObject.SetActive(false);
-            //_alert.gameObject.SetActive(false);
+        [SerializeField] private GameObject _connectionUI;
+        [SerializeField] private GameObject _classSelect;
+        [SerializeField] private GameObject _disconnectUI;
+        [SerializeField] private GameObject _backButton;
+        private bool isOpen;
+        private System.Action onUiOpen;
 
-            _healthBar = GetComponentInChildren<Healthbar>();
-            if(_healthBar != null){
-                _healthBar.Init();
-                _healthBar.gameObject.SetActive(false);
+        public void Init()
+        {
+            isOpen = true;
+            GameManager.leftGame += OnLeaveGame;
+            GameManager.stateChanged += UpdateUIState;
+        }
+        void Update(){
+            if(PlayerInput.Instance.tab){
+                print("Called OnOff");
+                ToggleHudOnOff();
             }
         }
 
-        public void OnJoinGame(){
-            if(_healthBar != null)
-                _healthBar.gameObject.SetActive(true);
+        public void ToggleHudOnOff(){
+            if(isOpen){
+                _connectionUI.SetActive(false);
+                _classSelect.SetActive(false);
+                _disconnectUI.SetActive(false);
+                _backButton.SetActive(false);
+            }else{
+                UpdateUIState();
+            }
+            isOpen = !isOpen;
         }
 
-        public static PanelManager GetPanelManager(){
-            return _connectionsRegion;
+        private void UpdateUIState(){
+            switch(GameManager.activeState){
+                case GameManager.States.ModeSelect:
+                    //print("updating in ModeSelect State");
+                    _connectionUI.SetActive(true);
+                    _classSelect.SetActive(false);
+                    _disconnectUI.SetActive(false);
+                    _backButton.SetActive(true);
+                    break;
+                case GameManager.States.Connected:
+                    //print("updating in Connected State");
+                    _connectionUI.SetActive(false);
+                    _classSelect.SetActive(true);
+                    _disconnectUI.SetActive(true);
+                    _backButton.SetActive(false);
+                    break;
+                case GameManager.States.InGame:
+                    //print("updating in InGame State");
+                    _connectionUI.SetActive(false);
+                    _classSelect.SetActive(false);
+                    _disconnectUI.SetActive(true);
+                    _backButton.SetActive(false);
+                    break;
+                case GameManager.States.PostGame:
+                    print("Post game state not implimented");
+                    break;
+                default:
+                    print("BUG IN PlayerCanvasManager");
+                    break;
+            }
+        }
+        private void OnLeaveGame(){
+            UpdateUIState();
+        }
+        private void OnDisable(){
+            GameManager.leftGame -= OnLeaveGame;
+            GameManager.stateChanged -= UpdateUIState;
         }
     }
 }

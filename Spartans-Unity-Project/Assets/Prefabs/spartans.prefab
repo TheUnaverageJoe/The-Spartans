@@ -4053,15 +4053,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
+  SyncPositionX: 0
+  SyncPositionY: 0
+  SyncPositionZ: 0
   SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
+  SyncRotAngleY: 0
+  SyncRotAngleZ: 0
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
@@ -4306,7 +4306,7 @@ GameObject:
   - component: {fileID: 324439227796420258}
   - component: {fileID: -4236820893792881773}
   - component: {fileID: 7167338817175085449}
-  - component: {fileID: -8968419939583623080}
+  - component: {fileID: 6866820073139171994}
   - component: {fileID: 7146745241015769666}
   - component: {fileID: 8564504367815281176}
   - component: {fileID: 1854636324971009952}
@@ -4438,7 +4438,7 @@ MonoBehaviour:
   worldSpaceCanvas: {fileID: 1258845699}
   mainCamera: {fileID: 0}
   _animationManager: {fileID: 0}
---- !u!114 &-8968419939583623080
+--- !u!114 &6866820073139171994
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4447,17 +4447,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 7093115869597867190}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 11f101fcd2dcb9b4383236fe65826778, type: 3}
+  m_Script: {fileID: 11500000, guid: 862f3cea03ec58f4b9ba8577bf5df602, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   lookAtPoint: {fileID: 5333111037838627753}
   spine: {fileID: 7208791380157409551}
-  canJump: 1
-  grounded: 0
-  jumpForce: 12
-  moveSpeed: 5
-  MAX_SPEED: 8
-  mouseSens: 1
+  _canJump: 1
+  _grounded: 0
+  _jumpForce: 12
+  _moveSpeed: 5
+  _MAX_SPEED: 8
+  _mouseSens: 1
 --- !u!114 &7146745241015769666
 MonoBehaviour:
   m_ObjectHideFlags: 0
