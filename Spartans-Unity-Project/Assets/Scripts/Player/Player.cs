@@ -12,12 +12,11 @@ namespace Spartans.Players
     {
         [SerializeField] GameObject cameraPrefab;
         [SerializeField] public GameObject worldSpaceCanvas;
-        private GameObject _mainCamera;
+        private Camera _characterCam;
         private GameManager _gameManager;
         //private PlayerMove _playerMove;
         private PlayerMoveRefactor _playerMove;
         private PlayerCanvasManager _HUD;
-        private Camera cam;
         private Rigidbody _rigidbody;
         //private Animator _animator;
         [SerializeField] public AnimationManager _animationManager;
@@ -45,12 +44,13 @@ namespace Spartans.Players
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             
             if(IsLocalPlayer){
-                _mainCamera = Instantiate(cameraPrefab, transform.position, transform.rotation) as GameObject; 
-                _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
-                _mainCamera.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
-                transform.GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
-                worldSpaceCanvas.GetComponent<Canvas>().worldCamera = _mainCamera.GetComponent<Camera>();
-                worldSpaceCanvas.GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
+                GameObject newCharacterCam = Instantiate(cameraPrefab, transform.position, transform.rotation)
+                _characterCam = newCharacterCam.GetComponent<Camera>();
+                _characterCam.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
+                _characterCam.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
+                transform.GetComponentInChildren<FloatingHealth>().camTransform = _characterCam.transform;
+                worldSpaceCanvas.GetComponent<Canvas>().worldCamera = _characterCam.GetComponent<Camera>();
+                worldSpaceCanvas.GetComponentInChildren<FloatingHealth>().camTransform = _characterCam.transform;
                 //_mainCamera.SetActive(false);
                 //_HUD.Init();
             }
@@ -73,7 +73,6 @@ namespace Spartans.Players
                 return;
             }
             if(IsLocalPlayer){
-                
                 if(Input.GetKeyDown(KeyCode.Escape)){
                     if(Cursor.visible) MouseLock(true);
                     else MouseLock(false);
