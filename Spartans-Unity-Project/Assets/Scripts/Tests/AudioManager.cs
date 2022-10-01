@@ -54,7 +54,6 @@ public class AudioManager : MonoBehaviour
         }
         
         PlayAudio(AudioChannels.Channel1, SoundClipsIndex.bg_music);
-
     }
 
     public void PlayAudio(AudioChannels channel, SoundClipsIndex index)

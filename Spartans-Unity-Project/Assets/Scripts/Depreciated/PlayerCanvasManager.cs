@@ -14,6 +14,8 @@ namespace Spartans.UI{
         [SerializeField] private GameObject _disconnectUI;
         [SerializeField] private GameObject _backButton;
         [SerializeField] private GameObject _volumeSettings;
+        [SerializeField] private List<GameObject> _uiObjectList;
+        
         private bool isOpen;
 
         public void Init()

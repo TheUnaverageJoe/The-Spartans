@@ -17,6 +17,7 @@ namespace Spartans{
         //private List<Player> _players = new List<Player>();
         [SerializeField] private List<GameObject> _playerPrefabs;
         [SerializeField] private TMP_InputField _input;
+        [SerializeField] private Camera _mainCamera;
         private UnityTransport connection;
         public static States activeState{get; private set;}
         //private PanelManager.ConnectionInfo info;
