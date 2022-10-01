@@ -13,14 +13,17 @@ namespace Spartans.UI{
         [SerializeField] private GameObject _classSelect;
         [SerializeField] private GameObject _disconnectUI;
         [SerializeField] private GameObject _backButton;
+        [SerializeField] private GameObject _volumeSettings;
+        [SerializeField] private List<GameObject> _uiObjectList;
+        
         private bool isOpen;
-        private System.Action onUiOpen;
 
         public void Init()
         {
             isOpen = true;
             GameManager.leftGame += OnLeaveGame;
             GameManager.stateChanged += UpdateUIState;
+            GameManager.stateChanged += PlayPressedSound;
         }
         void Update(){
             if(PlayerInput.Instance.tab){
@@ -35,6 +38,7 @@ namespace Spartans.UI{
                 _classSelect.SetActive(false);
                 _disconnectUI.SetActive(false);
                 _backButton.SetActive(false);
+                _volumeSettings.SetActive(false);
             }else{
                 UpdateUIState();
             }
@@ -49,6 +53,7 @@ namespace Spartans.UI{
                     _classSelect.SetActive(false);
                     _disconnectUI.SetActive(false);
                     _backButton.SetActive(true);
+                    _volumeSettings.SetActive(false);
                     break;
                 case GameManager.States.Connected:
                     //print("updating in Connected State");
@@ -63,6 +68,7 @@ namespace Spartans.UI{
                     _classSelect.SetActive(false);
                     _disconnectUI.SetActive(true);
                     _backButton.SetActive(false);
+                    _volumeSettings.SetActive(true);
                     break;
                 case GameManager.States.PostGame:
                     print("Post game state not implimented");
@@ -74,6 +80,9 @@ namespace Spartans.UI{
         }
         private void OnLeaveGame(){
             UpdateUIState();
+        }
+        private void PlayPressedSound(){
+            AudioManager.Instance.PlayAudio(AudioManager.AudioChannels.Channel2, AudioManager.SoundClipsIndex.spear_attack);
         }
         private void OnDisable(){
             GameManager.leftGame -= OnLeaveGame;

@@ -17,6 +17,7 @@ namespace Spartans{
         //private List<Player> _players = new List<Player>();
         [SerializeField] private List<GameObject> _playerPrefabs;
         [SerializeField] private TMP_InputField _input;
+        [SerializeField] private Camera _mainCamera;
         private UnityTransport connection;
         public static States activeState{get; private set;}
         //private PanelManager.ConnectionInfo info;
@@ -71,9 +72,8 @@ namespace Spartans{
         public void StopConnection(){
             NetworkManager.Singleton.Shutdown();
             activeState = States.ModeSelect;
-            stateChanged?.Invoke();
-            //leftGame?.Invoke();
-
+            //stateChanged?.Invoke();
+            leftGame?.Invoke();
         }
 
         private void JoinGameCallback(){
@@ -101,11 +101,13 @@ namespace Spartans{
             //print("assigning player for client " + clientID);
             GameObject spawningPlayer = Instantiate(_playerPrefabs[classIndex], Vector3.up*2, Quaternion.identity);
             spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientID);
+            
         }
         public void requestCharacter(int classIndex){
             requestCharacterServerRpc(NetworkManager.Singleton.LocalClientId, classIndex);
             activeState = States.InGame;
             stateChanged?.Invoke();
+            _playerCanvasManager.ToggleHudOnOff();
         }
      
     }

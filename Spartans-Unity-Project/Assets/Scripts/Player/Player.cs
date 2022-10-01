@@ -12,17 +12,15 @@ namespace Spartans.Players
     {
         [SerializeField] GameObject cameraPrefab;
         [SerializeField] public GameObject worldSpaceCanvas;
-        [SerializeField] public GameObject mainCamera;
+        private Camera _characterCam;
         private GameManager _gameManager;
         //private PlayerMove _playerMove;
         private PlayerMoveRefactor _playerMove;
         private PlayerCanvasManager _HUD;
-        private Camera cam;
         private Rigidbody _rigidbody;
         //private Animator _animator;
         [SerializeField] public AnimationManager _animationManager;
         private Health _myHealth;
-        private int players_in_lobby;
         public string playerName{ get; private set; }
 
         public void Awake(){
@@ -34,7 +32,6 @@ namespace Spartans.Players
             _playerMove = GetComponent<PlayerMoveRefactor>();
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager._playerCanvasManager;
-            players_in_lobby = 0;
             //_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             // cam = GetComponentInChildren<Camera>();
             
@@ -47,13 +44,13 @@ namespace Spartans.Players
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             
             if(IsLocalPlayer){
-                mainCamera = Instantiate(cameraPrefab, transform.position, transform.rotation) as GameObject; 
-                mainCamera.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
-                mainCamera.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
-                transform.GetComponentInChildren<FloatingHealth>().camTransform = mainCamera.transform;
-                worldSpaceCanvas.GetComponent<Canvas>().worldCamera = mainCamera.GetComponent<Camera>();
-                worldSpaceCanvas.GetComponentInChildren<FloatingHealth>().camTransform = mainCamera.transform;
-                transform.GetComponent<ArrowSpawner>().mainCamera = mainCamera;
+                GameObject newCharacterCam = Instantiate(cameraPrefab, transform.position, transform.rotation)
+                _characterCam = newCharacterCam.GetComponent<Camera>();
+                _characterCam.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
+                _characterCam.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
+                transform.GetComponentInChildren<FloatingHealth>().camTransform = _characterCam.transform;
+                worldSpaceCanvas.GetComponent<Canvas>().worldCamera = _characterCam.GetComponent<Camera>();
+                worldSpaceCanvas.GetComponentInChildren<FloatingHealth>().camTransform = _characterCam.transform;
                 //_mainCamera.SetActive(false);
                 //_HUD.Init();
             }
@@ -76,41 +73,25 @@ namespace Spartans.Players
                 return;
             }
             if(IsLocalPlayer){
-                
                 if(Input.GetKeyDown(KeyCode.Escape)){
                     if(Cursor.visible) MouseLock(true);
                     else MouseLock(false);
                 }
 
-                /* **Old Code used before PlayerInput was made**
-                if(Input.GetKeyDown(KeyCode.Tab)){
-                    _HUD.ToggleBackButtonActive();
-                    _HUD.ToggleConnectionButtonsActive();
-                }
-                */
-
-                if(GameObject.FindGameObjectsWithTag("Player").Length != players_in_lobby){
-                    var players = GameObject.FindGameObjectsWithTag("Player");
-                    for(int i = 0; i<players.Length; i++){
-                        players[i].transform.Find("WorldSpaceUI").GetComponent<Canvas>().worldCamera = mainCamera.GetComponent<Camera>();
-                        players[i].GetComponentInChildren<FloatingHealth>().camTransform = mainCamera.transform;
-                    }
-                    
-                    players_in_lobby = players.Length;
-                }
             }
         }
         void MouseLock(bool Lock){
-            if(Lock){
+            if(Lock && Application.isFocused){
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
                 return;
-            }else if(!Lock){
+            }else{
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
             }
         }
 
+        
         //Used to handle logic when Alt Tabbing in and out of the application
         void OnApplicationFocus(bool hasFocus){
             if(!IsLocalPlayer || Application.isEditor) return;
@@ -123,26 +104,15 @@ namespace Spartans.Players
                 Cursor.visible = true;
             }
         }
+        
 
         public override void OnNetworkSpawn()
         {
-            //if(!IsServer) return;
-            //print("HI MY NAME IS: " + playerName);
             base.OnNetworkSpawn();
-
-
-            //GameObject spawnpoint = GameObject.FindGameObjectsWithTag("Spawn1")[0];
-            //float xSpawnPos = spawnpoint.transform.position.x;
-            //float zSpawnPos = spawnpoint.transform.position.z;
-            
-            //transform.position = new Vector3(Random.Range(xSpawnPos - 3,xSpawnPos + 3), 
-            //                                1, Random.Range(zSpawnPos - 3, zSpawnPos + 3));
-            //print("MOVE MMEEEEE");
         }
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
-            //print("Despawned: " + playerName);
         }
 
     }
