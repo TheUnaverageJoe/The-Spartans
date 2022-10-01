@@ -71,9 +71,8 @@ namespace Spartans{
         public void StopConnection(){
             NetworkManager.Singleton.Shutdown();
             activeState = States.ModeSelect;
-            stateChanged?.Invoke();
-            //leftGame?.Invoke();
-
+            //stateChanged?.Invoke();
+            leftGame?.Invoke();
         }
 
         private void JoinGameCallback(){
@@ -101,11 +100,13 @@ namespace Spartans{
             //print("assigning player for client " + clientID);
             GameObject spawningPlayer = Instantiate(_playerPrefabs[classIndex], Vector3.up*2, Quaternion.identity);
             spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientID);
+            
         }
         public void requestCharacter(int classIndex){
             requestCharacterServerRpc(NetworkManager.Singleton.LocalClientId, classIndex);
             activeState = States.InGame;
             stateChanged?.Invoke();
+            _playerCanvasManager.ToggleHudOnOff();
         }
      
     }

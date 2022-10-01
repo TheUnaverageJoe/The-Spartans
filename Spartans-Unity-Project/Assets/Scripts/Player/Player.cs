@@ -22,7 +22,6 @@ namespace Spartans.Players
         //private Animator _animator;
         [SerializeField] public AnimationManager _animationManager;
         private Health _myHealth;
-        private int players_in_lobby;
         public string playerName{ get; private set; }
 
         public void Awake(){
@@ -34,7 +33,6 @@ namespace Spartans.Players
             _playerMove = GetComponent<PlayerMoveRefactor>();
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager._playerCanvasManager;
-            players_in_lobby = 0;
             //_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             // cam = GetComponentInChildren<Camera>();
             
@@ -81,35 +79,20 @@ namespace Spartans.Players
                     else MouseLock(false);
                 }
 
-                /* **Old Code used before PlayerInput was made**
-                if(Input.GetKeyDown(KeyCode.Tab)){
-                    _HUD.ToggleBackButtonActive();
-                    _HUD.ToggleConnectionButtonsActive();
-                }
-                */
-
-                if(GameObject.FindGameObjectsWithTag("Player").Length != players_in_lobby){
-                    var players = GameObject.FindGameObjectsWithTag("Player");
-                    for(int i = 0; i<players.Length; i++){
-                        players[i].transform.Find("WorldSpaceUI").GetComponent<Canvas>().worldCamera = _mainCamera.GetComponent<Camera>();
-                        players[i].GetComponentInChildren<FloatingHealth>().camTransform = _mainCamera.transform;
-                    }
-                    
-                    players_in_lobby = players.Length;
-                }
             }
         }
         void MouseLock(bool Lock){
-            if(Lock){
+            if(Lock && Application.isFocused){
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
                 return;
-            }else if(!Lock){
+            }else{
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
             }
         }
 
+        
         //Used to handle logic when Alt Tabbing in and out of the application
         void OnApplicationFocus(bool hasFocus){
             if(!IsLocalPlayer || Application.isEditor) return;
@@ -122,26 +105,15 @@ namespace Spartans.Players
                 Cursor.visible = true;
             }
         }
+        
 
         public override void OnNetworkSpawn()
         {
-            //if(!IsServer) return;
-            //print("HI MY NAME IS: " + playerName);
             base.OnNetworkSpawn();
-
-
-            //GameObject spawnpoint = GameObject.FindGameObjectsWithTag("Spawn1")[0];
-            //float xSpawnPos = spawnpoint.transform.position.x;
-            //float zSpawnPos = spawnpoint.transform.position.z;
-            
-            //transform.position = new Vector3(Random.Range(xSpawnPos - 3,xSpawnPos + 3), 
-            //                                1, Random.Range(zSpawnPos - 3, zSpawnPos + 3));
-            //print("MOVE MMEEEEE");
         }
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
-            //print("Despawned: " + playerName);
         }
 
     }
