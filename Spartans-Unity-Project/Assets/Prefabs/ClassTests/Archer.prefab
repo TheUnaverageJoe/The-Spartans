@@ -1739,7 +1739,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraPrefab: {fileID: 6566532239938505393, guid: 3ea986e08f4b2a44bb1934c5a1cec700, type: 3}
   worldSpaceCanvas: {fileID: 385576021230286853}
-  _animationManager: {fileID: 0}
+  _animationManager: {fileID: 3255800713322765034}
 --- !u!114 &3845976704101927409
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1866,6 +1866,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5680655943172591657}
   - component: {fileID: 1744461711621900883}
+  - component: {fileID: 4115800101327095719}
   m_Layer: 0
   m_Name: Erika Archer With Bow Arrow
   m_TagString: Untagged
@@ -1915,6 +1916,19 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &4115800101327095719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5016568905619196563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Animator: {fileID: 1744461711621900883}
 --- !u!1 &5024813189963207576
 GameObject:
   m_ObjectHideFlags: 0

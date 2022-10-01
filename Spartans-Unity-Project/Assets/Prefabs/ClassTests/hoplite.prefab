@@ -480,7 +480,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraPrefab: {fileID: 6566532239938505393, guid: 3ea986e08f4b2a44bb1934c5a1cec700, type: 3}
   worldSpaceCanvas: {fileID: 8861558909434390755}
-  _animationManager: {fileID: 0}
+  _animationManager: {fileID: 7153520548376365376}
 --- !u!114 &2716036272878251130
 MonoBehaviour:
   m_ObjectHideFlags: 0
