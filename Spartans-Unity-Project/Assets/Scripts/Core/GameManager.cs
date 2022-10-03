@@ -10,26 +10,44 @@ using Spartans.UI;
 using Spartans.Players;
 
 namespace Spartans{
+    //This class is a singleton
     public class GameManager : NetworkBehaviour
     {
+
+        public static GameManager Instance;
         private const string MENU_SCENE_NAME = "MainMenu";
         public PlayerCanvasManager _playerCanvasManager{get; private set;}
         //private List<Player> _players = new List<Player>();
         [SerializeField] private List<GameObject> _playerPrefabs;
-        [SerializeField] private TMP_InputField _input;
+        
         [SerializeField] private Camera _mainCamera;
-        private UnityTransport connection;
+
+        private GameMode.GameModeBase _gameMode;
+        private GameObject[] _objectives;
+        private GameObject selectedObjective;
         public static States activeState{get; private set;}
-        //private PanelManager.ConnectionInfo info;
-        public static System.Action stateChanged;
-        public static System.Action joinedGame;
-        public static System.Action leftGame;
+
+        private Dictionary<ulong, CharacterTypes> playerCharacterSelections;
+
+        public System.Action stateChanged;
+        public System.Action joinedGame;
+        public System.Action leftGame;
         //public System.Action onClickBack;
         public enum States{
             ModeSelect,
             Connected,
             InGame,
+            GameOver,
             PostGame
+        }
+
+        void Awake(){
+            if(Instance == null){
+                Instance = this;
+                DontDestroyOnLoad(this.gameObject);
+            }else{
+                Destroy(this.gameObject);
+            }
         }
 
         void Start(){
@@ -39,41 +57,23 @@ namespace Spartans{
             _playerCanvasManager = FindObjectOfType<PlayerCanvasManager>();
             _playerCanvasManager.Init();
 
-            connection = NetworkManager.Singleton.GetComponent<UnityTransport>();
-
             activeState = States.ModeSelect;
             stateChanged?.Invoke();
+
+            playerCharacterSelections = new Dictionary<ulong, CharacterTypes>();
             
             Physics.gravity = new Vector3(0, -20f, 0);
         }
 
-
-        public void StartServer(){
-            NetworkManager.Singleton.StartServer();
-            joinedGame.Invoke();
-        }
-        public void StartHost(){
-            NetworkManager.Singleton.StartHost();
-            joinedGame.Invoke();
-        }
-        public void JoinGame(){
-            if(_input.text.Length < 7 || _input.text == null){
-                connection.ConnectionData.Address = "127.0.0.1";
-            }else{
-                connection.ConnectionData.Address = _input.text;
-            }
-            NetworkManager.Singleton.StartClient();
-            joinedGame.Invoke();
-
-        }
         public void BackButtonPressed(){
             SceneManager.LoadScene(MENU_SCENE_NAME);
         }
         public void StopConnection(){
             NetworkManager.Singleton.Shutdown();
             activeState = States.ModeSelect;
-            //stateChanged?.Invoke();
-            leftGame?.Invoke();
+            Instance = null;
+            Destroy(this.gameObject);
+            BackButtonPressed();
         }
 
         private void JoinGameCallback(){
@@ -84,30 +84,92 @@ namespace Spartans{
             SceneManager.LoadScene(MENU_SCENE_NAME);
         }
 
-        private void OnDisable(){
-            if(NetworkManager.Singleton != null){
-                Destroy(NetworkManager.Singleton.gameObject);
-            }
-            joinedGame -= JoinGameCallback;
-            //onClickBack -= OnClickBackCallback;
-        }
+        //**SUMMARY**
+        ///<summary>
+        ///OnDisable Method destroyes the NetworkManager instance if we go back to main menu
+        ///Unsubscribes any Action listeners
+        ///</summary>
+        // private void OnDisable(){
+        //     if(NetworkManager.Singleton != null){
+        //         Destroy(NetworkManager.Singleton.gameObject);
+        //     }
+        //     joinedGame -= JoinGameCallback;
+        //     //onClickBack -= OnClickBackCallback;
+        // }
 
-        [ServerRpc(RequireOwnership = false)]
-        private void requestCharacterServerRpc(ulong clientID, int classIndex){
-            if(classIndex > _playerPrefabs.Count-1)
-            {
-                print("Client sender error: invalid classIndex");
-            }
-            //print("assigning player for client " + clientID);
-            GameObject spawningPlayer = Instantiate(_playerPrefabs[classIndex], Vector3.up*2, Quaternion.identity);
-            spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientID);
+        // [ServerRpc(RequireOwnership = false)]
+        // private void requestCharacterServerRpc(ulong clientID, int classIndex){
+        //     if(classIndex > _playerPrefabs.Count-1)
+        //     {
+        //         print("Client sender error: invalid classIndex");
+        //     }
+        //     //print("assigning player for client " + clientID);
+        //     GameObject spawningPlayer = Instantiate(_playerPrefabs[classIndex], Vector3.up*2, Quaternion.identity);
+        //     spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientID);
             
+        // }
+
+        // public void requestCharacter(int classIndex){
+        //     requestCharacterServerRpc(NetworkManager.Singleton.LocalClientId, classIndex);
+        //     activeState = States.InGame;
+        //     stateChanged?.Invoke();
+        //     _playerCanvasManager.ToggleHudOnOff();
+        // }
+
+        // public void AddCharacterSelection(ulong clientID, CharacterTypes type){
+        //     playerCharacterSelections.Add(clientID, type);
+        // }
+
+        [ServerRpc(RequireOwnership=false)]
+        public void requestAssignCharacterServerRpc(ulong requestingClient, CharacterTypes character)
+        {
+            if(!playerCharacterSelections.ContainsKey(requestingClient))
+            {
+                playerCharacterSelections.Add(requestingClient, character);
+                print($"Added {character.ToString()} for client {requestingClient.ToString()}");
+            }else{
+                print("SUGMA");
+            }
         }
-        public void requestCharacter(int classIndex){
-            requestCharacterServerRpc(NetworkManager.Singleton.LocalClientId, classIndex);
-            activeState = States.InGame;
-            stateChanged?.Invoke();
-            _playerCanvasManager.ToggleHudOnOff();
+        public void requestAssignCharacter(ulong requestingClient, CharacterTypes character)
+        {
+            if(IsServer)
+            {
+                if(!playerCharacterSelections.ContainsKey(requestingClient))
+                {
+                    playerCharacterSelections.Add(requestingClient, character);
+                    print($"Added {character.ToString()} for client {requestingClient.ToString()}");
+                }else{
+                    print("SUGMA");
+                }
+            }
+            else
+            {
+                requestAssignCharacterServerRpc(requestingClient, character);
+            }
+        }
+        
+
+
+        public override void OnNetworkSpawn(){
+            base.OnNetworkSpawn();
+            //Load all prefabs for objects from "Assets/Resources/Objectives" folder
+            _objectives = Resources.LoadAll<GameObject>("Objectives");
+            if(_objectives.Length <= 0 )
+            {
+                print("NO RESOURCES FOUND");
+            
+            }else
+            {
+                foreach(GameObject item in _objectives){
+                    NetworkManager.Singleton.AddNetworkPrefab(item);
+                    //print(item.name);
+                }
+            }
+
+            if(!IsServer) return;
+            selectedObjective = NetworkManager.Instantiate(_objectives[0]);
+            selectedObjective.GetComponent<NetworkObject>().Spawn();
         }
      
     }
