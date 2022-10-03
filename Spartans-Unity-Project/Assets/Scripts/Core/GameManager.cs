@@ -16,6 +16,7 @@ namespace Spartans{
 
         public static GameManager Instance;
         private const string MENU_SCENE_NAME = "MainMenu";
+        private const string GAMESCENE = "TestMap";
         public PlayerCanvasManager _playerCanvasManager{get; private set;}
         //private List<Player> _players = new List<Player>();
         [SerializeField] private List<GameObject> _playerPrefabs;
@@ -26,6 +27,7 @@ namespace Spartans{
         private GameObject[] _objectives;
         private GameObject selectedObjective;
         public static States activeState{get; private set;}
+        private Scene m_LoadedScene;
 
         private Dictionary<ulong, CharacterTypes> playerCharacterSelections;
 
@@ -52,6 +54,7 @@ namespace Spartans{
 
         void Start(){
             joinedGame += JoinGameCallback;
+            NetworkManager.SceneManager.OnSceneEvent += newFunc;
             //onClickBack += OnClickBackCallback;
 
             _playerCanvasManager = FindObjectOfType<PlayerCanvasManager>();
@@ -89,13 +92,15 @@ namespace Spartans{
         ///OnDisable Method destroyes the NetworkManager instance if we go back to main menu
         ///Unsubscribes any Action listeners
         ///</summary>
-        // private void OnDisable(){
+         private void OnDisable(){
+            print("Disabled Game Manager");
         //     if(NetworkManager.Singleton != null){
         //         Destroy(NetworkManager.Singleton.gameObject);
         //     }
         //     joinedGame -= JoinGameCallback;
         //     //onClickBack -= OnClickBackCallback;
         // }
+         }
 
         // [ServerRpc(RequireOwnership = false)]
         // private void requestCharacterServerRpc(ulong clientID, int classIndex){
@@ -126,6 +131,7 @@ namespace Spartans{
             if(!playerCharacterSelections.ContainsKey(requestingClient))
             {
                 playerCharacterSelections.Add(requestingClient, character);
+                //var status = NetworkManager.SceneManager.LoadScene(GAMESCENE, LoadSceneMode.Single);
                 print($"Added {character.ToString()} for client {requestingClient.ToString()}");
             }else{
                 print("SUGMA");
@@ -138,6 +144,7 @@ namespace Spartans{
                 if(!playerCharacterSelections.ContainsKey(requestingClient))
                 {
                     playerCharacterSelections.Add(requestingClient, character);
+                    StartCoroutine(StartSelectionCountdown());
                     print($"Added {character.ToString()} for client {requestingClient.ToString()}");
                 }else{
                     print("SUGMA");
@@ -170,6 +177,48 @@ namespace Spartans{
             if(!IsServer) return;
             selectedObjective = NetworkManager.Instantiate(_objectives[0]);
             selectedObjective.GetComponent<NetworkObject>().Spawn();
+        }
+
+        private void newFunc(SceneEvent sceneEvent){
+            var clientOrServer = sceneEvent.ClientId == NetworkManager.ServerClientId ? "server" : "client";
+            switch (sceneEvent.SceneEventType)
+            {
+                case SceneEventType.LoadComplete:
+                    break;
+                case SceneEventType.UnloadComplete:
+                    break;
+                case SceneEventType.LoadEventCompleted:
+                    // We want to handle this for only the server-side
+                    if (sceneEvent.ClientId == NetworkManager.ServerClientId)
+                    {
+                        // *** IMPORTANT ***
+                        // Keep track of the loaded scene, you need this to unload it
+                        m_LoadedScene = sceneEvent.Scene;
+                    }
+                    Debug.Log($"Loaded the {sceneEvent.SceneName} scene on " +
+                        $"{clientOrServer}-({sceneEvent.ClientId}).");
+
+                    foreach(KeyValuePair<ulong, CharacterTypes> item in playerCharacterSelections){
+                        GameObject spawningPlayer = Instantiate(_playerPrefabs[(int)item.Value], Vector3.up*2, Quaternion.identity);
+                        spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(item.Key);
+                    }
+                    break;
+                    
+                case SceneEventType.UnloadEventCompleted:
+                    break;
+            }
+        }
+
+        IEnumerator StartSelectionCountdown(){
+            print("Starting ready countdown");
+            yield return new WaitForSeconds(10);
+            var status = NetworkManager.SceneManager.LoadScene(GAMESCENE, LoadSceneMode.Single);
+            if (status != SceneEventProgressStatus.Started)
+            {
+                Debug.LogWarning($"Failed to load {GAMESCENE} " +
+                        $"with a {nameof(SceneEventProgressStatus)}: {status}");
+            }
+            StopCoroutine(StartSelectionCountdown());
         }
      
     }
