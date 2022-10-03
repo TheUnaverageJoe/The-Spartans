@@ -27,8 +27,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6566532239938505393}
-  m_LocalRotation: {x: -0.16400681, y: -0.010310436, z: -0.0017142892, w: 0.9864039}
-  m_LocalPosition: {x: 0.79747015, y: 0.3647728, z: -11.358196}
+  m_LocalRotation: {x: -0.17818427, y: -0.82030505, z: -0.41077492, w: 0.3558286}
+  m_LocalPosition: {x: 15.096018, y: 2.2073085, z: -31.00157}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -59,7 +59,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.1
+  near clip plane: 0.2
   far clip plane: 5000
   field of view: 40
   orthographic: 0
@@ -144,13 +144,13 @@ MonoBehaviour:
   m_Lens:
     FieldOfView: 40
     OrthographicSize: 10
-    NearClipPlane: 0.1
+    NearClipPlane: 0.2
     FarClipPlane: 5000
     Dutch: 0
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2.165725, y: 1}
+    m_SensorSize: {x: 1.8792793, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -171,9 +171,9 @@ GameObject:
   - component: {fileID: 941037091120408135}
   - component: {fileID: 4881656488882064948}
   - component: {fileID: 8163324049610747503}
-  - component: {fileID: 6078232848854148266}
   - component: {fileID: -4534243760753964967}
   - component: {fileID: -6383707421936241881}
+  - component: {fileID: 7525232044906372663}
   m_Layer: 0
   m_Name: cm
   m_TagString: Untagged
@@ -223,7 +223,7 @@ MonoBehaviour:
   m_NoiseProfile: {fileID: 11400000, guid: 46965f9cbaf525742a6da4c2172a99cd, type: 2}
   m_PivotOffset: {x: 0, y: 0, z: 0}
   m_AmplitudeGain: 0.5
-  m_FrequencyGain: 0.5
+  m_FrequencyGain: 0.3
   mNoiseOffsets: {x: 320.96237, y: -636.5879, z: -454.09717}
 --- !u!114 &8163324049610747503
 MonoBehaviour:
@@ -238,29 +238,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Damping: {x: 0, y: 0, z: 0}
-  ShoulderOffset: {x: 0.5, y: -0.4, z: 0}
+  ShoulderOffset: {x: 0.7, y: 0.25, z: 0}
   VerticalArmLength: 0.4
   CameraSide: 1
-  CameraDistance: 12
+  CameraDistance: 9
   CameraCollisionFilter:
     serializedVersion: 2
-    m_Bits: 0
-  IgnoreTag: 
-  CameraRadius: 0.2
+    m_Bits: 1
+  IgnoreTag: Player
+  CameraRadius: 0.15
   DampingIntoCollision: 0
   DampingFromCollision: 2
---- !u!114 &6078232848854148266
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8772927429713520246}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e8b78ac948f05a46a6d8339a503172b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &-4534243760753964967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -309,3 +297,15 @@ MonoBehaviour:
   CameraRadius: 0.2
   DampingIntoCollision: 0
   DampingFromCollision: 2
+--- !u!114 &7525232044906372663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8772927429713520246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e8b78ac948f05a46a6d8339a503172b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
