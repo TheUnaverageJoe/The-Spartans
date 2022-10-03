@@ -44,7 +44,7 @@ namespace Spartans.Players
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             
             if(IsLocalPlayer){
-                GameObject newCharacterCam = Instantiate(cameraPrefab, transform.position, transform.rotation)
+                GameObject newCharacterCam = Instantiate(cameraPrefab, transform.position, transform.rotation);
                 _characterCam = newCharacterCam.GetComponent<Camera>();
                 _characterCam.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
                 _characterCam.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
