@@ -25,18 +25,6 @@ namespace Spartans.UI{
             _myHealth.onHealthChanged += HandleOnHealthChange;
             _myHealth.onDie += OnDieCallback;
 
-            Camera[] temp = FindObjectsOfType<Camera>(false);
-            /*print("enabled cams: " + temp.Length);
-            if(_player.GetComponent<NetworkObject>().IsLocalPlayer){
-                int x = 0;
-                foreach(Camera cam in temp){
-                    ++x;
-                    print("Cam " + x + ": " + cam.name);
-                }
-            }
-            */
-            
-            camTransform = temp[0].transform;
             _nameText.text = _player.GetComponent<Player>().playerName.ToString();
             //print($"{_nameText.text} ran Init()");
         }
@@ -45,7 +33,7 @@ namespace Spartans.UI{
         void LateUpdate()
         {
             //keep health bar next to player in the world space
-            this.transform.rotation = camTransform.rotation;
+            this.transform.rotation = PlayerCameraFollow.Instance.transform.rotation;
             //this.transform.position = _player.transform.position + (Vector3.up * 4.5f);
         }
 
