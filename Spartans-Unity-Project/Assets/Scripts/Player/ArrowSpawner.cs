@@ -27,11 +27,11 @@ public class ArrowSpawner : NetworkBehaviour
         if(IsServer){
             float x = Screen.width / 2f;
             float y = Screen.height / 2f;
-            var ray = mainCamera.GetComponent<Camera>().ScreenPointToRay(new Vector2(x, y));
+            var ray = PlayerCameraFollow.Instance.camera.ScreenPointToRay(new Vector2(x, y));
             Vector3 initialPos = _lookAt.position;
             Quaternion rot = _lookAt.rotation;
             if(Physics.Raycast(ray, out RaycastHit raycastHit, 999f, _aimColliderMask)){
-                Vector3 dir = raycastHit.point - mainCamera.transform.position;
+                Vector3 dir = raycastHit.point - PlayerCameraFollow.Instance.camera.transform.position;
                 rot = Quaternion.LookRotation(dir);
                 //print(raycastHit.point.x + " " + raycastHit.point.y + " " + raycastHit.point.z);
             }
@@ -53,11 +53,11 @@ public class ArrowSpawner : NetworkBehaviour
         //GameObject newProjectile = NetworkManager.Instantiate(_arrowPrefab, _lookAt.position, _lookAt.rotation);
         float x = Screen.width / 2f;
         float y = Screen.height / 2f;
-        var ray = mainCamera.GetComponent<Camera>().ScreenPointToRay(new Vector2(x, y));
+        var ray = PlayerCameraFollow.Instance.camera.ScreenPointToRay(new Vector2(x, y));
         Vector3 initialPos = _lookAt.position;
         Quaternion rot = _lookAt.rotation;
         if(Physics.Raycast(ray, out RaycastHit raycastHit, 999f, _aimColliderMask)){
-            Vector3 dir = raycastHit.point - mainCamera.transform.position;
+            Vector3 dir = raycastHit.point - PlayerCameraFollow.Instance.camera.transform.position;
             rot = Quaternion.LookRotation(dir);
             //print(raycastHit.point.x + " " + raycastHit.point.y + " " + raycastHit.point.z);
         }

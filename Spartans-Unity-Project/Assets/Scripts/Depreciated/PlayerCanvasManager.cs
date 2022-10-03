@@ -38,7 +38,7 @@ namespace Spartans.UI{
                 _classSelect.SetActive(false);
                 _disconnectUI.SetActive(false);
                 _backButton.SetActive(false);
-                _volumeSettings.SetActive(false);
+                //_volumeSettings.SetActive(false);
             }else{
                 UpdateUIState();
             }
@@ -53,7 +53,7 @@ namespace Spartans.UI{
                     _classSelect.SetActive(false);
                     _disconnectUI.SetActive(false);
                     _backButton.SetActive(true);
-                    _volumeSettings.SetActive(false);
+                    //_volumeSettings.SetActive(false);
                     break;
                 case GameManager.States.Connected:
                     //print("updating in Connected State");
@@ -68,7 +68,7 @@ namespace Spartans.UI{
                     _classSelect.SetActive(false);
                     _disconnectUI.SetActive(true);
                     _backButton.SetActive(false);
-                    _volumeSettings.SetActive(true);
+                    //_volumeSettings.SetActive(true);
                     break;
                 case GameManager.States.PostGame:
                     print("Post game state not implimented");

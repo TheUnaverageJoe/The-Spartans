@@ -42,15 +42,19 @@ namespace Spartans.Players
             //print("Player name is: " + playerName);
             //print("Is local player: " + IsLocalPlayer);
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
-            
+            if(IsClient && IsOwner){
+                PlayerCameraFollow.Instance.FollowPlayer(transform.GetChild(0).transform);
+                PlayerCameraFollow.Instance.LookAtPlayer(transform.GetChild(0).transform);
+                transform.GetComponentInChildren<FloatingHealth>().camTransform = PlayerCameraFollow.Instance.camera.transform;
+                worldSpaceCanvas.GetComponent<Canvas>().worldCamera = PlayerCameraFollow.Instance.camera;
+                worldSpaceCanvas.GetComponentInChildren<FloatingHealth>().camTransform = PlayerCameraFollow.Instance.camera.transform;
+            }
             if(IsLocalPlayer){
-                GameObject newCharacterCam = Instantiate(cameraPrefab, transform.position, transform.rotation)
-                _characterCam = newCharacterCam.GetComponent<Camera>();
-                _characterCam.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
-                _characterCam.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
-                transform.GetComponentInChildren<FloatingHealth>().camTransform = _characterCam.transform;
-                worldSpaceCanvas.GetComponent<Canvas>().worldCamera = _characterCam.GetComponent<Camera>();
-                worldSpaceCanvas.GetComponentInChildren<FloatingHealth>().camTransform = _characterCam.transform;
+                //GameObject newCharacterCam = Instantiate(cameraPrefab, transform.position, transform.rotation);
+                //_characterCam = newCharacterCam.GetComponent<Camera>();
+                //_characterCam.transform.GetComponent<CinemachineVirtualCamera>().LookAt = transform.GetChild(0).transform;
+                //_characterCam.transform.GetComponent<CinemachineVirtualCamera>().Follow = transform.GetChild(0).transform;
+                
                 //_mainCamera.SetActive(false);
                 //_HUD.Init();
             }
