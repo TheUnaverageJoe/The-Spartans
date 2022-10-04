@@ -19,13 +19,7 @@ namespace Spartans{
         {
             print("Lobby scene loaded");
             connection = NetworkManager.Singleton.GetComponent<UnityTransport>();
-            NetworkManager.OnClientConnectedCallback += newFunc;
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            
+            NetworkManager.OnClientConnectedCallback += NotifyClientConnected;
         }
 
         public override void OnNetworkSpawn()
@@ -61,7 +55,7 @@ namespace Spartans{
             GameManager.Instance.requestAssignCharacter(NetworkManager.LocalClientId, (CharacterTypes)type);
 
         }
-        private void newFunc(ulong clientID){
+        private void NotifyClientConnected(ulong clientID){
             print($"Client {clientID} connected");
         }
         public void LeaveLobby(){

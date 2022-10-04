@@ -6,7 +6,7 @@ using Unity.Netcode;
 namespace Spartans.GameMode{
     public class TDM : GameModeBase
     {
-        [SerializeField] private GameObject _gamemodeUI;
+        //[SerializeField] private GameObject _gamemodeUI;
         //[SerializeField] private int _numberOfTeams;
 
         // Start is called before the first frame update
@@ -17,13 +17,12 @@ namespace Spartans.GameMode{
                 NetworkVariable<int> newVar = new NetworkVariable<int>();
                 base.teamScoresDict.Add(i, newVar);
             }
-            
         }
 
         public override void OnNetworkSpawn(){
             base.OnNetworkSpawn();
 
-            base.gamemodeUI = _gamemodeUI;
+            //base.gamemodeUI = _gamemodeUI;
             //base.numberOfTeams = _numberOfTeams;
             base.winConditions = new List<System.Action>();
             base.currentGameState = States.Starting;
