@@ -12,6 +12,7 @@ namespace Spartans.GameMode{
         // Start is called before the first frame update
         void Awake()
         {
+            teamScoresDict = new Dictionary<int, NetworkVariable<int>>();
             for(int i=0; i<base.numberOfTeams; i++)
             {
                 NetworkVariable<int> newVar = new NetworkVariable<int>();

@@ -37,6 +37,7 @@ namespace Spartans.UI{
         }
 
         public void PushPage(PageUI page){
+            print("pushed " + page.name);
             page.Enter();
             
             if(_pageStack.Count > 0){
