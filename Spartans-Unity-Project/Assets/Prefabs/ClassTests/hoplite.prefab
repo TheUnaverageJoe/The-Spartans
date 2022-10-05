@@ -352,6 +352,7 @@ GameObject:
   - component: {fileID: 8696077820451175237}
   - component: {fileID: 9113657418830669890}
   - component: {fileID: 4596307392534490483}
+  - component: {fileID: 4148938393711281369}
   - component: {fileID: 1841150152007909225}
   - component: {fileID: 2716036272878251130}
   - component: {fileID: 1861325914029540514}
@@ -466,7 +467,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1841150152007909225
+--- !u!114 &4148938393711281369
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -474,6 +475,30 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1771422829377585750}
   m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65d30a52d42901f45be3a86bf6b48cdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  worldSpaceCanvas: {fileID: 8861558909434390755}
+  lookAtPoint: {fileID: 3529011055375584585}
+  _animationManager: {fileID: 7153520548376365376}
+  spine: {fileID: 2229371365082707951}
+  _canJump: 1
+  _grounded: 0
+  _jumpForce: 12
+  _moveSpeed: 5
+  _MAX_SPEED: 8
+  _mouseSens: 1
+  _lastSentInput: {x: 0, y: 0, z: 0}
+  input: {x: 0, y: 0, z: 0}
+--- !u!114 &1841150152007909225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1771422829377585750}
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f2b6f5d37aac3c74c94f3889c4f2835c, type: 3}
   m_Name: 
@@ -488,7 +513,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1771422829377585750}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 862f3cea03ec58f4b9ba8577bf5df602, type: 3}
   m_Name: 
@@ -557,9 +582,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7636e378675dfc445836f3c6fe5a52a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainCamera: {fileID: 0}
   _arrowPrefab: {fileID: 1933142501969207380, guid: ab7e0d36d32692846a6d1d3bc8647ce8, type: 3}
   speedModifier: 50
   _lookAt: {fileID: 3529011055375584585}
+  _aimColliderMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1 &1875633422815777173
 GameObject:
   m_ObjectHideFlags: 0
