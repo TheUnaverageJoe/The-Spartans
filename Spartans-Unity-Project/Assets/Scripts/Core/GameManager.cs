@@ -125,19 +125,23 @@ namespace Spartans{
         private void SceneEventHandler(SceneEvent sceneEvent){
             var clientOrServer = sceneEvent.ClientId == NetworkManager.ServerClientId ? "server" : "client";
             if(sceneEvent.ClientsThatTimedOut != null){//sceneEvent.ClientsThatTimedOut.Count > 0
+                foreach(ulong id in sceneEvent.ClientsThatTimedOut){
+                    print($"{id} timed Out on scene transition");
+                }
                 Debug.LogWarning("CLIENT FAILED TO LOAD AND/OR SYNC???!");
             }
             switch (sceneEvent.SceneEventType)
             {
                 case SceneEventType.LoadComplete:
+                    print("Scene name " + sceneEvent.SceneName);
                     break;
                 case SceneEventType.UnloadComplete:
                     print("Unloaded " + sceneEvent.SceneName + " Scene");
                     break;
                 case SceneEventType.LoadEventCompleted:
-                    if(IsServer){
-                        NetworkManager.SceneManager.UnloadScene(SceneManager.GetSceneByName("Lobby"));
-                    }
+                    // if(IsServer){
+                    //     NetworkManager.SceneManager.UnloadScene(SceneManager.GetSceneByName("Lobby"));
+                    // }
                     print("LoadEventCompleted fired");
                     // We want to handle this for only the server-side
                     if (sceneEvent.ClientId == NetworkManager.ServerClientId)

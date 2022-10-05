@@ -6,6 +6,7 @@ using TMPro;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine.SceneManagement;
 
+using Spartans.Players;
 using Spartans.UI;
 
 namespace Spartans{
@@ -128,7 +129,8 @@ namespace Spartans{
         IEnumerator StartSelectionCountdown(){
             print("Starting ready countdown");
             yield return new WaitForSeconds(5);
-            var status = NetworkManager.SceneManager.LoadScene(GAMESCENE, LoadSceneMode.Additive);
+            //PlayerInput.Instance.OnDisable();
+            var status = NetworkManager.SceneManager.LoadScene(GAMESCENE, LoadSceneMode.Single);
             if (status != SceneEventProgressStatus.Started)
             {
                 Debug.LogWarning($"Failed to load {GAMESCENE} " +
@@ -144,6 +146,7 @@ namespace Spartans{
             if(!IsServer && !IsClient){
                 Destroy(NetworkManager.Singleton.gameObject);
             }
+            NetworkManager.OnClientConnectedCallback -= NotifyClientConnected;
         }
     }
 }

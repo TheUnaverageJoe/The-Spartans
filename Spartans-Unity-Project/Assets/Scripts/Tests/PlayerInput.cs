@@ -19,12 +19,16 @@ namespace Spartans.Players{
 
         
         void Awake(){
+            
             if(Instance == null){
                 //print("assigned instance");
                 Instance = this;
+                DontDestroyOnLoad(this.gameObject);
             }else{
+                print("Stopped playerInput spawn");
                 Destroy(this.gameObject);
             }
+            
         }
 
         // Start is called before the first frame update
@@ -62,8 +66,10 @@ namespace Spartans.Players{
             
 
         }
-        private void OnDisable(){
-            Instance = null;
+        public void OnDisable(){
+            //print("Unassigned playerInput");
+            //Instance = null;
+            //Destroy(this.gameObject);
         }
     }
 }
