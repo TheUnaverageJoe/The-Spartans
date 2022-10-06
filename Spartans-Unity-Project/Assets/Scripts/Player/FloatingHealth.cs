@@ -25,7 +25,7 @@ namespace Spartans.UI{
             _myHealth.onHealthChanged += HandleOnHealthChange;
             _myHealth.onDie += OnDieCallback;
 
-            _nameText.text = _player.GetComponent<Player>().playerName.ToString();
+            _nameText.text = _player.GetComponent<PlayerController>().playerName.ToString();
             //print($"{_nameText.text} ran Init()");
         }
 

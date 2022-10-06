@@ -67,7 +67,13 @@ namespace Spartans{
             //print($"Client {clientID} connected");
 
             if(IsServer){
-                StopCoroutine(startingRoutine);
+                if(startingRoutine != null){
+                   StopCoroutine(startingRoutine);     
+                }
+                else{
+                    print("No routine to stop???");
+                }
+                
             }
         }
         public void LeaveLobby(){
