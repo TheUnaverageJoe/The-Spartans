@@ -56,7 +56,7 @@ namespace Spartans.Players{
             mouseY = Input.GetAxis("Mouse Y");
 
             jump = Input.GetButtonDown("Jump");
-            escape = Input.GetKeyDown(KeyCode.Escape);
+            escape = Input.GetButtonDown("Escape");
             tab = Input.GetKeyDown(KeyCode.Tab);
 
             primary = Input.GetButtonDown("Fire1");

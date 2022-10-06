@@ -26,13 +26,13 @@ namespace Spartans{
         private Scene m_LoadedScene;
         private Dictionary<ulong, CharacterTypes> playerCharacterSelections;
 
-        public System.Action stateChanged;
-        public System.Action joinedGame;
-        public System.Action leftGame;
+        // public System.Action stateChanged;
+        // public System.Action joinedGame;
+        // public System.Action leftGame;
         //public System.Action onClickBack;
         public enum States{
-            ModeSelect,
-            Connected,
+            Lobby,
+            PreGame,
             InGame,
             GameOver,
             PostGame
@@ -48,19 +48,18 @@ namespace Spartans{
         }
 
         void Start(){
-            joinedGame += JoinGameCallback;
             NetworkManager.SceneManager.OnSceneEvent += SceneEventHandler;
             //onClickBack += OnClickBackCallback;
 
+            print("activeState" + activeState.ToString());
             if(activeState >= States.InGame){
                 print("GameManager finding Canvas and Init()ing");
                 _canvasManager = FindObjectOfType<CanvasManager>();
                 _canvasManager.Init();
             }
             
-
-            activeState = States.ModeSelect;
-            stateChanged?.Invoke();
+            activeState = States.Lobby;
+            //stateChanged?.Invoke();
 
             playerCharacterSelections = new Dictionary<ulong, CharacterTypes>();
             
@@ -69,7 +68,7 @@ namespace Spartans{
 
         public void StopConnection(){
             NetworkManager.Singleton.Shutdown();
-            activeState = States.ModeSelect;
+            activeState = States.Lobby;
             Instance = null;
             if(NetworkManager.Singleton != null){
                 print("GameManager killed Network Manager");
@@ -79,10 +78,6 @@ namespace Spartans{
             Destroy(this.gameObject);
         }
 
-        private void JoinGameCallback(){
-            activeState = States.Connected;
-            stateChanged?.Invoke();
-        }
         private void OnClickBackCallback(){
             SceneManager.LoadScene(MENU_SCENE_NAME);
         }
@@ -93,10 +88,7 @@ namespace Spartans{
         ///Unsubscribes any Action listeners
         ///</summary>
          private void OnDisable(){
-            print("Disabled Game Manager");
-            
-            
-            joinedGame -= JoinGameCallback;
+            //print("Disabled Game Manager");
             //onClickBack -= OnClickBackCallback;
         }
 
@@ -138,13 +130,16 @@ namespace Spartans{
                     print("Scene name " + sceneEvent.SceneName);
                     break;
                 case SceneEventType.UnloadComplete:
+                    if(sceneEvent.SceneName == "Lobby"){
+                        activeState = States.InGame;
+                    }
                     print("Unloaded " + sceneEvent.SceneName + " Scene");
                     break;
                 case SceneEventType.LoadEventCompleted:
                     // if(IsServer){
                     //     NetworkManager.SceneManager.UnloadScene(SceneManager.GetSceneByName("Lobby"));
                     // }
-                    print("LoadEventCompleted fired");
+                    //print("LoadEventCompleted fired");
                     // We want to handle this for only the server-side
                     if (sceneEvent.ClientId == NetworkManager.ServerClientId)
                     {
@@ -152,11 +147,15 @@ namespace Spartans{
                         // Keep track of the loaded scene, you need this to unload it
                         m_LoadedScene = sceneEvent.Scene;
                     }
-                    Debug.Log($"Loaded the {sceneEvent.SceneName} scene on " +
-                        $"{clientOrServer}-({sceneEvent.ClientId}).");
+                    //Debug.Log($"Loaded the {sceneEvent.SceneName} scene on " +
+                    //    $"{clientOrServer}-({sceneEvent.ClientId}).");
                     
                     if(playerCharacterSelections.Count > 0 ){
-                        
+                        if(!_canvasManager){
+                            print("Had to find canvas after load");
+                            _canvasManager = FindObjectOfType<CanvasManager>();
+                            _canvasManager.Init();
+                        }
                         foreach(KeyValuePair<ulong, CharacterTypes> item in playerCharacterSelections){
                             print("Spawning player for client" + item.Key);
                             GameObject spawningPlayer = Instantiate(_playerPrefabs[(int)item.Value], Vector3.up*2, Quaternion.identity);

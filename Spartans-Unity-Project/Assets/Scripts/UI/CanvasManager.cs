@@ -64,6 +64,5 @@ namespace Spartans.UI{
                 Debug.LogWarning("Only 1 PageUI left in the stack");
             }
         }
-
     }
 }
