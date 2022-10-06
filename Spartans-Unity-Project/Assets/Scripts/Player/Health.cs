@@ -76,7 +76,7 @@ namespace Spartans.Players{
             if(IsServer){
                 timeOfDeath = _respawnTime;
                 //_animator.SetBool("dead", true);
-                _playerController._animationManager.SetParameter("dead", true);
+                _playerController.AnimationManager.SetParameter("dead", true);
             }
         }
         //Respawn is only called by the server hence why only a 
@@ -84,7 +84,7 @@ namespace Spartans.Players{
         private void Respawn(){
             _healthDisplay.gameObject.SetActive(true);
             _currentHitpoints = _maxHitpoints;
-            _playerController._animationManager.SetParameter("dead", false);
+            _playerController.AnimationManager.SetParameter("dead", false);
             onHealthChanged?.Invoke(_maxHitpoints);
             onRespawn.Invoke();
 

@@ -10,11 +10,11 @@ namespace Spartans.Players
     [RequireComponent(typeof(AnimationManager), typeof(Rigidbody))]
     public class PlayerController : NetworkBehaviour
     {
-        [SerializeField] public GameObject worldSpaceCanvas;
-        [SerializeField] public Transform lookAtPoint;
-        [SerializeField] public AnimationManager _animationManager;
-        [SerializeField] public Transform spine;
-        [SerializeField] public string playerName{ get; private set; }
+        [SerializeField] public GameObject WorldSpaceCanvas;
+        [SerializeField] public Transform LookAtPoint;
+        [SerializeField] public AnimationManager AnimationManager;
+        [SerializeField] public Transform Spine;
+        [SerializeField] public string PlayerName{ get; private set; }
         [SerializeField] private bool _canJump = true;
         [SerializeField] private bool _grounded = false;
         [SerializeField] private float _jumpForce = 12.0f;
@@ -37,14 +37,14 @@ namespace Spartans.Players
         public void Awake(){
             _rigidbody = GetComponent<Rigidbody>();
             _myHealth = GetComponent<Health>();
-            _animationManager = GetComponent<AnimationManager>();
+            AnimationManager = GetComponent<AnimationManager>();
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager._canvasManager;
           
         }
 
         public void Start(){
-            playerName = "Player " + NetworkObjectId;
+            PlayerName = "Player " + NetworkObjectId;
             _animator = GetComponentInChildren<Animator>();
             _classController = GetComponent<ClassController>();
             //previously in start
@@ -57,8 +57,8 @@ namespace Spartans.Players
                 PlayerCameraFollow.Instance.FollowPlayer(transform.GetChild(0).transform);
                 PlayerCameraFollow.Instance.LookAtPlayer(transform.GetChild(0).transform);
                 transform.GetComponentInChildren<FloatingHealth>().camTransform = PlayerCameraFollow.Instance.camera.transform;
-                worldSpaceCanvas.GetComponent<Canvas>().worldCamera = PlayerCameraFollow.Instance.camera;
-                worldSpaceCanvas.GetComponentInChildren<FloatingHealth>().camTransform = PlayerCameraFollow.Instance.camera.transform;
+                WorldSpaceCanvas.GetComponent<Canvas>().worldCamera = PlayerCameraFollow.Instance.camera;
+                WorldSpaceCanvas.GetComponentInChildren<FloatingHealth>().camTransform = PlayerCameraFollow.Instance.camera.transform;
             }
 
             
@@ -69,7 +69,7 @@ namespace Spartans.Players
         // Update is called once per frame
         void Update()
         {
-            if(_animationManager == null || _animator == null){
+            if(AnimationManager == null || _animator == null){
 
                 print("Assign an animator/animationManager dummy!!!");
                 return;
@@ -128,7 +128,7 @@ namespace Spartans.Players
             if(!_grounded) return;
             _canJump = false;
             _grounded = false;
-            _animationManager.SetParameter("grounded", false);
+            AnimationManager.SetParameter("grounded", false);
             StartCoroutine(ResetJump());
             JumpResponseClientRpc();
         }
@@ -139,7 +139,7 @@ namespace Spartans.Players
                 transform.Rotate(new Vector3(0, rotX, 0));
             }
             if (rotY != 0){
-                lookAtPoint.Rotate(new Vector3(rotY, 0, 0));
+                LookAtPoint.Rotate(new Vector3(rotY, 0, 0));
             }
         }
 
@@ -147,7 +147,7 @@ namespace Spartans.Players
         public void requestMoveServerRpc(Vector3 dir){
             if(!_grounded) return;
             Vector3 moveDir = dir.normalized;
-            _animationManager.SetParameter("speed", dir.magnitude);
+            AnimationManager.SetParameter("speed", dir.magnitude);
             if (moveDir == Vector3.zero && _grounded){
                 _rigidbody.velocity = Vector3.zero;
             }
@@ -173,7 +173,7 @@ namespace Spartans.Players
                 //check if we are the server because This func gets run on server and client
                 //thus it would produce a duplicate instruction to change the Animator parameter
                 if(IsServer){
-                  _animationManager.SetParameter("grounded", true);
+                  AnimationManager.SetParameter("grounded", true);
                 }
                 _grounded = true;
             }else if(!hitOccured){

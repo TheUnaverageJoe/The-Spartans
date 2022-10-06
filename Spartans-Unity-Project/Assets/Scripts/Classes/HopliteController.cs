@@ -61,7 +61,7 @@ namespace Spartans.Players{
             }
         }
         public override void PrimaryAttack(){
-            _playerController._animationManager.SetParameter("attack", true);
+            _playerController.AnimationManager.SetParameter("attack", true);
             _attackOnCooldown = true;
             StartCoroutine(ResetAttackCooldown());
         }
@@ -78,7 +78,7 @@ namespace Spartans.Players{
 
         IEnumerator ResetAttackCooldown(){
             yield return new WaitForSeconds(1);
-            _playerController._animationManager.SetParameter("attack", false);
+            _playerController.AnimationManager.SetParameter("attack", false);
             _attackOnCooldown = false;
             _hitPlayers.Clear();
         }
@@ -97,8 +97,8 @@ namespace Spartans.Players{
             float x = Screen.width / 2f;
             float y = Screen.height / 2f;
             var ray = PlayerCameraFollow.Instance.camera.ScreenPointToRay(new Vector2(x, y));
-            Vector3 initialPos = _playerController.lookAtPoint.position;
-            Quaternion rot = _playerController.lookAtPoint.rotation;
+            Vector3 initialPos = _playerController.LookAtPoint.position;
+            Quaternion rot = _playerController.LookAtPoint.rotation;
             if(Physics.Raycast(ray, out RaycastHit raycastHit, 999f, _aimColliderMask)){
                 Vector3 dir = raycastHit.point - PlayerCameraFollow.Instance.camera.transform.position;
                 rot = Quaternion.LookRotation(dir);
