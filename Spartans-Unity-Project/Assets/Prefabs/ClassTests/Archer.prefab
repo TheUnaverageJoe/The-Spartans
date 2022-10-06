@@ -1612,8 +1612,6 @@ GameObject:
   - component: {fileID: 1180787338501321058}
   - component: {fileID: 9222883046351022133}
   - component: {fileID: 8248509183464699321}
-  - component: {fileID: 117774642079741790}
-  - component: {fileID: 3845976704101927409}
   - component: {fileID: 7784362515395398255}
   - component: {fileID: 3255800713322765034}
   - component: {fileID: 7000217329686785003}
@@ -1750,41 +1748,6 @@ MonoBehaviour:
   _mouseSens: 1
   _lastSentInput: {x: 0, y: 0, z: 0}
   input: {x: 0, y: 0, z: 0}
---- !u!114 &117774642079741790
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4872088991276116381}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2b6f5d37aac3c74c94f3889c4f2835c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cameraPrefab: {fileID: 6566532239938505393, guid: 3ea986e08f4b2a44bb1934c5a1cec700, type: 3}
-  worldSpaceCanvas: {fileID: 385576021230286853}
-  _animationManager: {fileID: 3255800713322765034}
---- !u!114 &3845976704101927409
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4872088991276116381}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 862f3cea03ec58f4b9ba8577bf5df602, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lookAtPoint: {fileID: 4228096135655989061}
-  spine: {fileID: 499078635807277870}
-  _canJump: 1
-  _grounded: 0
-  _jumpForce: 12
-  _moveSpeed: 5
-  _MAX_SPEED: 8
-  _mouseSens: 1
 --- !u!114 &7784362515395398255
 MonoBehaviour:
   m_ObjectHideFlags: 0

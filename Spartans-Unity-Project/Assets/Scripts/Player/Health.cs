@@ -9,14 +9,12 @@ namespace Spartans.Players{
     {
         [SerializeField]private int _maxHitpoints;
         [SerializeField] private int _currentHitpoints;
-        //Animator _animator;
-        Player _player;
+        PlayerController _playerController;
         FloatingHealth _healthDisplay;
-        [SerializeField]private float _respawnTime = 4;
+        [SerializeField] private float _respawnTime = 4;
         private float timeOfDeath = 0;
         private int _previousHitpoints;
-        //[SerializeField] private GameObject _floatingHealthPrefab;
-        //private GameObject hpDisplay;
+
 
 
         //int param is new health value
@@ -26,13 +24,9 @@ namespace Spartans.Players{
 
 
         //Stand in for Awake and Start, Initialization method called from Player.cs
-        public void Init(){
-            //_maxHitpoints = 3;
-            //_currentHitpoints = _maxHitpoints;
-            //hpDisplay = Instantiate(_floatingHealthPrefab, GetComponentInChildren<Canvas>().transform);
-            //_animator = GetComponentInChildren<Animator>();
+        public void Init(PlayerController playerController){
             _healthDisplay = GetComponentInChildren<FloatingHealth>();
-            _player = GetComponent<Player>();
+            _playerController = playerController;
 
             onDie += OnDieCallback;
 
@@ -82,8 +76,7 @@ namespace Spartans.Players{
             if(IsServer){
                 timeOfDeath = _respawnTime;
                 //_animator.SetBool("dead", true);
-                _player._animationManager.SetParameter("dead", true);
-                print("Killed: " + this.GetComponent<Player>().playerName.ToString());
+                _playerController._animationManager.SetParameter("dead", true);
             }
         }
         //Respawn is only called by the server hence why only a 
@@ -91,8 +84,7 @@ namespace Spartans.Players{
         private void Respawn(){
             _healthDisplay.gameObject.SetActive(true);
             _currentHitpoints = _maxHitpoints;
-            //_animator.SetBool("dead", false);
-            _player._animationManager.SetParameter("dead", false);
+            _playerController._animationManager.SetParameter("dead", false);
             onHealthChanged?.Invoke(_maxHitpoints);
             onRespawn.Invoke();
 

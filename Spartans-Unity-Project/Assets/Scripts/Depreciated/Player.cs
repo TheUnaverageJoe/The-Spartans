@@ -64,7 +64,7 @@ namespace Spartans.Players
             //}
             //Do in the case of any type of user
             //initialize all players on spawn
-            _myHealth.Init();
+            //_myHealth.Init();
             _playerMove.Init(_rigidbody);
         }
 

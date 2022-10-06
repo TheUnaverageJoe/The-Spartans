@@ -24,11 +24,13 @@ namespace Spartans.Players
         [SerializeField] private Vector3 _lastSentInput;
         [SerializeField] private Vector3 input;
 
+        
+
         private GameManager _gameManager;
-        private PlayerCanvasManager _HUD;
+        private CanvasManager _HUD;
         private Rigidbody _rigidbody;
         private Animator _animator;
-        
+        private ClassController _classController;
         private Health _myHealth;
         
 
@@ -37,14 +39,14 @@ namespace Spartans.Players
             _myHealth = GetComponent<Health>();
             _animationManager = GetComponent<AnimationManager>();
             _gameManager = FindObjectOfType<GameManager>();
-            _HUD = _gameManager._playerCanvasManager;
+            _HUD = _gameManager._canvasManager;
           
         }
 
         public void Start(){
             playerName = "Player " + NetworkObjectId;
             _animator = GetComponentInChildren<Animator>();
-
+            _classController = GetComponent<ClassController>();
             //previously in start
             _myHealth = GetComponent<Health>();
             _myHealth.onDie += OnDieCallback;
@@ -60,7 +62,8 @@ namespace Spartans.Players
             }
 
             
-            _myHealth.Init();
+            _myHealth.Init(this);
+            _classController.Init(this);
         }
         
         // Update is called once per frame
@@ -87,11 +90,10 @@ namespace Spartans.Players
                 _canJump = false;
                 _grounded = false;
             }
+
             //Update rotation
-            float mouseX = Input.GetAxis("Mouse X");
-            float mouseY = Input.GetAxis("Mouse Y");
-            requestRotationServerRpc(mouseX*_mouseSens, -mouseY*_mouseSens);
-            float rotMouseY = -mouseY*_mouseSens;
+            requestRotationServerRpc(Input.GetAxis("Mouse X")*_mouseSens, - Input.GetAxis("Mouse Y")*_mouseSens);
+            
             
             
             //Update movement
@@ -177,7 +179,6 @@ namespace Spartans.Players
             }else if(!hitOccured){
                 _grounded = false;
             }else{
-                //if()
                 print("Unanticipated condition occured");
             }
         }
