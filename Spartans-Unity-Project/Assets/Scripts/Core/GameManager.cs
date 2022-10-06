@@ -71,6 +71,10 @@ namespace Spartans{
             NetworkManager.Singleton.Shutdown();
             activeState = States.ModeSelect;
             Instance = null;
+            if(NetworkManager.Singleton != null){
+                print("GameManager killed Network Manager");
+                Destroy(NetworkManager.Singleton.gameObject);
+            }
             SceneManager.LoadScene(MENU_SCENE_NAME);
             Destroy(this.gameObject);
         }
@@ -90,9 +94,7 @@ namespace Spartans{
         ///</summary>
          private void OnDisable(){
             print("Disabled Game Manager");
-            // if(NetworkManager.Singleton != null){
-            //     Destroy(NetworkManager.Singleton.gameObject);
-            // }
+            
             
             joinedGame -= JoinGameCallback;
             //onClickBack -= OnClickBackCallback;
@@ -124,7 +126,7 @@ namespace Spartans{
 
         private void SceneEventHandler(SceneEvent sceneEvent){
             var clientOrServer = sceneEvent.ClientId == NetworkManager.ServerClientId ? "server" : "client";
-            if(sceneEvent.ClientsThatTimedOut != null){//sceneEvent.ClientsThatTimedOut.Count > 0
+            if(sceneEvent.ClientsThatTimedOut != null && sceneEvent.ClientsThatTimedOut.Count>0){//sceneEvent.ClientsThatTimedOut.Count > 0
                 foreach(ulong id in sceneEvent.ClientsThatTimedOut){
                     print($"{id} timed Out on scene transition");
                 }
@@ -152,12 +154,20 @@ namespace Spartans{
                     }
                     Debug.Log($"Loaded the {sceneEvent.SceneName} scene on " +
                         $"{clientOrServer}-({sceneEvent.ClientId}).");
-
-                    foreach(KeyValuePair<ulong, CharacterTypes> item in playerCharacterSelections){
-                        print("Spawning player for client" + item.Key);
-                        GameObject spawningPlayer = Instantiate(_playerPrefabs[(int)item.Value], Vector3.up*2, Quaternion.identity);
-                        spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(item.Key);
+                    
+                    if(playerCharacterSelections.Count > 0 ){
+                        
+                        foreach(KeyValuePair<ulong, CharacterTypes> item in playerCharacterSelections){
+                            print("Spawning player for client" + item.Key);
+                            GameObject spawningPlayer = Instantiate(_playerPrefabs[(int)item.Value], Vector3.up*2, Quaternion.identity);
+                            spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(item.Key);
+                        }
                     }
+                    else
+                    {
+                        print("Would have spawned players but none to spawn");
+                    }
+                    
                     break;
                     
                 case SceneEventType.UnloadEventCompleted:

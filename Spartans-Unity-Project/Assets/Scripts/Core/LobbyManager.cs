@@ -24,7 +24,7 @@ namespace Spartans{
         // Start is called before the first frame update
         void Start()
         {
-            print("Lobby scene loaded");
+            //print("Lobby scene loaded");
             connection = NetworkManager.Singleton.GetComponent<UnityTransport>();
             _canvasManager = FindObjectOfType<CanvasManager>();
             _canvasManager.Init();
@@ -36,7 +36,7 @@ namespace Spartans{
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            print("Lobby spawned into " + NetworkManager.Singleton.ConnectedHostname);
+            //print("Lobby spawned into " + NetworkManager.Singleton.ConnectedHostname);
 
             if(!IsServer) return;
             playerCharacterSelections = new Dictionary<ulong, CharacterTypes>();
@@ -64,7 +64,7 @@ namespace Spartans{
         }
 
         private void NotifyClientConnected(ulong clientID){
-            print($"Client {clientID} connected");
+            //print($"Client {clientID} connected");
 
             if(IsServer){
                 StopCoroutine(startingRoutine);
@@ -72,9 +72,13 @@ namespace Spartans{
         }
         public void LeaveLobby(){
             NetworkManager.Singleton.Shutdown();
+            Destroy(NetworkManager.Singleton.gameObject);
             SceneManager.LoadScene(MENU_SCENE_NAME);
         }
         public void BackToMenu(){
+            //if(!IsServer && !IsClient){
+            Destroy(NetworkManager.Singleton.gameObject);
+            //}
             SceneManager.LoadScene("MainMenu");
         }
 
@@ -115,19 +119,18 @@ namespace Spartans{
         }
         private bool CheckCanStart(){
             if(!IsServer) return false;
-            print("checking Can Start");
+            //print("checking Can Start");
             foreach(ulong id in NetworkManager.ConnectedClientsIds){
                 if(!playerCharacterSelections.ContainsKey(id)){
                     return false;
                 }
             }
             return true;
-            
         }
 
         
         IEnumerator StartSelectionCountdown(){
-            print("Starting ready countdown");
+            //print("Starting ready countdown");
             yield return new WaitForSeconds(5);
             //PlayerInput.Instance.OnDisable();
             var status = NetworkManager.SceneManager.LoadScene(GAMESCENE, LoadSceneMode.Single);
@@ -143,9 +146,9 @@ namespace Spartans{
             startingRoutine = StartCoroutine(StartSelectionCountdown());
         }
         private void OnDisable(){
-            if(!IsServer && !IsClient){
-                Destroy(NetworkManager.Singleton.gameObject);
-            }
+            
+            //print("Disabling LobbyManager");
+            PassOffToGameManager();
             NetworkManager.OnClientConnectedCallback -= NotifyClientConnected;
         }
     }

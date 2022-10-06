@@ -65,14 +65,5 @@ namespace Spartans.UI{
             }
         }
 
-        private void OnLeaveGame(){
-
-        }
-        private void PlayPressedSound(){
-            AudioManager.Instance.PlayAudio(AudioManager.AudioChannels.Channel2, AudioManager.SoundClipsIndex.spear_attack);
-        }
-        private void OnDisable(){
-
-        }
     }
 }
