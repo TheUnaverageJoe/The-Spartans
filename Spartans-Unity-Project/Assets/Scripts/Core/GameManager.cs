@@ -2,9 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;
 using UnityEngine.SceneManagement;
-using TMPro;
+
 
 using Spartans.UI;
 using Spartans.Players;
@@ -13,31 +12,27 @@ namespace Spartans{
     //This class is a singleton
     public class GameManager : NetworkBehaviour
     {
-
         public static GameManager Instance;
         private const string MENU_SCENE_NAME = "MainMenu";
-        private const string GAMESCENE = "TestMap";
-        public PlayerCanvasManager _playerCanvasManager{get; private set;}
+        public CanvasManager _canvasManager{get; private set;}
         //private List<Player> _players = new List<Player>();
         [SerializeField] private List<GameObject> _playerPrefabs;
-        
         [SerializeField] private Camera _mainCamera;
 
         private GameMode.GameModeBase _gameMode;
-        private GameObject[] _objectives;
-        private GameObject selectedObjective;
+        //private GameObject[] _objectives;
+        //private GameObject selectedObjective;
         public static States activeState{get; private set;}
         private Scene m_LoadedScene;
-
         private Dictionary<ulong, CharacterTypes> playerCharacterSelections;
 
-        public System.Action stateChanged;
-        public System.Action joinedGame;
-        public System.Action leftGame;
+        // public System.Action stateChanged;
+        // public System.Action joinedGame;
+        // public System.Action leftGame;
         //public System.Action onClickBack;
         public enum States{
-            ModeSelect,
-            Connected,
+            Lobby,
+            PreGame,
             InGame,
             GameOver,
             PostGame
@@ -53,36 +48,36 @@ namespace Spartans{
         }
 
         void Start(){
-            joinedGame += JoinGameCallback;
-            NetworkManager.SceneManager.OnSceneEvent += newFunc;
+            NetworkManager.SceneManager.OnSceneEvent += SceneEventHandler;
             //onClickBack += OnClickBackCallback;
 
-            _playerCanvasManager = FindObjectOfType<PlayerCanvasManager>();
-            _playerCanvasManager.Init();
-
-            activeState = States.ModeSelect;
-            stateChanged?.Invoke();
+            print("activeState" + activeState.ToString());
+            if(activeState >= States.InGame){
+                print("GameManager finding Canvas and Init()ing");
+                _canvasManager = FindObjectOfType<CanvasManager>();
+                _canvasManager.Init();
+            }
+            
+            activeState = States.Lobby;
+            //stateChanged?.Invoke();
 
             playerCharacterSelections = new Dictionary<ulong, CharacterTypes>();
             
             Physics.gravity = new Vector3(0, -20f, 0);
         }
 
-        public void BackButtonPressed(){
-            SceneManager.LoadScene(MENU_SCENE_NAME);
-        }
         public void StopConnection(){
             NetworkManager.Singleton.Shutdown();
-            activeState = States.ModeSelect;
+            activeState = States.Lobby;
             Instance = null;
+            if(NetworkManager.Singleton != null){
+                print("GameManager killed Network Manager");
+                Destroy(NetworkManager.Singleton.gameObject);
+            }
+            SceneManager.LoadScene(MENU_SCENE_NAME);
             Destroy(this.gameObject);
-            BackButtonPressed();
         }
 
-        private void JoinGameCallback(){
-            activeState = States.Connected;
-            stateChanged?.Invoke();
-        }
         private void OnClickBackCallback(){
             SceneManager.LoadScene(MENU_SCENE_NAME);
         }
@@ -93,73 +88,13 @@ namespace Spartans{
         ///Unsubscribes any Action listeners
         ///</summary>
          private void OnDisable(){
-            print("Disabled Game Manager");
-        //     if(NetworkManager.Singleton != null){
-        //         Destroy(NetworkManager.Singleton.gameObject);
-        //     }
-        //     joinedGame -= JoinGameCallback;
-        //     //onClickBack -= OnClickBackCallback;
-        // }
-         }
-
-        // [ServerRpc(RequireOwnership = false)]
-        // private void requestCharacterServerRpc(ulong clientID, int classIndex){
-        //     if(classIndex > _playerPrefabs.Count-1)
-        //     {
-        //         print("Client sender error: invalid classIndex");
-        //     }
-        //     //print("assigning player for client " + clientID);
-        //     GameObject spawningPlayer = Instantiate(_playerPrefabs[classIndex], Vector3.up*2, Quaternion.identity);
-        //     spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientID);
-            
-        // }
-
-        // public void requestCharacter(int classIndex){
-        //     requestCharacterServerRpc(NetworkManager.Singleton.LocalClientId, classIndex);
-        //     activeState = States.InGame;
-        //     stateChanged?.Invoke();
-        //     _playerCanvasManager.ToggleHudOnOff();
-        // }
-
-        // public void AddCharacterSelection(ulong clientID, CharacterTypes type){
-        //     playerCharacterSelections.Add(clientID, type);
-        // }
-
-        [ServerRpc(RequireOwnership=false)]
-        public void requestAssignCharacterServerRpc(ulong requestingClient, CharacterTypes character)
-        {
-            if(!playerCharacterSelections.ContainsKey(requestingClient))
-            {
-                playerCharacterSelections.Add(requestingClient, character);
-                //var status = NetworkManager.SceneManager.LoadScene(GAMESCENE, LoadSceneMode.Single);
-                print($"Added {character.ToString()} for client {requestingClient.ToString()}");
-            }else{
-                print("SUGMA");
-            }
+            //print("Disabled Game Manager");
+            //onClickBack -= OnClickBackCallback;
         }
-        public void requestAssignCharacter(ulong requestingClient, CharacterTypes character)
-        {
-            if(IsServer)
-            {
-                if(!playerCharacterSelections.ContainsKey(requestingClient))
-                {
-                    playerCharacterSelections.Add(requestingClient, character);
-                    StartCoroutine(StartSelectionCountdown());
-                    print($"Added {character.ToString()} for client {requestingClient.ToString()}");
-                }else{
-                    print("SUGMA");
-                }
-            }
-            else
-            {
-                requestAssignCharacterServerRpc(requestingClient, character);
-            }
-        }
-        
-
 
         public override void OnNetworkSpawn(){
             base.OnNetworkSpawn();
+            /*
             //Load all prefabs for objects from "Assets/Resources/Objectives" folder
             _objectives = Resources.LoadAll<GameObject>("Objectives");
             if(_objectives.Length <= 0 )
@@ -173,21 +108,38 @@ namespace Spartans{
                     //print(item.name);
                 }
             }
-
+            
             if(!IsServer) return;
             selectedObjective = NetworkManager.Instantiate(_objectives[0]);
             selectedObjective.GetComponent<NetworkObject>().Spawn();
+            _gameMode = selectedObjective.GetComponent<GameMode.GameModeBase>();
+            */
         }
 
-        private void newFunc(SceneEvent sceneEvent){
+        private void SceneEventHandler(SceneEvent sceneEvent){
             var clientOrServer = sceneEvent.ClientId == NetworkManager.ServerClientId ? "server" : "client";
+            if(sceneEvent.ClientsThatTimedOut != null && sceneEvent.ClientsThatTimedOut.Count>0){//sceneEvent.ClientsThatTimedOut.Count > 0
+                foreach(ulong id in sceneEvent.ClientsThatTimedOut){
+                    print($"{id} timed Out on scene transition");
+                }
+                Debug.LogWarning("CLIENT FAILED TO LOAD AND/OR SYNC???!");
+            }
             switch (sceneEvent.SceneEventType)
             {
                 case SceneEventType.LoadComplete:
+                    print("Scene name " + sceneEvent.SceneName);
                     break;
                 case SceneEventType.UnloadComplete:
+                    if(sceneEvent.SceneName == "Lobby"){
+                        activeState = States.InGame;
+                    }
+                    print("Unloaded " + sceneEvent.SceneName + " Scene");
                     break;
                 case SceneEventType.LoadEventCompleted:
+                    // if(IsServer){
+                    //     NetworkManager.SceneManager.UnloadScene(SceneManager.GetSceneByName("Lobby"));
+                    // }
+                    //print("LoadEventCompleted fired");
                     // We want to handle this for only the server-side
                     if (sceneEvent.ClientId == NetworkManager.ServerClientId)
                     {
@@ -195,13 +147,26 @@ namespace Spartans{
                         // Keep track of the loaded scene, you need this to unload it
                         m_LoadedScene = sceneEvent.Scene;
                     }
-                    Debug.Log($"Loaded the {sceneEvent.SceneName} scene on " +
-                        $"{clientOrServer}-({sceneEvent.ClientId}).");
-
-                    foreach(KeyValuePair<ulong, CharacterTypes> item in playerCharacterSelections){
-                        GameObject spawningPlayer = Instantiate(_playerPrefabs[(int)item.Value], Vector3.up*2, Quaternion.identity);
-                        spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(item.Key);
+                    //Debug.Log($"Loaded the {sceneEvent.SceneName} scene on " +
+                    //    $"{clientOrServer}-({sceneEvent.ClientId}).");
+                    
+                    if(playerCharacterSelections.Count > 0 ){
+                        if(!_canvasManager){
+                            print("Had to find canvas after load");
+                            _canvasManager = FindObjectOfType<CanvasManager>();
+                            _canvasManager.Init();
+                        }
+                        foreach(KeyValuePair<ulong, CharacterTypes> item in playerCharacterSelections){
+                            print("Spawning player for client" + item.Key);
+                            GameObject spawningPlayer = Instantiate(_playerPrefabs[(int)item.Value], Vector3.up*2, Quaternion.identity);
+                            spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(item.Key);
+                        }
                     }
+                    else
+                    {
+                        print("Would have spawned players but none to spawn");
+                    }
+                    
                     break;
                     
                 case SceneEventType.UnloadEventCompleted:
@@ -209,17 +174,15 @@ namespace Spartans{
             }
         }
 
-        IEnumerator StartSelectionCountdown(){
-            print("Starting ready countdown");
-            yield return new WaitForSeconds(10);
-            var status = NetworkManager.SceneManager.LoadScene(GAMESCENE, LoadSceneMode.Single);
-            if (status != SceneEventProgressStatus.Started)
-            {
-                Debug.LogWarning($"Failed to load {GAMESCENE} " +
-                        $"with a {nameof(SceneEventProgressStatus)}: {status}");
+        public void PopulatePlayerSelections(KeyValuePair<ulong, CharacterTypes>[] array){
+            //Only needs to be run on server machine
+            print("Copied dictonary");
+            foreach(KeyValuePair<ulong, CharacterTypes> entry in array){
+                playerCharacterSelections.Add(entry.Key, entry.Value);
+                print(entry);
             }
-            StopCoroutine(StartSelectionCountdown());
         }
+        
      
     }
 }

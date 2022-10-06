@@ -16,7 +16,7 @@ namespace Spartans.Players
         private GameManager _gameManager;
         //private PlayerMove _playerMove;
         private PlayerMoveRefactor _playerMove;
-        private PlayerCanvasManager _HUD;
+        private CanvasManager _HUD;
         private Rigidbody _rigidbody;
         //private Animator _animator;
         [SerializeField] public AnimationManager _animationManager;
@@ -31,7 +31,7 @@ namespace Spartans.Players
 
             _playerMove = GetComponent<PlayerMoveRefactor>();
             _gameManager = FindObjectOfType<GameManager>();
-            _HUD = _gameManager._playerCanvasManager;
+            _HUD = _gameManager._canvasManager;
             //_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             // cam = GetComponentInChildren<Camera>();
             
