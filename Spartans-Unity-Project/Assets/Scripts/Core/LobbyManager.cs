@@ -15,11 +15,16 @@ namespace Spartans{
         [SerializeField] private GameObject _gameManagerPrefab;
         [SerializeField] private TMP_InputField _input;
         private CanvasManager _canvasManager;
+        private GameMode.GameModeBase _gameMode;
         private const string MENU_SCENE_NAME = "MainMenu";
         private const string GAMESCENE = "TestMap";
         private UnityTransport connection;
-        private Dictionary<ulong, CharacterTypes> playerCharacterSelections;
+        private Dictionary<ulong, CharacterTypes> playerCharacterSelections = new Dictionary<ulong, CharacterTypes>();
+        private List<ulong> redTeam = new List<ulong>();
+        private List<ulong> blueTeam = new List<ulong>();
         private Coroutine startingRoutine;
+        private NetworkList<PlayerLobbyData> connectedPlayers = new NetworkList<PlayerLobbyData>();
+
 
         // Start is called before the first frame update
         void Start()
@@ -28,18 +33,18 @@ namespace Spartans{
             connection = NetworkManager.Singleton.GetComponent<UnityTransport>();
             _canvasManager = FindObjectOfType<CanvasManager>();
             _canvasManager.Init();
-
-            NetworkManager.OnClientConnectedCallback += NotifyClientConnected;
             
         }
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            connectedPlayers.OnListChanged += LobbyPlayersHandler;
+            NetworkManager.OnClientConnectedCallback += NotifyClientConnected;
+            NetworkManager.OnClientDisconnectCallback += NotifyClientDisconnected;
             //print("Lobby spawned into " + NetworkManager.Singleton.ConnectedHostname);
 
             if(!IsServer) return;
-            playerCharacterSelections = new Dictionary<ulong, CharacterTypes>();
             GameObject spawn = Instantiate(_gameManagerPrefab);
             //GameManager.Instance.GetComponent<NetworkObject>().Spawn();
             spawn.GetComponent<NetworkObject>().Spawn();
@@ -64,7 +69,7 @@ namespace Spartans{
         }
 
         private void NotifyClientConnected(ulong clientID){
-            //print($"Client {clientID} connected");
+            print($"Client {clientID} connected");
 
             if(IsServer){
                 if(startingRoutine != null){
@@ -73,8 +78,20 @@ namespace Spartans{
                 else{
                     print("No routine to stop???");
                 }
-                
             }
+            LobbySync.Teams team = redTeam.Count >= blueTeam.Count ? LobbySync.Teams.Red : LobbySync.Teams.Blue;
+            CharacterTypes type;
+            bool isReady = false;
+            if(!playerCharacterSelections.TryGetValue(clientID, out type)){
+                type = CharacterTypes.Hoplite;
+                isReady = true;
+            }
+            PlayerLobbyData newPlayer = new PlayerLobbyData(clientID, team, type, isReady);
+
+            LobbySync.Instance.AddPlayerConnection(newPlayer);
+        }
+        private void NotifyClientDisconnected(ulong clientID){
+            LobbySync.Instance.RemovePlayerConnection(clientID);
         }
         public void LeaveLobby(){
             NetworkManager.Singleton.Shutdown();
@@ -116,7 +133,7 @@ namespace Spartans{
             }
 
             if(CheckCanStart()){
-                StartStartingCountdown();
+                OfferStartIfAllReady();
             }
         }
         public void RequestAssignCharacter(int character)
@@ -133,7 +150,6 @@ namespace Spartans{
             }
             return true;
         }
-
         
         IEnumerator StartSelectionCountdown(){
             //print("Starting ready countdown");
@@ -152,10 +168,25 @@ namespace Spartans{
             startingRoutine = StartCoroutine(StartSelectionCountdown());
         }
         private void OnDisable(){
-            
             //print("Disabling LobbyManager");
             PassOffToGameManager();
             NetworkManager.OnClientConnectedCallback -= NotifyClientConnected;
+        }
+
+        public void StartGame(){
+            if(CheckCanStart()){
+                StartStartingCountdown();
+            }
+        }
+
+        private void OfferStartIfAllReady(){
+            if(CheckCanStart()){
+                LobbySync.Instance.StartButtonActive(true);
+            }
+        }
+
+        private void LobbyPlayersHandler(NetworkListEvent<PlayerLobbyData> changeEvent){
+            LobbySync.Instance.AddPlayerConnection(changeEvent.Value);
         }
     }
 }

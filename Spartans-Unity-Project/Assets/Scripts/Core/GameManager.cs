@@ -22,9 +22,9 @@ namespace Spartans{
         private GameMode.GameModeBase _gameMode;
         //private GameObject[] _objectives;
         //private GameObject selectedObjective;
-        public static States activeState{get; private set;}
+        public States activeState{get; private set;}
         private Scene m_LoadedScene;
-        private Dictionary<ulong, CharacterTypes> playerCharacterSelections;
+        private Dictionary<ulong, CharacterTypes> playerCharacterSelections = new Dictionary<ulong, CharacterTypes>();
 
         // public System.Action stateChanged;
         // public System.Action joinedGame;
@@ -33,7 +33,7 @@ namespace Spartans{
         public enum States{
             Lobby,
             PreGame,
-            InGame,
+            InProgress,
             GameOver,
             PostGame
         }
@@ -52,7 +52,7 @@ namespace Spartans{
             //onClickBack += OnClickBackCallback;
 
             print("activeState" + activeState.ToString());
-            if(activeState >= States.InGame){
+            if(activeState >= States.InProgress){
                 print("GameManager finding Canvas and Init()ing");
                 _canvasManager = FindObjectOfType<CanvasManager>();
                 _canvasManager.Init();
@@ -60,8 +60,6 @@ namespace Spartans{
             
             activeState = States.Lobby;
             //stateChanged?.Invoke();
-
-            playerCharacterSelections = new Dictionary<ulong, CharacterTypes>();
             
             Physics.gravity = new Vector3(0, -20f, 0);
         }
@@ -131,7 +129,7 @@ namespace Spartans{
                     break;
                 case SceneEventType.UnloadComplete:
                     if(sceneEvent.SceneName == "Lobby"){
-                        activeState = States.InGame;
+                        activeState = States.InProgress;
                     }
                     print("Unloaded " + sceneEvent.SceneName + " Scene");
                     break;

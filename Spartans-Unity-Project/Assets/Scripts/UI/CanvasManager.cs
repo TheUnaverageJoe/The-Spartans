@@ -30,10 +30,15 @@ namespace Spartans.UI{
             }
         }
         void Update(){
-            if(PlayerInput.Instance.escape){
-                print("esc pressed");
-                PopPage();
+            if(GameManager.Instance != null && GameManager.Instance.activeState != GameManager.States.Lobby)
+            {
+                if(PlayerInput.Instance.escape)
+                {
+                    print("esc pressed");
+                    PopPage();
+                }
             }
+            
         }
 
         public void PushPage(PageUI page){
