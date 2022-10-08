@@ -21,8 +21,8 @@ namespace Spartans.Players
         [SerializeField] private float _moveSpeed = 5f;
         [SerializeField] private float _MAX_SPEED = 8.0f;
         [SerializeField] private float _mouseSens = 1.0f;
-        [SerializeField] private Vector3 _lastSentInput;
-        [SerializeField] private Vector3 input;
+        [SerializeField] private Vector2 _lastSentInput;
+        [SerializeField] private Vector2 input;
 
         
 
@@ -97,7 +97,7 @@ namespace Spartans.Players
             
             
             //Update movement
-            input = new Vector3(Input.GetAxisRaw("Horizontal"), 0 , Input.GetAxisRaw("Vertical"));
+            input = new Vector2(Input.GetAxisRaw("Horizontal") , Input.GetAxisRaw("Vertical"));
             if(input != _lastSentInput){
                 _lastSentInput = input;
             }
@@ -144,10 +144,12 @@ namespace Spartans.Players
         }
 
         [ServerRpc]
-        public void requestMoveServerRpc(Vector3 dir){
+        public void requestMoveServerRpc(Vector2 dir){
             if(!_grounded) return;
-            Vector3 moveDir = dir.normalized;
+            Vector3 moveDir = new Vector3(dir.x, 0, dir.y).normalized;
             AnimationManager.SetParameter("speed", dir.magnitude);
+            AnimationManager.SetParameter("speedX", dir.x);
+            AnimationManager.SetParameter("speedY", dir.y);
             if (moveDir == Vector3.zero && _grounded){
                 _rigidbody.velocity = Vector3.zero;
             }

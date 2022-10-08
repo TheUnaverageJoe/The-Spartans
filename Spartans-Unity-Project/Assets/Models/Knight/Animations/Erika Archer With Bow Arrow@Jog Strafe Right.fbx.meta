@@ -1,11 +1,11 @@
 fileFormatVersion: 2
-guid: b76f2fdd16c62d0458461020d84ed4cb
+guid: 567aadc33a8693544bae89056061b6b5
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable:
   - first:
       74: -203655887218126122
-    second: mixamo.com
+    second: Jog Strafe Right
   externalObjects: {}
   materials:
     materialImportMode: 2
@@ -20,7 +20,14 @@ ModelImporter:
     removeConstantScaleCurves: 1
     motionNodeName: 
     rigImportErrors: 
-    rigImportWarnings: 
+    rigImportWarnings: "Copied Avatar Rig Configuration mis-match. Bone length in
+      copied configuration does not match position in animation file:\n\t'mixamorig:LeftUpLeg'
+      : position error = 20.449234 mm\n\t'mixamorig:LeftLeg' : position error = 26.278799
+      mm\n\t'mixamorig:LeftFoot' : position error = 74.816765 mm\n\t'mixamorig:LeftToeBase'
+      : position error = 29.489498 mm\n\t'mixamorig:RightUpLeg' : position error
+      = 21.039745 mm\n\t'mixamorig:RightLeg' : position error = 26.452583 mm\n\t'mixamorig:RightFoot'
+      : position error = 74.620605 mm\n\t'mixamorig:RightToeBase' : position error
+      = 29.519102 mm\n"
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -34,7 +41,36 @@ ModelImporter:
     animationWrapMode: 0
     extraExposedTransformPaths: []
     extraUserProperties: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Jog Strafe Right
+      takeName: mixamo.com
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 43
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     isReadable: 0
   meshes:
     lODScreenPercentages: []

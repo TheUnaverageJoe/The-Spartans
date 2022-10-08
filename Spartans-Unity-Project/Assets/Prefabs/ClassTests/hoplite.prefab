@@ -353,10 +353,8 @@ GameObject:
   - component: {fileID: 9113657418830669890}
   - component: {fileID: 4596307392534490483}
   - component: {fileID: 4148938393711281369}
-  - component: {fileID: 1861325914029540514}
   - component: {fileID: 874173009289139448}
   - component: {fileID: 7153520548376365376}
-  - component: {fileID: 1300392743089681369}
   - component: {fileID: 8483553969547998223}
   m_Layer: 6
   m_Name: hoplite
@@ -478,35 +476,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65d30a52d42901f45be3a86bf6b48cdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldSpaceCanvas: {fileID: 8861558909434390755}
-  lookAtPoint: {fileID: 3529011055375584585}
-  _animationManager: {fileID: 7153520548376365376}
-  spine: {fileID: 2229371365082707951}
+  WorldSpaceCanvas: {fileID: 8861558909434390755}
+  LookAtPoint: {fileID: 3529011055375584585}
+  AnimationManager: {fileID: 0}
+  Spine: {fileID: 2229371365082707951}
   _canJump: 1
   _grounded: 0
   _jumpForce: 12
   _moveSpeed: 5
   _MAX_SPEED: 8
   _mouseSens: 1
-  _lastSentInput: {x: 0, y: 0, z: 0}
-  input: {x: 0, y: 0, z: 0}
---- !u!114 &1861325914029540514
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1771422829377585750}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e51ac9028fed5f49a2058f6e71792f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  handRef: {fileID: 3320900639945400549}
-  attackMask:
-    serializedVersion: 2
-    m_Bits: 64
-  _playerDamage: 1
+  _lastSentInput: {x: 0, y: 0}
+  input: {x: 0, y: 0}
 --- !u!114 &874173009289139448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -534,25 +515,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 490fbe1eec18c664da075a29d4b73788, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1300392743089681369
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1771422829377585750}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7636e378675dfc445836f3c6fe5a52a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainCamera: {fileID: 0}
-  _arrowPrefab: {fileID: 1933142501969207380, guid: ab7e0d36d32692846a6d1d3bc8647ce8, type: 3}
-  speedModifier: 50
-  _lookAt: {fileID: 3529011055375584585}
-  _aimColliderMask:
-    serializedVersion: 2
-    m_Bits: 0
 --- !u!114 &8483553969547998223
 MonoBehaviour:
   m_ObjectHideFlags: 0
