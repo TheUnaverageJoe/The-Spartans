@@ -22,7 +22,7 @@ namespace Spartans{
             Red,
             Blue
         }
-
+        
         private void Awake(){
             if(Instance == null)
             {
@@ -32,6 +32,10 @@ namespace Spartans{
             {
                 Destroy(this.gameObject);
             }
+        }
+
+        void Update(){
+            
         }
 
         public void AddPlayerConnection(PlayerLobbyData dataObject)
@@ -73,7 +77,7 @@ namespace Spartans{
             _startButton.SetActive(ready);
         }
 
-        private void OnDisable(){
+        private void OnDestroy(){
             Instance = null;
         }
     }

@@ -18,6 +18,12 @@ namespace Spartans
             _isReady = isReady;
             _team = team;
         }
+        public PlayerLobbyData(PlayerLobbyData toClone){
+            _id = toClone._id;
+            _type = toClone._type;
+            _isReady = toClone._isReady;
+            _team = toClone._team;
+        }
 
         void INetworkSerializable.NetworkSerialize<T>(BufferSerializer<T> serializer)
         {
@@ -36,7 +42,6 @@ namespace Spartans
             }
 
             return false;
-            
         }
     }
 }

@@ -23,25 +23,43 @@ namespace Spartans{
         private List<ulong> redTeam = new List<ulong>();
         private List<ulong> blueTeam = new List<ulong>();
         private Coroutine startingRoutine;
-        private NetworkList<PlayerLobbyData> connectedPlayers = new NetworkList<PlayerLobbyData>();
+        private NetworkList<PlayerLobbyData> connectedPlayers;
 
-
+        void Awake(){
+            
+        }
         // Start is called before the first frame update
         void Start()
         {
             //print("Lobby scene loaded");
+            connectedPlayers = new NetworkList<PlayerLobbyData>();
+
             connection = NetworkManager.Singleton.GetComponent<UnityTransport>();
             _canvasManager = FindObjectOfType<CanvasManager>();
             _canvasManager.Init();
-            
+
         }
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            connectedPlayers.OnListChanged += LobbyPlayersHandler;
-            NetworkManager.OnClientConnectedCallback += NotifyClientConnected;
-            NetworkManager.OnClientDisconnectCallback += NotifyClientDisconnected;
+            if(IsClient){
+                connectedPlayers.OnListChanged += LobbyPlayersHandler;
+                print("Connected players " + connectedPlayers.Count);
+                foreach(PlayerLobbyData client in connectedPlayers){
+                    print("Addeding connection for client Instance " + client._id);
+                    LobbySync.Instance.AddPlayerConnection(client);
+                }
+            }
+            if(IsServer){
+                NetworkManager.OnClientConnectedCallback += NotifyClientConnected;
+                NetworkManager.OnClientDisconnectCallback += NotifyClientDisconnected;
+
+                foreach(NetworkClient client in NetworkManager.ConnectedClientsList){
+                    NotifyClientConnected(client.ClientId);
+                }
+            }
+            
             //print("Lobby spawned into " + NetworkManager.Singleton.ConnectedHostname);
 
             if(!IsServer) return;
@@ -70,6 +88,7 @@ namespace Spartans{
 
         private void NotifyClientConnected(ulong clientID){
             print($"Client {clientID} connected");
+            OfferStartIfAllReady();
 
             if(IsServer){
                 if(startingRoutine != null){
@@ -88,17 +107,28 @@ namespace Spartans{
             }
             PlayerLobbyData newPlayer = new PlayerLobbyData(clientID, team, type, isReady);
 
-            LobbySync.Instance.AddPlayerConnection(newPlayer);
+            //LobbySync.Instance.AddPlayerConnection(newPlayer);
+            connectedPlayers.Add(newPlayer);
+            print("Added player " + newPlayer._id + "to lobby");
         }
-        private void NotifyClientDisconnected(ulong clientID){
-            LobbySync.Instance.RemovePlayerConnection(clientID);
+        private void NotifyClientDisconnected(ulong clientID)
+        {
+            foreach(PlayerLobbyData item in connectedPlayers)
+            {
+                if(item._id == clientID)
+                {
+                    connectedPlayers.Remove(item);
+                }
+            }
         }
-        public void LeaveLobby(){
+        public void LeaveLobby()
+        {
             NetworkManager.Singleton.Shutdown();
             Destroy(NetworkManager.Singleton.gameObject);
             SceneManager.LoadScene(MENU_SCENE_NAME);
         }
-        public void BackToMenu(){
+        public void BackToMenu()
+        {
             //if(!IsServer && !IsClient){
             Destroy(NetworkManager.Singleton.gameObject);
             //}
@@ -111,7 +141,8 @@ namespace Spartans{
             int counter = 0;
             KeyValuePair<ulong, CharacterTypes>[] saved = new KeyValuePair<ulong, CharacterTypes>[playerCharacterSelections.Count];
 
-            foreach(KeyValuePair<ulong, CharacterTypes> entry in playerCharacterSelections){
+            foreach(KeyValuePair<ulong, CharacterTypes> entry in playerCharacterSelections)
+            {
                 //playerCharacterSelections.Remove(entry.Key);  Can do this if memory needs to be conserved
                 saved[counter] = entry;
                 counter+=1;
@@ -127,24 +158,29 @@ namespace Spartans{
             {
                 playerCharacterSelections.Add(requestingClient, character);
                 //var status = NetworkManager.SceneManager.LoadScene(GAMESCENE, LoadSceneMode.Single);
-                print($"Added {character.ToString()} for client {requestingClient.ToString()}");
-            }else{
+                //print($"Added {character.ToString()} for client {requestingClient.ToString()}");
+            }
+            else
+            {
                 print("Changing class not implimented");
             }
 
-            if(CheckCanStart()){
-                OfferStartIfAllReady();
-            }
+            //if(CheckCanStart()){
+            //    OfferStartIfAllReady();
+            //}
         }
         public void RequestAssignCharacter(int character)
         {
             RequestAssignCharacterServerRpc(NetworkManager.LocalClientId, (CharacterTypes)character);
         }
-        private bool CheckCanStart(){
+        private bool CheckCanStart()
+        {
             if(!IsServer) return false;
             //print("checking Can Start");
-            foreach(ulong id in NetworkManager.ConnectedClientsIds){
-                if(!playerCharacterSelections.ContainsKey(id)){
+            foreach(ulong id in NetworkManager.ConnectedClientsIds)
+            {
+                if(!playerCharacterSelections.ContainsKey(id))
+                {
                     return false;
                 }
             }
@@ -164,29 +200,55 @@ namespace Spartans{
             //StopCoroutine(StartSelectionCountdown());
         }
         
-        private void StartStartingCountdown(){
+        private void StartStartingCountdown()
+        {
             startingRoutine = StartCoroutine(StartSelectionCountdown());
         }
-        private void OnDisable(){
+        private void OnDisable()
+        {
             //print("Disabling LobbyManager");
-            PassOffToGameManager();
             NetworkManager.OnClientConnectedCallback -= NotifyClientConnected;
+            NetworkManager.OnClientDisconnectCallback -= NotifyClientDisconnected;
+            connectedPlayers.OnListChanged -= LobbyPlayersHandler;
         }
 
-        public void StartGame(){
-            if(CheckCanStart()){
+        public void StartGame()
+        {
+            if(CheckCanStart())
+            {
                 StartStartingCountdown();
+                PassOffToGameManager();
             }
         }
 
-        private void OfferStartIfAllReady(){
-            if(CheckCanStart()){
+        private void OfferStartIfAllReady()
+        {
+            if(CheckCanStart())
+            {
                 LobbySync.Instance.StartButtonActive(true);
             }
         }
 
-        private void LobbyPlayersHandler(NetworkListEvent<PlayerLobbyData> changeEvent){
-            LobbySync.Instance.AddPlayerConnection(changeEvent.Value);
+        private void LobbyPlayersHandler(NetworkListEvent<PlayerLobbyData> changeEvent)
+        {
+            print("Recieved lobbyPlayers list change event");
+            PlayerLobbyData newConnection = new PlayerLobbyData(changeEvent.Value);
+            if(LobbySync.Instance){
+                print("LobbySync instance is assigned going to add next");
+            }else{
+                print(" NO LobbySync INSTANCE!!!");
+            }
+            if(changeEvent.Type == NetworkListEvent<PlayerLobbyData>.EventType.Add){
+                LobbySync.Instance.AddPlayerConnection(newConnection);
+            }//else if(changeEvent.Type == NetworkListEvent<PlayerLobbyData>.EventType.Value){}
+            else if(changeEvent.Type == NetworkListEvent<PlayerLobbyData>.EventType.Remove)
+            {
+                LobbySync.Instance.RemovePlayerConnection(newConnection._id);
+            }
+            else
+            {
+                print("Unknown case needed to be handled in LobbyPlayersHandler");
+            }
         }
     }
 }

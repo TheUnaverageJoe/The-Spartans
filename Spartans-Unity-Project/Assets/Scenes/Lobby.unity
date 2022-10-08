@@ -3745,7 +3745,6 @@ GameObject:
   - component: {fileID: 1348150934}
   - component: {fileID: 1348150936}
   - component: {fileID: 1348150935}
-  - component: {fileID: 1348150938}
   - component: {fileID: 1348150937}
   - component: {fileID: 1348150939}
   m_Layer: 5
@@ -3831,22 +3830,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ExitOnNewPage: 0
---- !u!114 &1348150938
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1348150933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3281835700
-  AlwaysReplicateAsRoot: 0
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &1348150939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3864,7 +3847,10 @@ MonoBehaviour:
   _connectionUiPrefab: {fileID: 6636249965095722593, guid: 9cb801f4a6f190b43a803fa5995b00b3, type: 3}
   _startButton: {fileID: 273709424}
   _lobbyManager: {fileID: 1089232409}
-  _characterIcons: []
+  _characterIcons:
+  - {fileID: 21300000, guid: e33361b78b35ab74aa457e9f6899c093, type: 3}
+  - {fileID: 21300000, guid: 1c89a9ae3564f924d8193d10c527bfc5, type: 3}
+  - {fileID: 21300000, guid: ad9de47cf77fc4d44a79df9df7ee93f1, type: 3}
 --- !u!1 &1359569445
 GameObject:
   m_ObjectHideFlags: 0
@@ -4083,7 +4069,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6636249965095722594, guid: 9cb801f4a6f190b43a803fa5995b00b3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -42.7
+      value: -42.69995
       objectReference: {fileID: 0}
     - target: {fileID: 6636249965095722594, guid: 9cb801f4a6f190b43a803fa5995b00b3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -9936,7 +9922,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6636249965095722594, guid: 9cb801f4a6f190b43a803fa5995b00b3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -42.7
+      value: -42.69995
       objectReference: {fileID: 0}
     - target: {fileID: 6636249965095722594, guid: 9cb801f4a6f190b43a803fa5995b00b3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

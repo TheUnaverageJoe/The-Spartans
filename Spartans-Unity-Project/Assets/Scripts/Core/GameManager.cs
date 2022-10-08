@@ -174,7 +174,7 @@ namespace Spartans{
 
         public void PopulatePlayerSelections(KeyValuePair<ulong, CharacterTypes>[] array){
             //Only needs to be run on server machine
-            print("Copied dictonary");
+            //print("Copied dictonary");
             foreach(KeyValuePair<ulong, CharacterTypes> entry in array){
                 playerCharacterSelections.Add(entry.Key, entry.Value);
                 print(entry);
