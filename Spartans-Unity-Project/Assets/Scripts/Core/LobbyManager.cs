@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 using Spartans.Players;
 using Spartans.UI;
+using System;
 
 namespace Spartans{
     public class LobbyManager : NetworkBehaviour
@@ -23,11 +24,11 @@ namespace Spartans{
         private List<ulong> redTeam = new List<ulong>();
         private List<ulong> blueTeam = new List<ulong>();
         private Coroutine startingRoutine;
-        private NetworkList<PlayerLobbyData> connectedPlayers;
 
-        void Awake(){
-            
-        }
+        private NetworkList<PlayerLobbyData> connectedPlayers;
+        private NetworkVariable<float> _startCountdown = new NetworkVariable<float>();
+        private float _timer;
+        
         // Start is called before the first frame update
         void Start()
         {
@@ -39,12 +40,23 @@ namespace Spartans{
             _canvasManager.Init();
 
         }
+        void Update(){
+            if(_startCountdown.Value >= 0){
+                if(_timer <= 0f){
+                    _startCountdown.Value -= 1;
+                    _timer = 1;
+                }else{
+                    _timer -= Time.deltaTime;
+                }
+            }
+        }
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
             if(IsClient){
                 connectedPlayers.OnListChanged += LobbyPlayersHandler;
+                _startCountdown.OnValueChanged += StartTimeUpdate;
                 print("Connected players " + connectedPlayers.Count);
                 foreach(PlayerLobbyData client in connectedPlayers){
                     print("Addeding connection for client Instance " + client._id);
@@ -88,7 +100,7 @@ namespace Spartans{
 
         private void NotifyClientConnected(ulong clientID){
             print($"Client {clientID} connected");
-            OfferStartIfAllReady();
+            LobbySync.Instance.StartButtonActive(false);
 
             if(IsServer){
                 if(startingRoutine != null){
@@ -157,6 +169,7 @@ namespace Spartans{
             if(!playerCharacterSelections.ContainsKey(requestingClient))
             {
                 playerCharacterSelections.Add(requestingClient, character);
+                OfferStartIfAllReady();
                 //var status = NetworkManager.SceneManager.LoadScene(GAMESCENE, LoadSceneMode.Single);
                 //print($"Added {character.ToString()} for client {requestingClient.ToString()}");
             }
@@ -204,6 +217,12 @@ namespace Spartans{
         {
             startingRoutine = StartCoroutine(StartSelectionCountdown());
         }
+
+        private void StartTimeUpdate(float previousValue, float newValue)
+        {
+            LobbySync.Instance.UpdateTimeToStart(newValue);
+        }
+
         private void OnDisable()
         {
             //print("Disabling LobbyManager");
@@ -216,6 +235,8 @@ namespace Spartans{
         {
             if(CheckCanStart())
             {
+                _startCountdown.Value = 5;
+                LobbySync.Instance.StartButtonActive(false);
                 StartStartingCountdown();
                 PassOffToGameManager();
             }
@@ -225,6 +246,7 @@ namespace Spartans{
         {
             if(CheckCanStart())
             {
+                //print("Offered Start");
                 LobbySync.Instance.StartButtonActive(true);
             }
         }
@@ -232,18 +254,18 @@ namespace Spartans{
         private void LobbyPlayersHandler(NetworkListEvent<PlayerLobbyData> changeEvent)
         {
             print("Recieved lobbyPlayers list change event");
-            PlayerLobbyData newConnection = new PlayerLobbyData(changeEvent.Value);
+            //PlayerLobbyData newConnection = new PlayerLobbyData(changeEvent.Value);
             if(LobbySync.Instance){
                 print("LobbySync instance is assigned going to add next");
             }else{
                 print(" NO LobbySync INSTANCE!!!");
             }
             if(changeEvent.Type == NetworkListEvent<PlayerLobbyData>.EventType.Add){
-                LobbySync.Instance.AddPlayerConnection(newConnection);
+                LobbySync.Instance.AddPlayerConnection(changeEvent.Value);
             }//else if(changeEvent.Type == NetworkListEvent<PlayerLobbyData>.EventType.Value){}
             else if(changeEvent.Type == NetworkListEvent<PlayerLobbyData>.EventType.Remove)
             {
-                LobbySync.Instance.RemovePlayerConnection(newConnection._id);
+                LobbySync.Instance.RemovePlayerConnection(changeEvent.Value._id);
             }
             else
             {

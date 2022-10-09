@@ -25,7 +25,7 @@ namespace Spartans
             _team = toClone._team;
         }
 
-        void INetworkSerializable.NetworkSerialize<T>(BufferSerializer<T> serializer)
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref _id);
             serializer.SerializeValue(ref _type);

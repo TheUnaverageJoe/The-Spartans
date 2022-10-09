@@ -16,6 +16,7 @@ namespace Spartans{
         [SerializeField] public GameObject _startButton;
         [SerializeField] private LobbyManager _lobbyManager;
         [SerializeField] private List<Sprite> _characterIcons;
+        [SerializeField] private TMP_Text _startTimerText;
         private Dictionary<ulong, GameObject> playerConnectionInstances = new  Dictionary<ulong, GameObject>();
 
         public enum Teams{
@@ -75,6 +76,13 @@ namespace Spartans{
 
         public void StartButtonActive(bool ready){
             _startButton.SetActive(ready);
+        }
+
+        public void UpdateTimeToStart(float time){
+            if(time < 0){
+                _startTimerText.text = "";
+            }
+            _startTimerText.text = time.ToString();
         }
 
         private void OnDestroy(){
