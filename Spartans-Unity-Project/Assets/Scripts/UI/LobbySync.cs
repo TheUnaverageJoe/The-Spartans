@@ -35,34 +35,36 @@ namespace Spartans{
             }
         }
 
-        void Update(){
-            
-        }
-
         public void AddPlayerConnection(PlayerLobbyData dataObject)
         {
             if(playerConnectionInstances.TryGetValue(dataObject._id, out GameObject obj)){
                 UpdatePlayerConnection(dataObject, obj);
+                return;
             }
             GameObject newConnection;
             switch(dataObject._team){
                 case Teams.Red:
                     newConnection= Instantiate(_connectionUiPrefab, _redTeamField.transform);
                     newConnection.transform.GetChild(0).gameObject.GetComponent<TMP_Text>().text = dataObject._id.ToString();
-                    newConnection.transform.GetChild(1).gameObject.GetComponent<Image>().sprite = _characterIcons[0];
+                    newConnection.transform.GetChild(1).gameObject.GetComponent<Image>().sprite = _characterIcons[(int)dataObject._type];
                     newConnection.transform.GetChild(2).gameObject.SetActive(dataObject._isReady);
 
                     playerConnectionInstances.Add(dataObject._id, newConnection);
                     break;
                 case Teams.Blue:
                     newConnection= Instantiate(_connectionUiPrefab, _blueTeamField.transform);
+                    newConnection.transform.GetChild(0).gameObject.GetComponent<TMP_Text>().text = dataObject._id.ToString();
+                    newConnection.transform.GetChild(1).gameObject.GetComponent<Image>().sprite = _characterIcons[(int)dataObject._type];
+                    newConnection.transform.GetChild(2).gameObject.SetActive(dataObject._isReady);
+
                     playerConnectionInstances.Add(dataObject._id, newConnection);
                     break;
             }
         }
         public void UpdatePlayerConnection(PlayerLobbyData dataObject, GameObject obj){
+            print("Updating because Lobby connection already exsists");
             obj.transform.GetChild(0).gameObject.GetComponent<TMP_Text>().text = dataObject._id.ToString();
-            obj.transform.GetChild(1).gameObject.GetComponent<Image>().sprite = _characterIcons[0];
+            obj.transform.GetChild(1).gameObject.GetComponent<Image>().sprite = _characterIcons[(int)dataObject._type];
             obj.transform.GetChild(2).gameObject.SetActive(dataObject._isReady);
         }
 

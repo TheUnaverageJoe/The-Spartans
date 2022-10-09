@@ -51,7 +51,7 @@ namespace Spartans{
             NetworkManager.SceneManager.OnSceneEvent += SceneEventHandler;
             //onClickBack += OnClickBackCallback;
 
-            print("activeState" + activeState.ToString());
+            //print("activeState" + activeState.ToString());
             if(activeState >= States.InProgress){
                 print("GameManager finding Canvas and Init()ing");
                 _canvasManager = FindObjectOfType<CanvasManager>();

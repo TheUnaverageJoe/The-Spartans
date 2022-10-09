@@ -43,5 +43,9 @@ namespace Spartans
 
             return false;
         }
+        public override string ToString()
+        {
+            return $"{_id} is a {_type} and is ready: {_isReady} on team {_team}";
+        }
     }
 }

@@ -57,7 +57,7 @@ namespace Spartans{
             if(IsClient){
                 connectedPlayers.OnListChanged += LobbyPlayersHandler;
                 _startCountdown.OnValueChanged += StartTimeUpdate;
-                print("Connected players " + connectedPlayers.Count);
+                //print("Connected players " + connectedPlayers.Count);
                 foreach(PlayerLobbyData client in connectedPlayers){
                     print("Addeding connection for client Instance " + client._id);
                     LobbySync.Instance.AddPlayerConnection(client);
@@ -107,21 +107,25 @@ namespace Spartans{
                    StopCoroutine(startingRoutine);     
                 }
                 else{
-                    print("No routine to stop???");
+                    //print("No routine to stop???");
                 }
             }
-            LobbySync.Teams team = redTeam.Count >= blueTeam.Count ? LobbySync.Teams.Red : LobbySync.Teams.Blue;
+            LobbySync.Teams team = redTeam.Count == blueTeam.Count ? LobbySync.Teams.Red : LobbySync.Teams.Blue;
             CharacterTypes type;
             bool isReady = false;
             if(!playerCharacterSelections.TryGetValue(clientID, out type)){
                 type = CharacterTypes.Hoplite;
-                isReady = true;
+                isReady = false;
             }
             PlayerLobbyData newPlayer = new PlayerLobbyData(clientID, team, type, isReady);
-
+            if(team == LobbySync.Teams.Red){
+                redTeam.Add(clientID);
+            }else if(team == LobbySync.Teams.Blue){
+                blueTeam.Add(clientID);
+            }
             //LobbySync.Instance.AddPlayerConnection(newPlayer);
             connectedPlayers.Add(newPlayer);
-            print("Added player " + newPlayer._id + "to lobby");
+            print("Added player " + newPlayer._id + " to lobby");
         }
         private void NotifyClientDisconnected(ulong clientID)
         {
@@ -169,6 +173,22 @@ namespace Spartans{
             if(!playerCharacterSelections.ContainsKey(requestingClient))
             {
                 playerCharacterSelections.Add(requestingClient, character);
+                
+                LobbySync.Teams teamAssignment = LobbySync.Teams.Red;
+                int clientEntryIndex = -1;
+                foreach(var item in connectedPlayers){
+                    if(item._id == requestingClient){
+                        clientEntryIndex = connectedPlayers.IndexOf(item);
+                    }
+                    teamAssignment = redTeam.Contains(item._id) ? LobbySync.Teams.Red : LobbySync.Teams.Blue;
+                }
+                
+                PlayerLobbyData newPlayer = new PlayerLobbyData(requestingClient, teamAssignment, character, true);
+                if(clientEntryIndex >= 0){
+                    connectedPlayers[clientEntryIndex] = newPlayer;
+                }
+                print(newPlayer.ToString());
+
                 OfferStartIfAllReady();
                 //var status = NetworkManager.SceneManager.LoadScene(GAMESCENE, LoadSceneMode.Single);
                 //print($"Added {character.ToString()} for client {requestingClient.ToString()}");
@@ -253,14 +273,10 @@ namespace Spartans{
 
         private void LobbyPlayersHandler(NetworkListEvent<PlayerLobbyData> changeEvent)
         {
-            print("Recieved lobbyPlayers list change event");
-            //PlayerLobbyData newConnection = new PlayerLobbyData(changeEvent.Value);
-            if(LobbySync.Instance){
-                print("LobbySync instance is assigned going to add next");
-            }else{
-                print(" NO LobbySync INSTANCE!!!");
-            }
-            if(changeEvent.Type == NetworkListEvent<PlayerLobbyData>.EventType.Add){
+
+            if(changeEvent.Type == NetworkListEvent<PlayerLobbyData>.EventType.Add || 
+                changeEvent.Type == NetworkListEvent<PlayerLobbyData>.EventType.Value)
+            {
                 LobbySync.Instance.AddPlayerConnection(changeEvent.Value);
             }//else if(changeEvent.Type == NetworkListEvent<PlayerLobbyData>.EventType.Value){}
             else if(changeEvent.Type == NetworkListEvent<PlayerLobbyData>.EventType.Remove)
