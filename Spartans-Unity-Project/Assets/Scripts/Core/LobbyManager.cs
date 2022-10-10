@@ -41,12 +41,19 @@ namespace Spartans{
 
         }
         void Update(){
-            if(_startCountdown.Value >= 0){
-                if(_timer <= 0f){
-                    _startCountdown.Value -= 1;
-                    _timer = 1;
-                }else{
-                    _timer -= Time.deltaTime;
+            if(IsServer)
+            {
+                if(_startCountdown.Value >= 0)
+                {
+                    if(_timer <= 0f)
+                    {
+                        _startCountdown.Value -= 1;
+                        _timer = 1;
+                    }
+                    else
+                    {
+                        _timer -= Time.deltaTime;
+                    }
                 }
             }
         }
@@ -59,7 +66,7 @@ namespace Spartans{
                 _startCountdown.OnValueChanged += StartTimeUpdate;
                 //print("Connected players " + connectedPlayers.Count);
                 foreach(PlayerLobbyData client in connectedPlayers){
-                    print("Addeding connection for client Instance " + client._id);
+                    print("Addeding connection for client Instance " + client.Id);
                     LobbySync.Instance.AddPlayerConnection(client);
                 }
             }
@@ -125,13 +132,13 @@ namespace Spartans{
             }
             //LobbySync.Instance.AddPlayerConnection(newPlayer);
             connectedPlayers.Add(newPlayer);
-            print("Added player " + newPlayer._id + " to lobby");
+            print("Added player " + newPlayer.Id + " to lobby");
         }
         private void NotifyClientDisconnected(ulong clientID)
         {
             foreach(PlayerLobbyData item in connectedPlayers)
             {
-                if(item._id == clientID)
+                if(item.Id == clientID)
                 {
                     connectedPlayers.Remove(item);
                 }
@@ -177,17 +184,17 @@ namespace Spartans{
                 LobbySync.Teams teamAssignment = LobbySync.Teams.Red;
                 int clientEntryIndex = -1;
                 foreach(var item in connectedPlayers){
-                    if(item._id == requestingClient){
+                    if(item.Id == requestingClient){
                         clientEntryIndex = connectedPlayers.IndexOf(item);
                     }
-                    teamAssignment = redTeam.Contains(item._id) ? LobbySync.Teams.Red : LobbySync.Teams.Blue;
+                    teamAssignment = redTeam.Contains(item.Id) ? LobbySync.Teams.Red : LobbySync.Teams.Blue;
                 }
                 
                 PlayerLobbyData newPlayer = new PlayerLobbyData(requestingClient, teamAssignment, character, true);
                 if(clientEntryIndex >= 0){
                     connectedPlayers[clientEntryIndex] = newPlayer;
                 }
-                print(newPlayer.ToString());
+                //print(newPlayer.ToString());
 
                 OfferStartIfAllReady();
                 //var status = NetworkManager.SceneManager.LoadScene(GAMESCENE, LoadSceneMode.Single);
@@ -249,12 +256,14 @@ namespace Spartans{
             NetworkManager.OnClientConnectedCallback -= NotifyClientConnected;
             NetworkManager.OnClientDisconnectCallback -= NotifyClientDisconnected;
             connectedPlayers.OnListChanged -= LobbyPlayersHandler;
+            _startCountdown.OnValueChanged -= StartTimeUpdate;
         }
 
         public void StartGame()
         {
             if(CheckCanStart())
             {
+                //GameMode.GameModeManager.Instance.SelectMode();
                 _startCountdown.Value = 5;
                 LobbySync.Instance.StartButtonActive(false);
                 StartStartingCountdown();
@@ -281,7 +290,7 @@ namespace Spartans{
             }//else if(changeEvent.Type == NetworkListEvent<PlayerLobbyData>.EventType.Value){}
             else if(changeEvent.Type == NetworkListEvent<PlayerLobbyData>.EventType.Remove)
             {
-                LobbySync.Instance.RemovePlayerConnection(changeEvent.Value._id);
+                LobbySync.Instance.RemovePlayerConnection(changeEvent.Value.Id);
             }
             else
             {

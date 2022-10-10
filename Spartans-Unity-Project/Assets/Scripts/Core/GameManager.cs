@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 
 using Spartans.UI;
-using Spartans.Players;
+using Spartans.GameMode;
 
 namespace Spartans{
     //This class is a singleton
@@ -19,7 +19,7 @@ namespace Spartans{
         [SerializeField] private List<GameObject> _playerPrefabs;
         [SerializeField] private Camera _mainCamera;
 
-        private GameMode.GameModeBase _gameMode;
+        //private GameMode.GameModeBase _gameMode;
         //private GameObject[] _objectives;
         //private GameObject selectedObjective;
         public States activeState{get; private set;}
@@ -52,7 +52,7 @@ namespace Spartans{
             //onClickBack += OnClickBackCallback;
 
             //print("activeState" + activeState.ToString());
-            if(activeState >= States.InProgress){
+            if(activeState >= States.PreGame){
                 print("GameManager finding Canvas and Init()ing");
                 _canvasManager = FindObjectOfType<CanvasManager>();
                 _canvasManager.Init();
@@ -88,10 +88,10 @@ namespace Spartans{
          private void OnDisable(){
             //print("Disabled Game Manager");
             //onClickBack -= OnClickBackCallback;
+            NetworkManager.SceneManager.OnSceneEvent -= SceneEventHandler;
         }
 
         public override void OnNetworkSpawn(){
-            base.OnNetworkSpawn();
             /*
             //Load all prefabs for objects from "Assets/Resources/Objectives" folder
             _objectives = Resources.LoadAll<GameObject>("Objectives");
@@ -114,47 +114,47 @@ namespace Spartans{
             */
         }
 
-        private void SceneEventHandler(SceneEvent sceneEvent){
-            var clientOrServer = sceneEvent.ClientId == NetworkManager.ServerClientId ? "server" : "client";
+        private void SceneEventHandler(SceneEvent sceneEvent)
+        {
             if(sceneEvent.ClientsThatTimedOut != null && sceneEvent.ClientsThatTimedOut.Count>0){//sceneEvent.ClientsThatTimedOut.Count > 0
-                foreach(ulong id in sceneEvent.ClientsThatTimedOut){
+                foreach(ulong id in sceneEvent.ClientsThatTimedOut)
+                {
                     print($"{id} timed Out on scene transition");
                 }
                 Debug.LogWarning("CLIENT FAILED TO LOAD AND/OR SYNC???!");
             }
+
             switch (sceneEvent.SceneEventType)
             {
                 case SceneEventType.LoadComplete:
                     print("Scene name " + sceneEvent.SceneName);
                     break;
+
                 case SceneEventType.UnloadComplete:
                     if(sceneEvent.SceneName == "Lobby"){
-                        activeState = States.InProgress;
+                        activeState = States.PreGame;
                     }
                     print("Unloaded " + sceneEvent.SceneName + " Scene");
                     break;
+
                 case SceneEventType.LoadEventCompleted:
-                    // if(IsServer){
-                    //     NetworkManager.SceneManager.UnloadScene(SceneManager.GetSceneByName("Lobby"));
-                    // }
-                    //print("LoadEventCompleted fired");
-                    // We want to handle this for only the server-side
                     if (sceneEvent.ClientId == NetworkManager.ServerClientId)
                     {
                         // *** IMPORTANT ***
                         // Keep track of the loaded scene, you need this to unload it
                         m_LoadedScene = sceneEvent.Scene;
                     }
-                    //Debug.Log($"Loaded the {sceneEvent.SceneName} scene on " +
-                    //    $"{clientOrServer}-({sceneEvent.ClientId}).");
                     
-                    if(playerCharacterSelections.Count > 0 ){
-                        if(!_canvasManager){
+                    if(playerCharacterSelections.Count > 0 )
+                    {
+                        if(!_canvasManager)
+                        {
                             print("Had to find canvas after load");
                             _canvasManager = FindObjectOfType<CanvasManager>();
                             _canvasManager.Init();
                         }
-                        foreach(KeyValuePair<ulong, CharacterTypes> item in playerCharacterSelections){
+                        foreach(KeyValuePair<ulong, CharacterTypes> item in playerCharacterSelections)
+                        {
                             print("Spawning player for client" + item.Key);
                             GameObject spawningPlayer = Instantiate(_playerPrefabs[(int)item.Value], Vector3.up*2, Quaternion.identity);
                             spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(item.Key);
@@ -164,6 +164,8 @@ namespace Spartans{
                     {
                         print("Would have spawned players but none to spawn");
                     }
+
+                    GameModeManager.Instance.StartSelectedMode();
                     
                     break;
                     

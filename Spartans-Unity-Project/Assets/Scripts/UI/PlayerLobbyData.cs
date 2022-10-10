@@ -7,36 +7,36 @@ namespace Spartans
 { 
     public struct PlayerLobbyData : INetworkSerializable, System.IEquatable<PlayerLobbyData>
     {
-         public ulong _id;
-         public CharacterTypes _type;
-         public bool _isReady;
-         public LobbySync.Teams _team;
+         public ulong Id;
+         public CharacterTypes Type;
+         public bool IsReady;
+         public LobbySync.Teams Team;
 
         public PlayerLobbyData(ulong id, LobbySync.Teams team, CharacterTypes type, bool isReady){
-            _id = id;
-            _type = type;
-            _isReady = isReady;
-            _team = team;
+            Id = id;
+            Type = type;
+            IsReady = isReady;
+            Team = team;
         }
         public PlayerLobbyData(PlayerLobbyData toClone){
-            _id = toClone._id;
-            _type = toClone._type;
-            _isReady = toClone._isReady;
-            _team = toClone._team;
+            Id = toClone.Id;
+            Type = toClone.Type;
+            IsReady = toClone.IsReady;
+            Team = toClone.Team;
         }
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            serializer.SerializeValue(ref _id);
-            serializer.SerializeValue(ref _type);
-            serializer.SerializeValue(ref _isReady);
-            serializer.SerializeValue(ref _team);
+            serializer.SerializeValue(ref Id);
+            serializer.SerializeValue(ref Type);
+            serializer.SerializeValue(ref IsReady);
+            serializer.SerializeValue(ref Team);
         }
 
         public bool Equals(PlayerLobbyData other)
         {
-            if(this._id == other._id && this._isReady == other._isReady &&
-               this._team == other._team && this._type == other._type)
+            if(this.Id == other.Id && this.IsReady == other.IsReady &&
+               this.Team == other.Team && this.Type == other.Type)
             {
                 return true;
             }
@@ -45,7 +45,7 @@ namespace Spartans
         }
         public override string ToString()
         {
-            return $"{_id} is a {_type} and is ready: {_isReady} on team {_team}";
+            return $"{Id} is a {Type} and is ready: {IsReady} on team {Team}";
         }
     }
 }

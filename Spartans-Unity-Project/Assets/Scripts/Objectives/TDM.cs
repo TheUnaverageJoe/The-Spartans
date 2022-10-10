@@ -12,22 +12,7 @@ namespace Spartans.GameMode{
         // Start is called before the first frame update
         void Awake()
         {
-            teamScoresDict = new Dictionary<int, NetworkVariable<int>>();
-            for(int i=0; i<base.numberOfTeams; i++)
-            {
-                NetworkVariable<int> newVar = new NetworkVariable<int>();
-                base.teamScoresDict.Add(i, newVar);
-            }
-        }
-
-        public override void OnNetworkSpawn(){
-            base.OnNetworkSpawn();
-
-            //base.gamemodeUI = _gamemodeUI;
-            //base.numberOfTeams = _numberOfTeams;
-            base.winConditions = new List<System.Action>();
-            base.currentGameState = States.Starting;
-
+            
         }
 
         protected override States GetGameState()
@@ -40,9 +25,9 @@ namespace Spartans.GameMode{
         {
             
             //throw new System.NotImplementedException();
-            foreach(System.Action pred in base.winConditions){
-                print("found pred " + pred.ToString());
-            }
+            //foreach(System.Action pred in base.winConditions){
+           //     print("found pred " + pred.ToString());
+            //}
             return false;
         }
     }
