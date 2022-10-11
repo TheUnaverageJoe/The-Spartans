@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aaa488a8ae7e15f499fbaf7f7d09a8b3, type: 3}
   m_Name: TDM
   m_EditorClassIdentifier: 
-  numberOfTeams: 0
+  numberOfTeams: 2
+  modeName: TDM
   verticalBanner: {fileID: 21300000, guid: 335291c724b39194796f7dd5db8c5abd, type: 3}

@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aaa488a8ae7e15f499fbaf7f7d09a8b3, type: 3}
   m_Name: CTF
   m_EditorClassIdentifier: 
-  numberOfTeams: 0
+  numberOfTeams: 4
+  modeName: CTF
   verticalBanner: {fileID: 21300000, guid: 57460e080a13e8a46aaa1786d7b72389, type: 3}

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.UI;
+using TMPro;
 
 using Spartans.UI;
-using System;
 
 namespace Spartans.GameMode{
     public class GameModeManager : NetworkBehaviour
@@ -20,12 +20,18 @@ namespace Spartans.GameMode{
         // the state of the scritable objects is unessecary
         private GameModeData[] _gameModes;
         private GameModeData _currentGameMode;
-        //private bool _gameModeSelected;
+        
 
         ///----Lobby Scene variables------
         private CanvasManager _canvasManager;
         private Image _gameModeBanner;
         private Button[] buttons;
+
+        //-------GameScene Variables-----------
+        private Slider[] _scores;
+        private TMP_Text TimerText;
+        private GameModeBase _gameMode;
+        float timeTillNextTimerUpdate;
 
 
         //Network Variables for syncing
@@ -71,6 +77,25 @@ namespace Spartans.GameMode{
             }
         }
 
+        void Update()
+        {
+            if(IsServer)
+            {
+                if(TimeRemaining.Value > 0)
+                {
+                    if(timeTillNextTimerUpdate <= 0)
+                    {
+                        TimeRemaining.Value -= 1;
+                        timeTillNextTimerUpdate = 1;
+                    }
+                    else
+                    {
+                        timeTillNextTimerUpdate -= Time.deltaTime;
+                    }
+                }
+            }
+        }
+
         public override void OnNetworkSpawn()
         {
             if(IsClient)
@@ -84,8 +109,9 @@ namespace Spartans.GameMode{
                 foreach(Button item in buttons){
                     item.gameObject.SetActive(true);
                 }
-                UpdateGameMode(0, 0);
             }
+            UpdateGameMode(0, 0); //Initialize so it has a sprite
+            _currentGameMode = _gameModes[0]; //initiallize
         }
 
         private void GetNextGameMode(){
@@ -120,20 +146,41 @@ namespace Spartans.GameMode{
             _gameModeBanner.sprite = _gameModes[newValue].verticalBanner;
         }
 
-        public void StartSelectedMode(){
+        public void StartAsSelectedMode(){
+
+            _canvasManager = FindObjectOfType<CanvasManager>();
+
+            Transform containerObjForGameModeUI = _canvasManager.transform.Find("TDM_UI").GetChild(0);
+            TimerText = containerObjForGameModeUI.GetComponentInChildren<TMP_Text>();
+            _scores = containerObjForGameModeUI.GetComponentsInChildren<Slider>();
+
             for(int i=0; i<_currentGameMode.numberOfTeams ; i++)
             {
                 TeamScores.Add(0);
             }
-            TeamScores.OnListChanged += updateTeamScore;
+            TeamScores.OnListChanged += UpdateTeamScore;
+            
+
+            _gameMode = new TDM(2, 10, 10);
+            TimeRemaining.Value = 10;
+
         }
 
         private void UpdateTimeRemaining(int previousValue, int newValue)
         {
-            throw new NotImplementedException();
+            //print("called updateTime");
+            string displayTime = "";
+            int minute, second;
+            minute = newValue/60;
+            second = newValue%60;
+
+            //displayTime = string.Format("{0:0000}", displayTime);
+            displayTime = string.Format("{0:00}", minute) + ":" + string.Format("{0:00}", second);
+            //displayTime = minute + ":" + second;
+            TimerText.text = displayTime;
         }
 
-        private void updateTeamScore(NetworkListEvent<int> changeEvent)
+        private void UpdateTeamScore(NetworkListEvent<int> changeEvent)
         {
             if(changeEvent.Type == NetworkListEvent<int>.EventType.Value)
             {

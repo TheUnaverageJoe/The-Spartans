@@ -165,7 +165,7 @@ namespace Spartans{
                         print("Would have spawned players but none to spawn");
                     }
 
-                    GameModeManager.Instance.StartSelectedMode();
+                    GameModeManager.Instance.StartAsSelectedMode();
                     
                     break;
                     

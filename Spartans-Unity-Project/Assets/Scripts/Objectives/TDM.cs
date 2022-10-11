@@ -6,28 +6,37 @@ using Unity.Netcode;
 namespace Spartans.GameMode{
     public class TDM : GameModeBase
     {
-        //[SerializeField] private GameObject _gamemodeUI;
-        //[SerializeField] private int _numberOfTeams;
+        private int _requiredEliminations = 0;
 
-        // Start is called before the first frame update
-        void Awake()
+        public TDM(int teams, int reqKills, int maxTimeSeconds)
         {
-            
+            NumTeams = teams;
+            _requiredEliminations = reqKills;
+            MaxGameTime = maxTimeSeconds;
+            Scores = new int[teams];
         }
-
+        
         protected override States GetGameState()
         {
             return base.currentGameState;
-            //throw new System.NotImplementedException();
         }
 
         public override bool WinConditionsMet()
         {
-            
-            //throw new System.NotImplementedException();
-            //foreach(System.Action pred in base.winConditions){
-           //     print("found pred " + pred.ToString());
-            //}
+            for(int i=0; i<NumTeams; i++)
+            {
+                if(Scores[i] >= _requiredEliminations)
+                {
+                    System.Console.WriteLine("Win condition was met by team: " + i);
+                    return true;
+                }
+            }
+            if(CurrentGameTime >= MaxGameTime)
+            {
+                System.Console.WriteLine("Time limit reached");
+                return true;
+            }
+
             return false;
         }
     }

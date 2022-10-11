@@ -11,8 +11,12 @@ namespace Spartans.GameMode{
             Finished
         }
         //**PROPERTIES**
-        //protected GameObject gamemodeUI;
         protected States currentGameState;
+
+        protected int MaxGameTime;
+        protected int CurrentGameTime;
+        protected int NumTeams;
+        protected int[] Scores;
 
         //**METHODS**
         //public abstract void Init();
