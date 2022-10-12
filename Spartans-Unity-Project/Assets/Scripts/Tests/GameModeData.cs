@@ -8,6 +8,7 @@ namespace Spartans{
     public class GameModeData : ScriptableObject
     {
         public int numberOfTeams;
+        //public int maxTimeSeconds;
         public string modeName;
         public Sprite verticalBanner;
 

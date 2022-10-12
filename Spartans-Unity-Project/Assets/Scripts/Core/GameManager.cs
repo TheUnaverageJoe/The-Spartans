@@ -25,6 +25,7 @@ namespace Spartans{
         public States activeState{get; private set;}
         private Scene m_LoadedScene;
         private Dictionary<ulong, CharacterTypes> playerCharacterSelections = new Dictionary<ulong, CharacterTypes>();
+        private Dictionary<ulong, PlayerGameData> playerData = new Dictionary<ulong, PlayerGameData>();
 
         // public System.Action stateChanged;
         // public System.Action joinedGame;
@@ -144,15 +145,19 @@ namespace Spartans{
                         // Keep track of the loaded scene, you need this to unload it
                         m_LoadedScene = sceneEvent.Scene;
                     }
+
+                    if(!_canvasManager)
+                    {
+                        print("Had to find canvas after load");
+                        _canvasManager = FindObjectOfType<CanvasManager>();
+                        _canvasManager.Init();
+                    }
                     
+                    //----------------------------------------------
+                    /*
                     if(playerCharacterSelections.Count > 0 )
                     {
-                        if(!_canvasManager)
-                        {
-                            print("Had to find canvas after load");
-                            _canvasManager = FindObjectOfType<CanvasManager>();
-                            _canvasManager.Init();
-                        }
+                        
                         foreach(KeyValuePair<ulong, CharacterTypes> item in playerCharacterSelections)
                         {
                             print("Spawning player for client" + item.Key);
@@ -164,6 +169,19 @@ namespace Spartans{
                     {
                         print("Would have spawned players but none to spawn");
                     }
+                    */
+                    //-------------------------------------------
+
+                    if(playerData.Count > 0)
+                    {
+                        foreach(KeyValuePair<ulong, PlayerGameData> item in playerData)
+                        {
+                            print("Spawning player for client" + item.Key);
+                            GameObject spawningPlayer = Instantiate(_playerPrefabs[(int)item.Value.Type], Vector3.up*2, Quaternion.identity);
+                            spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(item.Key);
+                        }
+                    }
+
 
                     GameModeManager.Instance.StartAsSelectedMode();
                     
@@ -180,6 +198,17 @@ namespace Spartans{
             foreach(KeyValuePair<ulong, CharacterTypes> entry in array){
                 playerCharacterSelections.Add(entry.Key, entry.Value);
                 print(entry);
+            }
+        }
+
+        public void LoadPlayerData(){
+            List<PlayerGameData> temp = SavedData.LoadDataFromPlayerLobby();
+
+            foreach(var item in temp){
+                if(playerData.ContainsKey(item.Id)){
+                    Debug.LogWarning("DUPLICATE KEY ADDED WHEN LOADING PLAYER DATA FROM LOBBY");
+                }
+                playerData.Add(item.Id, item);
             }
         }
         

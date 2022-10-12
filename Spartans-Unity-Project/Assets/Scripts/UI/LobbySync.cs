@@ -5,7 +5,7 @@ using Unity.Netcode;
 using TMPro;
 using UnityEngine.UI;
 
-namespace Spartans{
+namespace Spartans.UI{
     public class LobbySync : MonoBehaviour
     {
         public static LobbySync Instance;
@@ -18,11 +18,6 @@ namespace Spartans{
         [SerializeField] private List<Sprite> _characterIcons;
         [SerializeField] private TMP_Text _startTimerText;
         private Dictionary<ulong, GameObject> playerConnectionInstances = new  Dictionary<ulong, GameObject>();
-
-        public enum Teams{
-            Red,
-            Blue
-        }
         
         private void Awake(){
             if(Instance == null)

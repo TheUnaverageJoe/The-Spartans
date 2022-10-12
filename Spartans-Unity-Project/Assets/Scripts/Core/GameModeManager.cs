@@ -10,6 +10,12 @@ using Spartans.UI;
 namespace Spartans.GameMode{
     public class GameModeManager : NetworkBehaviour
     {
+        public enum States{
+            None,
+            Starting,
+            InProgress,
+            Finished
+        }
         //Singleton Instance
         public static GameModeManager Instance;
 
@@ -20,6 +26,7 @@ namespace Spartans.GameMode{
         // the state of the scritable objects is unessecary
         private GameModeData[] _gameModes;
         private GameModeData _currentGameMode;
+        private States _currentState = States.None;
         
 
         ///----Lobby Scene variables------
@@ -39,6 +46,9 @@ namespace Spartans.GameMode{
         private NetworkVariable<int> TimeRemaining = new NetworkVariable<int>(0);
         private NetworkVariable<int> SelectedMode = new NetworkVariable<int>();
 
+        [SerializeField] private int MaxGameTime;
+
+        //Awake occurs in Lobby Scene
         void Awake(){
             if(Instance == null){
                 Instance = this;
@@ -47,6 +57,8 @@ namespace Spartans.GameMode{
                 Destroy(this.gameObject);
             }
         }
+
+        //Start occurs during lobby scene
         void Start(){
             _canvasManager = FindObjectOfType<CanvasManager>();
             TeamScores = new NetworkList<int>();
@@ -81,7 +93,7 @@ namespace Spartans.GameMode{
         {
             if(IsServer)
             {
-                if(TimeRemaining.Value > 0)
+                if(_currentState!=States.Starting && TimeRemaining.Value > 0)
                 {
                     if(timeTillNextTimerUpdate <= 0)
                     {
@@ -100,7 +112,7 @@ namespace Spartans.GameMode{
         {
             if(IsClient)
             {
-                print("Subeed");
+                //print("Subeed");
                 SelectedMode.OnValueChanged += UpdateGameMode;
                 TimeRemaining.OnValueChanged += UpdateTimeRemaining;
             }
@@ -110,8 +122,9 @@ namespace Spartans.GameMode{
                     item.gameObject.SetActive(true);
                 }
             }
+            //initiallize for all game instances
             UpdateGameMode(0, 0); //Initialize so it has a sprite
-            _currentGameMode = _gameModes[0]; //initiallize
+            _currentGameMode = _gameModes[0]; 
         }
 
         private void GetNextGameMode(){
@@ -146,6 +159,9 @@ namespace Spartans.GameMode{
             _gameModeBanner.sprite = _gameModes[newValue].verticalBanner;
         }
 
+
+        //Called by GameManager after game scene has loaded to start preperations for game
+        //Should ONLY be called 1 time
         public void StartAsSelectedMode(){
 
             _canvasManager = FindObjectOfType<CanvasManager>();
@@ -161,8 +177,9 @@ namespace Spartans.GameMode{
             TeamScores.OnListChanged += UpdateTeamScore;
             
 
-            _gameMode = new TDM(2, 10, 10);
-            TimeRemaining.Value = 10;
+            _gameMode = new TDM(2, 10, MaxGameTime);
+            _currentState = States.Starting;
+            TimeRemaining.Value = MaxGameTime;
 
         }
 
@@ -174,9 +191,8 @@ namespace Spartans.GameMode{
             minute = newValue/60;
             second = newValue%60;
 
-            //displayTime = string.Format("{0:0000}", displayTime);
             displayTime = string.Format("{0:00}", minute) + ":" + string.Format("{0:00}", second);
-            //displayTime = minute + ":" + second;
+
             TimerText.text = displayTime;
         }
 
@@ -186,6 +202,12 @@ namespace Spartans.GameMode{
             {
 
             }
+        }
+
+        void OnDisable(){
+            SelectedMode.OnValueChanged -= UpdateGameMode;
+            TimeRemaining.OnValueChanged -= UpdateTimeRemaining;
+            TeamScores.OnListChanged -= UpdateTeamScore;
         }
 
     }

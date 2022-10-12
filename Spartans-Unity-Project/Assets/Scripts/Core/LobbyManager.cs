@@ -16,18 +16,20 @@ namespace Spartans{
         [SerializeField] private GameObject _gameManagerPrefab;
         [SerializeField] private TMP_InputField _input;
         private CanvasManager _canvasManager;
-        private GameMode.GameModeBase _gameMode;
         private const string MENU_SCENE_NAME = "MainMenu";
         private const string GAMESCENE = "TestMap";
         private UnityTransport connection;
         private Dictionary<ulong, CharacterTypes> playerCharacterSelections = new Dictionary<ulong, CharacterTypes>();
         private List<ulong> redTeam = new List<ulong>();
         private List<ulong> blueTeam = new List<ulong>();
-        private Coroutine startingRoutine;
+        private Coroutine countdownRoutine;
+        private float _timer;
 
+
+        //Network Variables
         private NetworkList<PlayerLobbyData> connectedPlayers;
         private NetworkVariable<float> _startCountdown = new NetworkVariable<float>();
-        private float _timer;
+        
         
         // Start is called before the first frame update
         void Start()
@@ -110,14 +112,14 @@ namespace Spartans{
             LobbySync.Instance.StartButtonActive(false);
 
             if(IsServer){
-                if(startingRoutine != null){
-                   StopCoroutine(startingRoutine);     
+                if(countdownRoutine != null){
+                   StopCoroutine(countdownRoutine);     
                 }
                 else{
                     //print("No routine to stop???");
                 }
             }
-            LobbySync.Teams team = redTeam.Count == blueTeam.Count ? LobbySync.Teams.Red : LobbySync.Teams.Blue;
+            Teams team = redTeam.Count == blueTeam.Count ? Teams.Red : Teams.Blue;
             CharacterTypes type;
             bool isReady = false;
             if(!playerCharacterSelections.TryGetValue(clientID, out type)){
@@ -125,9 +127,9 @@ namespace Spartans{
                 isReady = false;
             }
             PlayerLobbyData newPlayer = new PlayerLobbyData(clientID, team, type, isReady);
-            if(team == LobbySync.Teams.Red){
+            if(team == Teams.Red){
                 redTeam.Add(clientID);
-            }else if(team == LobbySync.Teams.Blue){
+            }else if(team == Teams.Blue){
                 blueTeam.Add(clientID);
             }
             //LobbySync.Instance.AddPlayerConnection(newPlayer);
@@ -161,9 +163,9 @@ namespace Spartans{
         private void PassOffToGameManager()
         {
             if(!IsServer) return;
+            /*
             int counter = 0;
             KeyValuePair<ulong, CharacterTypes>[] saved = new KeyValuePair<ulong, CharacterTypes>[playerCharacterSelections.Count];
-
             foreach(KeyValuePair<ulong, CharacterTypes> entry in playerCharacterSelections)
             {
                 //playerCharacterSelections.Remove(entry.Key);  Can do this if memory needs to be conserved
@@ -171,7 +173,19 @@ namespace Spartans{
                 counter+=1;
                 
             }
-            GameManager.Instance.PopulatePlayerSelections(saved);  
+            GameManager.Instance.PopulatePlayerSelections(saved);
+            */
+
+
+            //trying new savedData static class strategy
+            //Explicitly call methods which the GameManager needs to run on scene start
+            PlayerLobbyData[] playerDataArray = new PlayerLobbyData[connectedPlayers.Count];
+            for(int i=0; i<connectedPlayers.Count; i++){
+                playerDataArray[i] = connectedPlayers[i];
+            }
+            SavedData.SavePlayerLobbyData(playerDataArray);
+            GameManager.Instance.LoadPlayerData();
+            
         }
 
         [ServerRpc(RequireOwnership=false)]
@@ -181,13 +195,13 @@ namespace Spartans{
             {
                 playerCharacterSelections.Add(requestingClient, character);
                 
-                LobbySync.Teams teamAssignment = LobbySync.Teams.Red;
+                Teams teamAssignment = Teams.Red;
                 int clientEntryIndex = -1;
                 foreach(var item in connectedPlayers){
                     if(item.Id == requestingClient){
                         clientEntryIndex = connectedPlayers.IndexOf(item);
                     }
-                    teamAssignment = redTeam.Contains(item.Id) ? LobbySync.Teams.Red : LobbySync.Teams.Blue;
+                    teamAssignment = redTeam.Contains(item.Id) ? Teams.Red : Teams.Blue;
                 }
                 
                 PlayerLobbyData newPlayer = new PlayerLobbyData(requestingClient, teamAssignment, character, true);
@@ -242,7 +256,7 @@ namespace Spartans{
         
         private void StartStartingCountdown()
         {
-            startingRoutine = StartCoroutine(StartSelectionCountdown());
+            countdownRoutine = StartCoroutine(StartSelectionCountdown());
         }
 
         private void StartTimeUpdate(float previousValue, float newValue)
@@ -259,6 +273,7 @@ namespace Spartans{
             _startCountdown.OnValueChanged -= StartTimeUpdate;
         }
 
+        //Called from start game button on Lobby scene
         public void StartGame()
         {
             if(CheckCanStart())

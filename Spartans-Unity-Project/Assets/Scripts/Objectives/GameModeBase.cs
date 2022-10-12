@@ -5,14 +5,6 @@ using UnityEngine;
 namespace Spartans.GameMode{
     public abstract class GameModeBase
     {
-        protected enum States{
-            Starting,
-            InProgress,
-            Finished
-        }
-        //**PROPERTIES**
-        protected States currentGameState;
-
         protected int MaxGameTime;
         protected int CurrentGameTime;
         protected int NumTeams;
@@ -20,7 +12,7 @@ namespace Spartans.GameMode{
 
         //**METHODS**
         //public abstract void Init();
-        public abstract bool WinConditionsMet();
-        protected abstract States GetGameState();
+        public abstract bool EndConditionsMet();
+        public abstract int CheckWinner();
     }
 }

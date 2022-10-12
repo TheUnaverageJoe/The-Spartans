@@ -16,12 +16,7 @@ namespace Spartans.GameMode{
             Scores = new int[teams];
         }
         
-        protected override States GetGameState()
-        {
-            return base.currentGameState;
-        }
-
-        public override bool WinConditionsMet()
+        public override bool EndConditionsMet()
         {
             for(int i=0; i<NumTeams; i++)
             {
@@ -38,6 +33,35 @@ namespace Spartans.GameMode{
             }
 
             return false;
+        }
+
+        public override int CheckWinner()
+        {
+            int IndexOfHighestScore = 0;
+            bool isTie = false;
+
+            for(int i=0; i<NumTeams; i++)
+            {
+                if(Scores[i] == Scores[IndexOfHighestScore])
+                {
+                    isTie = true;
+                }
+                else if(Scores[i] > Scores[IndexOfHighestScore])
+                {
+                    if(isTie)
+                    {
+                        isTie = false;
+                    }
+                    IndexOfHighestScore = i;
+                    
+                }
+            }
+            
+            if(isTie){
+                return -1;
+            }else{
+                return IndexOfHighestScore; //If we have a winner return their team index
+            }
         }
     }
 }
