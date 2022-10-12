@@ -91,9 +91,13 @@ namespace Spartans.GameMode{
 
         void Update()
         {
+            if(_currentState == States.None){
+                return;
+            }
             if(IsServer)
             {
-                if(_currentState!=States.Starting && TimeRemaining.Value > 0)
+                //Starting Phase
+                if(_currentState==States.Starting && TimeRemaining.Value > 0)
                 {
                     if(timeTillNextTimerUpdate <= 0)
                     {
@@ -104,6 +108,23 @@ namespace Spartans.GameMode{
                     {
                         timeTillNextTimerUpdate -= Time.deltaTime;
                     }
+                }//Post starting state
+                else if(_currentState!=States.Starting && TimeRemaining.Value > 0)
+                {
+                    if(timeTillNextTimerUpdate <= 0)
+                    {
+                        TimeRemaining.Value -= 1;
+                        timeTillNextTimerUpdate = 1;
+                    }
+                    else
+                    {
+                        timeTillNextTimerUpdate -= Time.deltaTime;
+                    }
+                }
+                else{
+                    _currentState = _currentState+1;
+                    TimeRemaining.Value = 85;
+                    print("Updated State to " + _currentState);
                 }
             }
         }
@@ -176,10 +197,13 @@ namespace Spartans.GameMode{
             }
             TeamScores.OnListChanged += UpdateTeamScore;
             
-
-            _gameMode = new TDM(2, 10, MaxGameTime);
-            _currentState = States.Starting;
-            TimeRemaining.Value = MaxGameTime;
+            if(IsServer)
+            {
+                _gameMode = new TDM(2, 10, MaxGameTime);
+                _currentState = States.Starting;
+                TimeRemaining.Value = MaxGameTime;
+            }
+            
 
         }
 

@@ -45,7 +45,7 @@ namespace Spartans{
         void Update(){
             if(IsServer)
             {
-                if(_startCountdown.Value >= 0)
+                if(_startCountdown.Value > 0)
                 {
                     if(_timer <= 0f)
                     {
@@ -79,14 +79,9 @@ namespace Spartans{
                 foreach(NetworkClient client in NetworkManager.ConnectedClientsList){
                     NotifyClientConnected(client.ClientId);
                 }
-            }
-            
-            //print("Lobby spawned into " + NetworkManager.Singleton.ConnectedHostname);
-
-            if(!IsServer) return;
-            GameObject spawn = Instantiate(_gameManagerPrefab);
-            //GameManager.Instance.GetComponent<NetworkObject>().Spawn();
-            spawn.GetComponent<NetworkObject>().Spawn();
+                GameObject spawn = Instantiate(_gameManagerPrefab);
+                spawn.GetComponent<NetworkObject>().Spawn();
+            }       
         }
 
         public void StartServer(){
@@ -119,7 +114,7 @@ namespace Spartans{
                     //print("No routine to stop???");
                 }
             }
-            Teams team = redTeam.Count == blueTeam.Count ? Teams.Red : Teams.Blue;
+            Teams team = redTeam.Count <= blueTeam.Count ? Teams.Red : Teams.Blue;
             CharacterTypes type;
             bool isReady = false;
             if(!playerCharacterSelections.TryGetValue(clientID, out type)){
@@ -128,8 +123,10 @@ namespace Spartans{
             }
             PlayerLobbyData newPlayer = new PlayerLobbyData(clientID, team, type, isReady);
             if(team == Teams.Red){
+                print("Added to red team");
                 redTeam.Add(clientID);
             }else if(team == Teams.Blue){
+                print("Added to blue team");
                 blueTeam.Add(clientID);
             }
             //LobbySync.Instance.AddPlayerConnection(newPlayer);
@@ -208,20 +205,14 @@ namespace Spartans{
                 if(clientEntryIndex >= 0){
                     connectedPlayers[clientEntryIndex] = newPlayer;
                 }
-                //print(newPlayer.ToString());
 
                 OfferStartIfAllReady();
-                //var status = NetworkManager.SceneManager.LoadScene(GAMESCENE, LoadSceneMode.Single);
-                //print($"Added {character.ToString()} for client {requestingClient.ToString()}");
             }
             else
             {
                 print("Changing class not implimented");
             }
 
-            //if(CheckCanStart()){
-            //    OfferStartIfAllReady();
-            //}
         }
         public void RequestAssignCharacter(int character)
         {
