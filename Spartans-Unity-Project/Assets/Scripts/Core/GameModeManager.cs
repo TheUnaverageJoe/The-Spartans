@@ -8,6 +8,9 @@ using TMPro;
 using Spartans.UI;
 
 namespace Spartans.GameMode{
+    ///Summary
+    ///This class controls game mode specific logic such as win conditions, also in charge of updating UI related to game mode data
+    ///Do Not Destroy On Load Singleton use, starts in lobby scene and carries through(for now)
     public class GameModeManager : NetworkBehaviour
     {
         public enum States{
@@ -44,8 +47,10 @@ namespace Spartans.GameMode{
         //Network Variables for syncing
         private NetworkList<int> TeamScores;
         private NetworkVariable<int> TimeRemaining = new NetworkVariable<int>(0);
+        //below for UI display in lobby scene
         private NetworkVariable<int> SelectedMode = new NetworkVariable<int>();
 
+        //consider making below var gamemode specific
         [SerializeField] private int MaxGameTime;
 
         //Awake occurs in Lobby Scene
@@ -129,6 +134,10 @@ namespace Spartans.GameMode{
             }
         }
 
+        void FixedUpdate(){
+            if(IsServer && _currentState >= States.Starting)
+            TeamScores[0]++;
+        }
         public override void OnNetworkSpawn()
         {
             if(IsClient)
@@ -174,6 +183,7 @@ namespace Spartans.GameMode{
             _currentGameMode = _gameModes[SelectedMode.Value];
         }
 
+        //only used for UI updating to show selected gamemode
         private void UpdateGameMode(int previousValue, int newValue)
         {
             print("Game Mode Index of " + newValue);
@@ -191,8 +201,12 @@ namespace Spartans.GameMode{
             TimerText = containerObjForGameModeUI.GetComponentInChildren<TMP_Text>();
             _scores = containerObjForGameModeUI.GetComponentsInChildren<Slider>();
 
+            //print("SLiders found " + _scores.Length);
+
             for(int i=0; i<_currentGameMode.numberOfTeams ; i++)
             {
+                //print("I is:" + i);
+                _scores[i].maxValue = _currentGameMode.numberOfTeams*5;
                 TeamScores.Add(0);
             }
             TeamScores.OnListChanged += UpdateTeamScore;
@@ -224,7 +238,10 @@ namespace Spartans.GameMode{
         {
             if(changeEvent.Type == NetworkListEvent<int>.EventType.Value)
             {
-
+                _scores[changeEvent.Index].value = changeEvent.Value;
+                //TeamScores[changeEvent.Index] = changeEvent.Value;
+            }else{
+                print("SHOULDNT OCCUR");
             }
         }
 

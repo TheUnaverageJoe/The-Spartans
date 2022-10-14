@@ -19,7 +19,7 @@ namespace Spartans{
         private const string MENU_SCENE_NAME = "MainMenu";
         private const string GAMESCENE = "TestMap";
         private UnityTransport connection;
-        private Dictionary<ulong, CharacterTypes> playerCharacterSelections = new Dictionary<ulong, CharacterTypes>();
+        //private Dictionary<ulong, CharacterTypes> playerCharacterSelections = new Dictionary<ulong, CharacterTypes>();
         private List<ulong> redTeam = new List<ulong>();
         private List<ulong> blueTeam = new List<ulong>();
         private Coroutine countdownRoutine;
@@ -115,12 +115,12 @@ namespace Spartans{
                 }
             }
             Teams team = redTeam.Count <= blueTeam.Count ? Teams.Red : Teams.Blue;
-            CharacterTypes type;
+            CharacterTypes type = CharacterTypes.Hoplite;
             bool isReady = false;
-            if(!playerCharacterSelections.TryGetValue(clientID, out type)){
-                type = CharacterTypes.Hoplite;
-                isReady = false;
-            }
+            //if(!playerCharacterSelections.TryGetValue(clientID, out type)){
+            //    type = CharacterTypes.Hoplite;
+            //    isReady = false;
+            //}
             PlayerLobbyData newPlayer = new PlayerLobbyData(clientID, team, type, isReady);
             if(team == Teams.Red){
                 print("Added to red team");
@@ -188,6 +188,22 @@ namespace Spartans{
         [ServerRpc(RequireOwnership=false)]
         public void RequestAssignCharacterServerRpc(ulong requestingClient, CharacterTypes character)
         {
+            int index=0;
+            foreach(var data in connectedPlayers)
+            {
+                if(data.Id == requestingClient)
+                {
+                    break;
+                }
+                index++;
+            }
+            //this will need to get reworked if we plan to enable character changing, a ready + unready feature as opposed to
+            //selecting a character indicating readyness, or team changing
+            PlayerLobbyData currentPlayerData = connectedPlayers[index];
+            connectedPlayers[index] = new PlayerLobbyData(currentPlayerData.Id, currentPlayerData.Team, character, true);
+            OfferStartIfAllReady();
+
+            /*
             if(!playerCharacterSelections.ContainsKey(requestingClient))
             {
                 playerCharacterSelections.Add(requestingClient, character);
@@ -212,6 +228,7 @@ namespace Spartans{
             {
                 print("Changing class not implimented");
             }
+            */
 
         }
         public void RequestAssignCharacter(int character)
@@ -224,10 +241,20 @@ namespace Spartans{
             //print("checking Can Start");
             foreach(ulong id in NetworkManager.ConnectedClientsIds)
             {
-                if(!playerCharacterSelections.ContainsKey(id))
+                bool clientIsReady = false;
+                foreach(var data in connectedPlayers)
                 {
-                    return false;
+                    if(data.Id == id && data.IsReady)
+                    {
+                        clientIsReady = true;
+                        break;
+                    } 
                 }
+                if(!clientIsReady) return false;
+                //if(!ContainsConnectedPlayerWithId(id))
+                //{
+                //    return false;
+                //}
             }
             return true;
         }
@@ -267,14 +294,14 @@ namespace Spartans{
         //Called from start game button on Lobby scene
         public void StartGame()
         {
-            if(CheckCanStart())
-            {
-                //GameMode.GameModeManager.Instance.SelectMode();
-                _startCountdown.Value = 5;
-                LobbySync.Instance.StartButtonActive(false);
-                StartStartingCountdown();
-                PassOffToGameManager();
-            }
+            //if(CheckCanStart())
+            //{
+            //GameMode.GameModeManager.Instance.SelectMode();
+            _startCountdown.Value = 5;
+            LobbySync.Instance.StartButtonActive(false);
+            StartStartingCountdown();
+            PassOffToGameManager();
+            //}
         }
 
         private void OfferStartIfAllReady()
@@ -302,6 +329,21 @@ namespace Spartans{
             {
                 print("Unknown case needed to be handled in LobbyPlayersHandler");
             }
+        }
+
+        //Intended to be used with NetworkList<PlayerLobbyData> as a stand in for Dictionary.ContainsKey
+        private bool ContainsConnectedPlayerWithId(ulong id){
+            bool foundId = false;
+            foreach(var data in connectedPlayers){
+                if(data.Id == id){
+                    foundId= true;
+                    break;
+                }
+            }
+            if(!foundId){
+                return false;
+            }
+            return true;
         }
     }
 }

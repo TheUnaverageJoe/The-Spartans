@@ -28,6 +28,8 @@ namespace Spartans{
 
         public States activeState{get; private set;}
         private Scene m_LoadedScene;
+        
+        //only for server Use
         private Dictionary<ulong, PlayerGameData> playerData = new Dictionary<ulong, PlayerGameData>();
 
         void Awake(){

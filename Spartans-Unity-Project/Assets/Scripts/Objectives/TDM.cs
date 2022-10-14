@@ -6,7 +6,7 @@ using Unity.Netcode;
 namespace Spartans.GameMode{
     public class TDM : GameModeBase
     {
-        private int _requiredEliminations = 0;
+        private int _requiredEliminations = 10;
 
         public TDM(int teams, int reqKills, int maxTimeSeconds)
         {
