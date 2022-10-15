@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 
 using Spartans.UI;
+using Spartans;
 
 namespace Spartans.GameMode{
     ///Summary
@@ -66,8 +67,8 @@ namespace Spartans.GameMode{
         //Start occurs during lobby scene
         void Start(){
             _canvasManager = FindObjectOfType<CanvasManager>();
-            TeamScores = new NetworkList<int>();
             _gameModeBanner = _canvasManager.transform.Find("GameModeDisplay").GetComponent<Image>();
+            TeamScores = new NetworkList<int>();
 
             buttons = _gameModeBanner.gameObject.GetComponentsInChildren<Button>(true);
             if(buttons.Length == 2){
@@ -135,8 +136,8 @@ namespace Spartans.GameMode{
         }
 
         void FixedUpdate(){
-            if(IsServer && _currentState >= States.Starting)
-            TeamScores[0]++;
+            //if(IsServer && _currentState >= States.Starting)
+            //TeamScores[0]++;
         }
         public override void OnNetworkSpawn()
         {
@@ -206,7 +207,7 @@ namespace Spartans.GameMode{
             for(int i=0; i<_currentGameMode.numberOfTeams ; i++)
             {
                 //print("I is:" + i);
-                _scores[i].maxValue = _currentGameMode.numberOfTeams*5;
+                _scores[i].maxValue = 10;
                 TeamScores.Add(0);
             }
             TeamScores.OnListChanged += UpdateTeamScore;
@@ -217,8 +218,6 @@ namespace Spartans.GameMode{
                 _currentState = States.Starting;
                 TimeRemaining.Value = MaxGameTime;
             }
-            
-
         }
 
         private void UpdateTimeRemaining(int previousValue, int newValue)
@@ -249,6 +248,16 @@ namespace Spartans.GameMode{
             SelectedMode.OnValueChanged -= UpdateGameMode;
             TimeRemaining.OnValueChanged -= UpdateTimeRemaining;
             TeamScores.OnListChanged -= UpdateTeamScore;
+        }
+
+        //This method should only ever be called from the server
+        public void AddScore(Teams team, int valueToAdd)
+        {
+            if(IsClient){
+                Debug.LogError("This method should not be called in a client instance");
+                return;
+            }
+            TeamScores[(int)team] += valueToAdd;
         }
 
     }

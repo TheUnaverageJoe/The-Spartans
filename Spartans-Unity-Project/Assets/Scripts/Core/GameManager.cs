@@ -121,6 +121,14 @@ namespace Spartans{
                             print($"Spawning {item.Value.Type} for client {item.Key} on {item.Value.Team} team");
                             GameObject spawningPlayer = Instantiate(_playerPrefabs[(int)item.Value.Type], Vector3.up*2, Quaternion.identity);
                             spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(item.Key);
+                            if(item.Value.Team == Teams.Red)
+                            {
+                                spawningPlayer.transform.position = new Vector3(Random.Range(30, 40), 2, Random.Range(15, 25));
+                            }else
+                            {
+                                spawningPlayer.transform.position = new Vector3(Random.Range(-30, -40), 2, Random.Range(15, 25));
+
+                            }
                         }
                     }
                     //called on Clients and server, used for initiallization at beginning of game scene
