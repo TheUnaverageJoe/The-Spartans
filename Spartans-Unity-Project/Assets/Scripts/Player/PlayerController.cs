@@ -25,7 +25,7 @@ namespace Spartans.Players
         [SerializeField] private Vector3 input;
 
         
-
+        private PageUI _pauseScreen;
         private GameManager _gameManager;
         private CanvasManager _HUD;
         private Rigidbody _rigidbody;
@@ -40,7 +40,7 @@ namespace Spartans.Players
             _animationManager = GetComponent<AnimationManager>();
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager._canvasManager;
-          
+            _pauseScreen = _HUD.transform.Find("PauseScreen").GetComponent<PageUI>();
         }
 
         public void Start(){
@@ -79,25 +79,23 @@ namespace Spartans.Players
                 return;
             }
 
-            if(Input.GetKeyDown(KeyCode.Escape)){
-                    if(Cursor.visible) MouseLock(true);
-                    else MouseLock(false);
+            if(PlayerInput.Instance.escape)
+            {
+                TogglePauseMenu();
             }
 
             //Jump
-            if(Input.GetButtonDown("Jump") && _canJump && _grounded){
+            if(PlayerInput.Instance.jump && _canJump && _grounded){
                 RequestJumpServerRpc();
                 _canJump = false;
                 _grounded = false;
             }
 
             //Update rotation
-            requestRotationServerRpc(Input.GetAxis("Mouse X")*_mouseSens, - Input.GetAxis("Mouse Y")*_mouseSens);
-            
-            
+            requestRotationServerRpc(PlayerInput.Instance.mouseX*_mouseSens, -PlayerInput.Instance.mouseY*_mouseSens);
             
             //Update movement
-            input = new Vector3(Input.GetAxisRaw("Horizontal"), 0 , Input.GetAxisRaw("Vertical"));
+            input = PlayerInput.Instance.movementDir;
             if(input != _lastSentInput){
                 _lastSentInput = input;
             }
@@ -183,6 +181,23 @@ namespace Spartans.Players
             }
         }
 
+        void TogglePauseMenu()
+        {
+            //Handle closing of open UI pages but exclude base PauseScreen case
+            if(_HUD.GetStackCount() > 2){
+                _HUD.PopPage();
+                return;
+            }
+
+            //Handle closing and opening of base PauseScreen UI
+            if(_pauseScreen.gameObject.activeSelf){
+                _HUD.PopPage();
+                MouseLock(true);
+            }else{
+                _HUD.PushPage(_pauseScreen);
+                MouseLock(false);
+            }
+        }
         void MouseLock(bool Lock){
             if(Lock && Application.isFocused){
                 Cursor.lockState = CursorLockMode.Locked;
@@ -228,8 +243,6 @@ namespace Spartans.Players
         {
             base.OnNetworkDespawn();
         }
-
-
         IEnumerator ResetJump(){
             yield return new WaitForSeconds(0.5f);
             _canJump = true;

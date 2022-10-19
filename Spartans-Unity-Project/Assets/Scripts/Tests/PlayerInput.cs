@@ -6,7 +6,7 @@ namespace Spartans.Players{
     public class PlayerInput : MonoBehaviour
     {
         public static PlayerInput Instance{get; private set;} = null;
-        public Vector3 movement{get; private set;}
+        public Vector3 movementDir{get; private set;}
         public float mouseX{get; private set;}
         public float mouseY{get; private set;}
 
@@ -34,7 +34,7 @@ namespace Spartans.Players{
         // Start is called before the first frame update
         void Start()
         {
-            movement = Vector3.zero;
+            movementDir = Vector3.zero;
             jump = false;
             tab = false;
             escape = false;
@@ -51,7 +51,7 @@ namespace Spartans.Players{
         // Update is called once per frame
         void Update()
         {
-            movement = new Vector3(Input.GetAxisRaw("Horizontal"), 0 , Input.GetAxisRaw("Vertical"));
+            movementDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0 , Input.GetAxisRaw("Vertical"));
             mouseX = Input.GetAxis("Mouse X");
             mouseY = Input.GetAxis("Mouse Y");
 
@@ -65,11 +65,6 @@ namespace Spartans.Players{
             special = Input.GetKeyDown(KeyCode.Q);
             
 
-        }
-        public void OnDisable(){
-            //print("Unassigned playerInput");
-            //Instance = null;
-            //Destroy(this.gameObject);
         }
     }
 }

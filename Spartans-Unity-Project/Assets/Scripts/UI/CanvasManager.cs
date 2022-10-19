@@ -12,7 +12,6 @@ namespace Spartans.UI{
     {
         //Page and Canvas manager pattern from lIamAcadamy on Youtube
         [SerializeField] private PageUI _initialPage;
-        private Canvas RootCanvas;
         private Stack<PageUI> _pageStack = new Stack<PageUI>();
         
         public void Init()
@@ -34,8 +33,8 @@ namespace Spartans.UI{
             {
                 if(PlayerInput.Instance.escape)
                 {
-                    print("esc pressed");
-                    PopPage();
+                    //print("esc pressed");
+                    //PopPage();
                 }
             }
             
@@ -68,6 +67,11 @@ namespace Spartans.UI{
             }else{
                 Debug.LogWarning("Only 1 PageUI left in the stack");
             }
+        }
+
+        public int GetStackCount()
+        {
+            return _pageStack.Count;
         }
     }
 }

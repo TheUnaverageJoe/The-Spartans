@@ -22,8 +22,8 @@ namespace Spartans.Players{
 
         public override void Init(PlayerController playerController){
             _playerController = playerController;
-            onAttackStart += PrimaryAttack;
-            onSecondaryAttackStart += SecondaryAttack;
+            //onAttackStart += PrimaryAttack;
+            //onSecondaryAttackStart += SecondaryAttack;
         }
 
         // Update is called once per frame
@@ -32,11 +32,13 @@ namespace Spartans.Players{
             Debug.DrawRay(handRef.transform.position, handRef.transform.forward*3, Color.magenta, 0.25f);
             if(!IsLocalPlayer) return;
 
-            if(Input.GetButtonDown("Fire1") && !_attackOnCooldown){
-                onAttackStart.Invoke();         
+            if(PlayerInput.Instance.primary && !_attackOnCooldown){
+                //onAttackStart.Invoke();
+                PrimaryAttack();
             }
-            if(Input.GetButtonDown("Fire2") && !_secondaryAttackOnCooldown){
-                onSecondaryAttackStart?.Invoke();
+            if(PlayerInput.Instance.secondary && !_secondaryAttackOnCooldown){
+                //onSecondaryAttackStart?.Invoke();
+                SecondaryAttack();
             }
         }
         void FixedUpdate(){
@@ -46,6 +48,7 @@ namespace Spartans.Players{
             
             if(_attackOnCooldown){
                 allHit = Physics.RaycastAll(handRef.transform.position, transform.TransformDirection(handRef.transform.up), 3, attackMask);
+
                 foreach(RaycastHit hit in allHit){
                     if(!_hitPlayers.Contains(hit.transform)){
                         Health _healthAffected = hit.transform.gameObject.GetComponent<Health>();
@@ -61,7 +64,8 @@ namespace Spartans.Players{
             }
         }
         public override void PrimaryAttack(){
-            _playerController._animationManager.SetParameter("attack", true);
+            AttackServerRpc();
+            //_playerController._animationManager.SetParameter("attack", true);
             _attackOnCooldown = true;
             StartCoroutine(ResetAttackCooldown());
         }
@@ -89,7 +93,11 @@ namespace Spartans.Players{
 
         [ServerRpc]
         public void AttackServerRpc(){
-            onAttackStart.Invoke();
+            //onAttackStart.Invoke();
+            _playerController._animationManager.SetParameter("attack", true);
+            _attackOnCooldown = true;
+            StartCoroutine(ResetAttackCooldown());
+
         }
         
         [ServerRpc]
