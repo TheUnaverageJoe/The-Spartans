@@ -19,9 +19,11 @@ namespace Spartans.Players{
         
         private RaycastHit _lastAttackedObject;
         private List<Transform> _hitPlayers = new List<Transform>();
+        private Rigidbody _rb;
 
         public override void Init(PlayerController playerController){
             _playerController = playerController;
+            _rb = GetComponent<Rigidbody>();
             //onAttackStart += PrimaryAttack;
             //onSecondaryAttackStart += SecondaryAttack;
         }
@@ -39,6 +41,10 @@ namespace Spartans.Players{
             if(PlayerInput.Instance.secondary && !_secondaryAttackOnCooldown){
                 //onSecondaryAttackStart?.Invoke();
                 SecondaryAttack();
+            }
+            if(PlayerInput.Instance.special){
+                SpecialAttack();
+                _playerController.JumpStarted();
             }
         }
         void FixedUpdate(){
@@ -62,20 +68,29 @@ namespace Spartans.Players{
                     }
                 }
             }
+
+            if(_playerController.IsAirborn())
+            {
+                //_rb.AddForce(-transform.TransformDirection(Vector3.forward)*20, ForceMode.Acceleration);
+                _rb.AddForce(Vector3.down*30, ForceMode.Acceleration);
+            }
         }
-        public override void PrimaryAttack(){
+        public override void PrimaryAttack()
+        {
             AttackServerRpc();
             //_playerController._animationManager.SetParameter("attack", true);
             _attackOnCooldown = true;
             StartCoroutine(ResetAttackCooldown());
         }
-        public override void SecondaryAttack(){
+        public override void SecondaryAttack()
+        {
             SecondaryAttackServerRpc();
             _secondaryAttackOnCooldown = true;
             StartCoroutine(ResetSecondaryAttackCooldown());
         }
-        public override void SpecialAttack(){
-
+        public override void SpecialAttack()
+        {
+            SpecialAttackServerRpc();
         }
 
         
@@ -92,7 +107,8 @@ namespace Spartans.Players{
         }
 
         [ServerRpc]
-        public void AttackServerRpc(){
+        public void AttackServerRpc()
+        {
             //onAttackStart.Invoke();
             _playerController._animationManager.SetParameter("attack", true);
             _attackOnCooldown = true;
@@ -101,7 +117,8 @@ namespace Spartans.Players{
         }
         
         [ServerRpc]
-        public void SecondaryAttackServerRpc(){
+        public void SecondaryAttackServerRpc()
+        {
             float x = Screen.width / 2f;
             float y = Screen.height / 2f;
             var ray = PlayerCameraFollow.Instance.camera.ScreenPointToRay(new Vector2(x, y));
@@ -115,6 +132,15 @@ namespace Spartans.Players{
             newProjectile.GetComponent<Projectile>().sourceCollider = GetComponent<Collider>();
             newProjectile.GetComponent<NetworkObject>().Spawn();
             newProjectile.GetComponent<Rigidbody>().AddForce(newProjectile.transform.forward * speedModifier, ForceMode.VelocityChange);
+        }
+
+        [ServerRpc]
+        public void SpecialAttackServerRpc()
+        {
+            _rb.AddForce(transform.TransformDirection(Vector3.forward)*30, ForceMode.VelocityChange);
+            _rb.AddForce(Vector3.up*30, ForceMode.VelocityChange);
+
+            //_rb.AddForce(-transform.TransformDirection(Vector3.forward)*10, ForceMode.Acceleration);
         }
 
     }

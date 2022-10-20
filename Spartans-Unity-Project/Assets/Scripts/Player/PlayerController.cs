@@ -87,8 +87,8 @@ namespace Spartans.Players
             //Jump
             if(PlayerInput.Instance.jump && _canJump && _grounded){
                 RequestJumpServerRpc();
-                _canJump = false;
-                _grounded = false;
+                // _canJump = false;
+                // _grounded = false;
             }
 
             //Update rotation
@@ -116,18 +116,18 @@ namespace Spartans.Players
     
         [ClientRpc]
         public void JumpResponseClientRpc(){
+            JumpStarted();
             Vector3 horizPlane = new Vector3(_rigidbody.velocity.x, 0, _rigidbody.velocity.z);
             _rigidbody.AddForce(transform.up * _jumpForce, ForceMode.VelocityChange);
-            StartCoroutine(ResetJump());
+            //StartCoroutine(ResetJump());
         }
 
         [ServerRpc]
         public void RequestJumpServerRpc(){
             if(!_grounded) return;
-            _canJump = false;
-            _grounded = false;
+            JumpStarted();
             _animationManager.SetParameter("grounded", false);
-            StartCoroutine(ResetJump());
+            //StartCoroutine(ResetJump());
             JumpResponseClientRpc();
         }
 
@@ -246,6 +246,21 @@ namespace Spartans.Players
         IEnumerator ResetJump(){
             yield return new WaitForSeconds(0.5f);
             _canJump = true;
+        }
+        public void JumpStarted(){
+            _canJump = false;
+            _grounded = false;
+            StartCoroutine(ResetJump());
+        }
+        public bool IsAirborn(){
+            if(_grounded)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }
