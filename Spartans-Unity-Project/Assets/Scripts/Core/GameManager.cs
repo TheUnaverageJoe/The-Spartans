@@ -119,16 +119,21 @@ namespace Spartans{
                         foreach(KeyValuePair<ulong, PlayerGameData> item in playerData)
                         {
                             Vector3 spawnLocation;
+                            Quaternion startingRot;
                             if(item.Value.Team == Teams.Red)
                             {
                                 spawnLocation = new Vector3(Random.Range(30, 35), 2, Random.Range(-10, 10));
+                                startingRot = Quaternion.Euler(0, -90, 0);
                             }else
                             {
                                 spawnLocation = new Vector3(Random.Range(-30, -35), 2, Random.Range(-10, 10));
+                                startingRot = Quaternion.Euler(0, 90, 0);
                             }
+
                             print($"Spawning {item.Value.Type} for client {item.Key} on {item.Value.Team} team");
-                            GameObject spawningPlayer = Instantiate(_playerPrefabs[(int)item.Value.Type], spawnLocation, Quaternion.identity);
+                            GameObject spawningPlayer = Instantiate(_playerPrefabs[(int)item.Value.Type], spawnLocation, startingRot);
                             spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(item.Key);
+                            spawningPlayer.GetComponent<Spartans.Players.PlayerController>().ChangeTeam(item.Value.Team);
                         }
                     }
                     //called on Clients and server, used for initiallization at beginning of game scene

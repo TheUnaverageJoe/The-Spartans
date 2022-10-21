@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+
 using Spartans.Players;
 
 public class Projectile : NetworkBehaviour
 {
     [SerializeField] private int _damage;
     [SerializeField] private float _maxLifeSpanTime;//in seconds
-    public Collider sourceCollider;
+    private PlayerController sourcePlayer;
     private float _lifeSpanTime = 0;
     //private Collider _collider;
 
@@ -28,17 +29,22 @@ public class Projectile : NetworkBehaviour
         if(!IsServer){
             return;
         }
-        if(sourceCollider == null){
+        if(sourcePlayer == null){
             print("PROBLEM");
         }
-        if(other == sourceCollider){
+        if(other.GetComponent<PlayerController>() == sourcePlayer){
             return;
         }
         Health hitTarget;
         if(other.TryGetComponent<Health>(out hitTarget)){
-            hitTarget.TakeDamageServerRpc(_damage);
+            //hitTarget.TakeDamageServerRpc(_damage);
+            hitTarget.TakeDamage(_damage, sourcePlayer.GetTeamAssociation().Value);
         }
         print($"Projectile hit {other.name}");
         this.gameObject.GetComponent<NetworkObject>().Despawn();
+    }
+
+    public void SetSource(PlayerController source){
+        sourcePlayer = source;
     }
 }

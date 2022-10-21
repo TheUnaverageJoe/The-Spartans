@@ -62,7 +62,7 @@ public class WeaponHit : NetworkBehaviour
                         print("You cant hit yourself silly");
                         return;
                     }
-                    _healthAffected.TakeDamageServerRpc(_playerDamage);
+                    //_healthAffected.TakeDamageServerRpc(_playerDamage);
                     //print("Did damage to: " + _healthAffected.GetHitpoints());
                     _hitPlayers.Add(_healthAffected.transform);
                 }

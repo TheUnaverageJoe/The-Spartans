@@ -25,6 +25,7 @@ namespace Spartans.Players
         [SerializeField] private Vector3 input;
 
         
+        private NetworkVariable<Teams> myTeam = new NetworkVariable<Teams>();
         private PageUI _pauseScreen;
         private GameManager _gameManager;
         private CanvasManager _HUD;
@@ -238,6 +239,7 @@ namespace Spartans.Players
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+
         }
         public override void OnNetworkDespawn()
         {
@@ -261,6 +263,21 @@ namespace Spartans.Players
             {
                 return true;
             }
+        }
+        public void ChangeTeam(Teams team)
+        {
+            if(myTeam.Value == team) return;
+
+            myTeam.Value = team;
+        }
+        public System.Nullable<Teams> GetTeamAssociation(){
+            if(!IsServer){
+                Debug.LogError("GetTeamAssociation can only be called from server");
+                return null;
+            }
+
+            //print("myTeam var is: " + myTeam.Value);
+            return myTeam.Value;
         }
     }
 }

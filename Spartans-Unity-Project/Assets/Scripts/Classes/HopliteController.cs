@@ -20,6 +20,7 @@ namespace Spartans.Players{
         private RaycastHit _lastAttackedObject;
         private List<Transform> _hitPlayers = new List<Transform>();
         private Rigidbody _rb;
+        private bool _leaping;
 
         public override void Init(PlayerController playerController){
             _playerController = playerController;
@@ -61,18 +62,24 @@ namespace Spartans.Players{
                         if(_healthAffected == GetComponent<Health>())
                         {
                             print("You cant hit yourself silly");
-                            return;
+                            continue;
                         }
-                        _healthAffected.TakeDamageServerRpc(_playerDamage);
+                        //_healthAffected.TakeDamageServerRpc(_playerDamage);
+                        _healthAffected.TakeDamage(_playerDamage, _playerController.GetTeamAssociation().Value);
                         _hitPlayers.Add(hit.transform);
                     }
                 }
             }
 
-            if(_playerController.IsAirborn())
+            if(_leaping)
             {
-                //_rb.AddForce(-transform.TransformDirection(Vector3.forward)*20, ForceMode.Acceleration);
-                _rb.AddForce(Vector3.down*30, ForceMode.Acceleration);
+                if(_playerController.IsAirborn())
+                {
+                    //_rb.AddForce(-transform.TransformDirection(Vector3.forward)*20, ForceMode.Acceleration);
+                    _rb.AddForce(Vector3.down*30, ForceMode.Acceleration);
+                }else{
+                    _leaping = false;
+                }
             }
         }
         public override void PrimaryAttack()
@@ -92,8 +99,6 @@ namespace Spartans.Players{
         {
             SpecialAttackServerRpc();
         }
-
-        
 
         IEnumerator ResetAttackCooldown(){
             yield return new WaitForSeconds(1);
@@ -129,7 +134,7 @@ namespace Spartans.Players{
                 rot = Quaternion.LookRotation(dir);
             }
             GameObject newProjectile = NetworkManager.Instantiate(_arrowPrefab, initialPos, rot);
-            newProjectile.GetComponent<Projectile>().sourceCollider = GetComponent<Collider>();
+            newProjectile.GetComponent<Projectile>().SetSource(GetComponent<PlayerController>());
             newProjectile.GetComponent<NetworkObject>().Spawn();
             newProjectile.GetComponent<Rigidbody>().AddForce(newProjectile.transform.forward * speedModifier, ForceMode.VelocityChange);
         }
@@ -137,6 +142,8 @@ namespace Spartans.Players{
         [ServerRpc]
         public void SpecialAttackServerRpc()
         {
+            _playerController.JumpStarted();
+            _leaping = true;
             _rb.AddForce(transform.TransformDirection(Vector3.forward)*30, ForceMode.VelocityChange);
             _rb.AddForce(Vector3.up*30, ForceMode.VelocityChange);
 

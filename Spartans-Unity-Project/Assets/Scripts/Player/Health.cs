@@ -50,6 +50,27 @@ namespace Spartans.Players{
             }
         }
         
+        //Method should only be called from server exclusive code blocks
+        public void TakeDamage(int damage, Teams userTeam)
+        {
+            if(!IsServer){
+                print("TakeDamage not called from server");
+                return;
+            }
+            //NEED TO consider case of is friendly fire off
+            if(_playerController.GetTeamAssociation() == userTeam)
+            {
+                //NO FRIENDLY FIRE
+                return;
+            }
+            updateHealthClientRpc(damage);
+            _currentHitpoints -= damage;
+            onHealthChanged?.Invoke(_currentHitpoints);
+            if(_currentHitpoints <= 0) onDie?.Invoke();
+            //deal damage
+
+        }
+        /*
         [ServerRpc(RequireOwnership = false)]
         public void TakeDamageServerRpc(int damage){
             updateHealthClientRpc(damage);
@@ -57,6 +78,7 @@ namespace Spartans.Players{
             onHealthChanged?.Invoke(_currentHitpoints);
             if(_currentHitpoints <= 0) onDie?.Invoke();
         }
+        */
         [ClientRpc]
         public void updateHealthClientRpc(int damage){
             if(IsServer) return;
