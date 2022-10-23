@@ -28,6 +28,7 @@ namespace Spartans.Players{
             _healthDisplay = GetComponentInChildren<FloatingHealth>();
             _playerController = playerController;
 
+            //if(IsServer)
             onDie += OnDieCallback;
 
             if(_healthDisplay == null){
@@ -61,6 +62,7 @@ namespace Spartans.Players{
             if(_playerController.GetTeamAssociation() == userTeam)
             {
                 //NO FRIENDLY FIRE
+                Debug.LogWarning("No Friendly Fire");
                 return;
             }
             updateHealthClientRpc(damage);
@@ -96,8 +98,8 @@ namespace Spartans.Players{
 
         private void OnDieCallback(){
             if(IsServer){
+                Spartans.GameMode.GameModeManager.Instance.AddScore(_playerController.GetTeamAssociation().Value, 1);
                 timeOfDeath = _respawnTime;
-                //_animator.SetBool("dead", true);
                 _playerController._animationManager.SetParameter("dead", true);
             }
         }

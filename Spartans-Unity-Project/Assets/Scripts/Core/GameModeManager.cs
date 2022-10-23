@@ -238,6 +238,7 @@ namespace Spartans.GameMode{
             if(changeEvent.Type == NetworkListEvent<int>.EventType.Value)
             {
                 _scores[changeEvent.Index].value = changeEvent.Value;
+                print("score was change for: " + changeEvent.Index + " by: " + changeEvent.Value);
                 //TeamScores[changeEvent.Index] = changeEvent.Value;
             }else{
                 print("SHOULDNT OCCUR");
@@ -253,10 +254,11 @@ namespace Spartans.GameMode{
         //This method should only ever be called from the server
         public void AddScore(Teams team, int valueToAdd)
         {
-            if(IsClient){
-                Debug.LogError("This method should not be called in a client instance");
+            if(!IsServer){
+                Debug.LogWarning("This method should not be called in a client instance");
                 return;
             }
+            //print("Added score of " + valueToAdd + " to team " + team);
             TeamScores[(int)team] += valueToAdd;
         }
 
