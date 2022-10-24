@@ -25,7 +25,6 @@ namespace Spartans{
         private Coroutine countdownRoutine;
         private float _timer;
 
-
         //Network Variables
         private NetworkList<PlayerLobbyData> connectedPlayers;
         private NetworkVariable<float> _startCountdown = new NetworkVariable<float>();
@@ -123,10 +122,10 @@ namespace Spartans{
             //}
             PlayerLobbyData newPlayer = new PlayerLobbyData(clientID, team, type, isReady);
             if(team == Teams.Red){
-                print("Added to red team");
+                //print("Added to red team");
                 redTeam.Add(clientID);
             }else if(team == Teams.Blue){
-                print("Added to blue team");
+                //print("Added to blue team");
                 blueTeam.Add(clientID);
             }
             //LobbySync.Instance.AddPlayerConnection(newPlayer);

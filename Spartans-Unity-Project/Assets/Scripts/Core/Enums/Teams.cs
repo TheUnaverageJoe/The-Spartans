@@ -6,7 +6,10 @@ namespace Spartans
 {
     public enum Teams
     {
+            None = -1,
             Red,
-            Blue
+            Blue,
+            Green,
+            Purple
     }
 }

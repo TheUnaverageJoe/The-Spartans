@@ -9,10 +9,12 @@ namespace Spartans.GameMode{
         protected int CurrentGameTime;
         protected int NumTeams;
         protected int[] Scores;
+        //protected List<System.Func<int, bool>> predicates;
 
         //**METHODS**
         //public abstract void Init();
         public abstract bool EndConditionsMet();
-        public abstract int CheckWinner();
+        public abstract Teams CheckWinner();
+        public abstract void ChangeScoreForTeam(int index, int value);
     }
 }

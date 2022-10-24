@@ -17,7 +17,7 @@ namespace Spartans.GameMode{
         }
         
         public override bool EndConditionsMet()
-        {
+        { 
             for(int i=0; i<NumTeams; i++)
             {
                 if(Scores[i] >= _requiredEliminations)
@@ -33,9 +33,10 @@ namespace Spartans.GameMode{
             }
 
             return false;
+            
         }
 
-        public override int CheckWinner()
+        public override Teams CheckWinner()
         {
             int IndexOfHighestScore = 0;
             bool isTie = false;
@@ -58,10 +59,15 @@ namespace Spartans.GameMode{
             }
             
             if(isTie){
-                return -1;
+                return (Teams)(-1);
             }else{
-                return IndexOfHighestScore; //If we have a winner return their team index
+                return (Teams)IndexOfHighestScore; //If we have a winner return their team index
             }
+        }
+
+        public override void ChangeScoreForTeam(int index, int value)
+        {
+            Scores[index] = value;
         }
     }
 }

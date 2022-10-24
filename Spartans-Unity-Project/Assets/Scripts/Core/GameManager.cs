@@ -71,11 +71,6 @@ namespace Spartans{
             SceneManager.LoadScene(MENU_SCENE_NAME);
         }
 
-        public override void OnNetworkSpawn()
-        {
-
-        }
-
         private void SceneEventHandler(SceneEvent sceneEvent)
         {
             if(sceneEvent.ClientsThatTimedOut != null && sceneEvent.ClientsThatTimedOut.Count>0){//sceneEvent.ClientsThatTimedOut.Count > 0
@@ -109,7 +104,7 @@ namespace Spartans{
 
                     if(!_canvasManager)
                     {
-                        print("Had to find canvas after load");
+                        //print("Had to find canvas after load");
                         _canvasManager = FindObjectOfType<CanvasManager>();
                         _canvasManager.Init();
                     }

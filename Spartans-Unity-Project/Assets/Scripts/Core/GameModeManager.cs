@@ -40,8 +40,9 @@ namespace Spartans.GameMode{
 
         //-------GameScene Variables-----------
         private Slider[] _scores;
-        private TMP_Text TimerText;
+        private TMP_Text _timerText;
         private GameModeBase _gameMode;
+        private TMP_Text _winnerText;
         float timeTillNextTimerUpdate;
 
 
@@ -53,6 +54,8 @@ namespace Spartans.GameMode{
 
         //consider making below var gamemode specific
         [SerializeField] private int MaxGameTime;
+        public event System.Action<Teams> OnGameOver;
+
 
         //Awake occurs in Lobby Scene
         void Awake(){
@@ -154,8 +157,8 @@ namespace Spartans.GameMode{
                 }
             }
             //initiallize for all game instances
-            UpdateGameMode(0, 0); //Initialize so it has a sprite
-            _currentGameMode = _gameModes[0]; 
+            UpdateGameMode(0, SelectedMode.Value); //Initialize so it has a sprite
+            _currentGameMode = _gameModes[SelectedMode.Value];
         }
 
         private void GetNextGameMode(){
@@ -187,7 +190,7 @@ namespace Spartans.GameMode{
         //only used for UI updating to show selected gamemode
         private void UpdateGameMode(int previousValue, int newValue)
         {
-            print("Game Mode Index of " + newValue);
+            //print("Game Mode Index of " + newValue);
             _gameModeBanner.sprite = _gameModes[newValue].verticalBanner;
         }
 
@@ -199,8 +202,10 @@ namespace Spartans.GameMode{
             _canvasManager = FindObjectOfType<CanvasManager>();
 
             Transform containerObjForGameModeUI = _canvasManager.transform.Find("TDM_UI").GetChild(0);
-            TimerText = containerObjForGameModeUI.GetComponentInChildren<TMP_Text>();
+            _timerText = containerObjForGameModeUI.GetComponentInChildren<TMP_Text>();
             _scores = containerObjForGameModeUI.GetComponentsInChildren<Slider>();
+            _winnerText = _canvasManager.transform.Find("GameOver").GetComponentInChildren<TMP_Text>();
+
 
             //print("SLiders found " + _scores.Length);
 
@@ -211,6 +216,8 @@ namespace Spartans.GameMode{
                 TeamScores.Add(0);
             }
             TeamScores.OnListChanged += UpdateTeamScore;
+            OnGameOver += NotifyGameOverClientRpc;
+            OnGameOver += PrintDebug;
             
             if(IsServer)
             {
@@ -230,7 +237,7 @@ namespace Spartans.GameMode{
 
             displayTime = string.Format("{0:00}", minute) + ":" + string.Format("{0:00}", second);
 
-            TimerText.text = displayTime;
+            _timerText.text = displayTime;
         }
 
         private void UpdateTeamScore(NetworkListEvent<int> changeEvent)
@@ -239,6 +246,7 @@ namespace Spartans.GameMode{
             {
                 _scores[changeEvent.Index].value = changeEvent.Value;
                 print("score was change for: " + changeEvent.Index + " by: " + changeEvent.Value);
+                _gameMode.ChangeScoreForTeam(changeEvent.Index, changeEvent.Value);
                 //TeamScores[changeEvent.Index] = changeEvent.Value;
             }else{
                 print("SHOULDNT OCCUR");
@@ -260,6 +268,22 @@ namespace Spartans.GameMode{
             }
             //print("Added score of " + valueToAdd + " to team " + team);
             TeamScores[(int)team] += valueToAdd;
+            if(_gameMode.EndConditionsMet())
+            {
+                OnGameOver?.Invoke(_gameMode.CheckWinner());
+            }
+        }
+
+        [ClientRpc]
+        public void NotifyGameOverClientRpc(Teams team)
+        {
+            _canvasManager.PushPage(_winnerText.transform.parent.GetComponent<PageUI>());
+            print("Winner is " + team);
+            _winnerText.text = $"Winner {team} Team";
+
+        }
+        private void PrintDebug(Teams team){
+            print("Debuging OnGameOver callback");
         }
 
     }
