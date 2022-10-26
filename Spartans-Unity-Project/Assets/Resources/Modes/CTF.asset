@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: CTF
   m_EditorClassIdentifier: 
   numberOfTeams: 2
+  targetValue: 2
   modeName: CTF
   verticalBanner: {fileID: 21300000, guid: 57460e080a13e8a46aaa1786d7b72389, type: 3}

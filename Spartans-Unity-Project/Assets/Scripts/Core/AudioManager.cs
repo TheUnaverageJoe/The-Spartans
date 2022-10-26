@@ -41,7 +41,7 @@ public class AudioManager : MonoBehaviour
             DontDestroyOnLoad(this);
         }else
         {
-            print("Destroyed an spawned audio manager");
+            //print("Destroyed an spawned audio manager");
             Destroy(this.gameObject);
         }
     }

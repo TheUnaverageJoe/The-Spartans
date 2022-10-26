@@ -43,7 +43,8 @@ namespace Spartans{
 
         void Start(){
             NetworkManager.SceneManager.OnSceneEvent += SceneEventHandler;
-            
+            NetworkManager.OnClientDisconnectCallback += OnClientDisconnected;
+
             if(activeState >= States.PreGame){
                 print("GameManager finding Canvas and Init()ing");
                 _canvasManager = FindObjectOfType<CanvasManager>();
@@ -70,6 +71,28 @@ namespace Spartans{
         private void OnClickBackCallback(){
             SceneManager.LoadScene(MENU_SCENE_NAME);
         }
+        private void SpawnPlayersFromLobby()
+        {
+            foreach(KeyValuePair<ulong, PlayerGameData> item in playerData)
+            {
+                Vector3 spawnLocation;
+                Quaternion startingRot;
+                if(item.Value.Team == Teams.Red)
+                {
+                    spawnLocation = new Vector3(Random.Range(30, 35), 2, Random.Range(-10, 10));
+                    startingRot = Quaternion.Euler(0, -90, 0);
+                }else
+                {
+                    spawnLocation = new Vector3(Random.Range(-30, -35), 2, Random.Range(-10, 10));
+                    startingRot = Quaternion.Euler(0, 90, 0);
+                }
+
+                //print($"Spawning {item.Value.Type} for client {item.Key} on {item.Value.Team} team");
+                GameObject spawningPlayer = Instantiate(_playerPrefabs[(int)item.Value.Type], spawnLocation, startingRot);
+                spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(item.Key);
+                spawningPlayer.GetComponent<Spartans.Players.PlayerController>().ChangeTeam(item.Value.Team);
+            }
+        }
 
         private void SceneEventHandler(SceneEvent sceneEvent)
         {
@@ -84,14 +107,14 @@ namespace Spartans{
             switch (sceneEvent.SceneEventType)
             {
                 case SceneEventType.LoadComplete:
-                    print("Scene name " + sceneEvent.SceneName);
+                    //print("Scene name " + sceneEvent.SceneName);
                     break;
 
                 case SceneEventType.UnloadComplete:
                     if(sceneEvent.SceneName == "Lobby"){
                         activeState = States.PreGame;
                     }
-                    print("Unloaded " + sceneEvent.SceneName + " Scene");
+                    //print("Unloaded " + sceneEvent.SceneName + " Scene");
                     break;
 
                 case SceneEventType.LoadEventCompleted:
@@ -111,25 +134,7 @@ namespace Spartans{
 
                     if(playerData.Count > 0)
                     {
-                        foreach(KeyValuePair<ulong, PlayerGameData> item in playerData)
-                        {
-                            Vector3 spawnLocation;
-                            Quaternion startingRot;
-                            if(item.Value.Team == Teams.Red)
-                            {
-                                spawnLocation = new Vector3(Random.Range(30, 35), 2, Random.Range(-10, 10));
-                                startingRot = Quaternion.Euler(0, -90, 0);
-                            }else
-                            {
-                                spawnLocation = new Vector3(Random.Range(-30, -35), 2, Random.Range(-10, 10));
-                                startingRot = Quaternion.Euler(0, 90, 0);
-                            }
-
-                            print($"Spawning {item.Value.Type} for client {item.Key} on {item.Value.Team} team");
-                            GameObject spawningPlayer = Instantiate(_playerPrefabs[(int)item.Value.Type], spawnLocation, startingRot);
-                            spawningPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(item.Key);
-                            spawningPlayer.GetComponent<Spartans.Players.PlayerController>().ChangeTeam(item.Value.Team);
-                        }
+                        SpawnPlayersFromLobby();
                     }
                     //called on Clients and server, used for initiallization at beginning of game scene
                     // which is only know after the scene finishes loading on all players
@@ -165,7 +170,15 @@ namespace Spartans{
             //onClickBack -= OnClickBackCallback;
             NetworkManager.SceneManager.OnSceneEvent -= SceneEventHandler;
         }
-        
+
+        private void OnClientDisconnected(ulong clientId)
+        {
+            if (clientId == NetworkManager.ServerClientId)
+            {
+                Debug.LogWarning("server shutting down");
+                SceneManager.LoadScene(MENU_SCENE_NAME, LoadSceneMode.Single);
+            }
+        }
      
     }
 }

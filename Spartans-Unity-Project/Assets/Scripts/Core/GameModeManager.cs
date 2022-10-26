@@ -90,7 +90,7 @@ namespace Spartans.GameMode{
             
             }else
             {
-                print("Number of GameModes found: " + _gameModes.Length);
+                //print("Number of GameModes found: " + _gameModes.Length);
             }
 
             if(!_gameModeBanner){
@@ -138,10 +138,6 @@ namespace Spartans.GameMode{
             }
         }
 
-        void FixedUpdate(){
-            //if(IsServer && _currentState >= States.Starting)
-            //TeamScores[0]++;
-        }
         public override void OnNetworkSpawn()
         {
             if(IsClient)
@@ -207,21 +203,20 @@ namespace Spartans.GameMode{
             _winnerText = _canvasManager.transform.Find("GameOver").GetComponentInChildren<TMP_Text>();
 
 
-            //print("SLiders found " + _scores.Length);
+            //print("Sliders found " + _scores.Length);
 
             for(int i=0; i<_currentGameMode.numberOfTeams ; i++)
             {
                 //print("I is:" + i);
-                _scores[i].maxValue = 10;
+                _scores[i].maxValue = _currentGameMode.targetValue;
                 TeamScores.Add(0);
             }
             TeamScores.OnListChanged += UpdateTeamScore;
             OnGameOver += NotifyGameOverClientRpc;
-            OnGameOver += PrintDebug;
             
             if(IsServer)
             {
-                _gameMode = new TDM(2, 10, MaxGameTime);
+                _gameMode = new TDM(2, _currentGameMode.targetValue, MaxGameTime);
                 _currentState = States.Starting;
                 TimeRemaining.Value = MaxGameTime;
             }
@@ -245,11 +240,15 @@ namespace Spartans.GameMode{
             if(changeEvent.Type == NetworkListEvent<int>.EventType.Value)
             {
                 _scores[changeEvent.Index].value = changeEvent.Value;
-                print("score was change for: " + changeEvent.Index + " by: " + changeEvent.Value);
-                _gameMode.ChangeScoreForTeam(changeEvent.Index, changeEvent.Value);
+                //print("score was change for: " + changeEvent.Index + " by: " + changeEvent.Value);
+                if(IsServer)
+                {
+                    _gameMode.ChangeScoreForTeam(changeEvent.Index, changeEvent.Value);
+                }
                 //TeamScores[changeEvent.Index] = changeEvent.Value;
             }else{
                 print("SHOULDNT OCCUR");
+                print("List Update for TeamScore of type: " + changeEvent.Type + " Value: " + changeEvent.Value);
             }
         }
 
@@ -278,13 +277,9 @@ namespace Spartans.GameMode{
         public void NotifyGameOverClientRpc(Teams team)
         {
             _canvasManager.PushPage(_winnerText.transform.parent.GetComponent<PageUI>());
-            print("Winner is " + team);
+            print("Winner is " + team + ", " + (int)team);
             _winnerText.text = $"Winner {team} Team";
 
         }
-        private void PrintDebug(Teams team){
-            print("Debuging OnGameOver callback");
-        }
-
     }
 }

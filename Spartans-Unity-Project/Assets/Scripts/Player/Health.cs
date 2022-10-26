@@ -19,7 +19,7 @@ namespace Spartans.Players{
 
         //int param is new health value
         public event System.Action<int> onHealthChanged;
-        public event System.Action onDie;
+        public event System.Action<Teams> onKilledBy;
         public event System.Action onRespawn;
 
 
@@ -29,7 +29,7 @@ namespace Spartans.Players{
             _playerController = playerController;
 
             //if(IsServer)
-            onDie += OnDieCallback;
+            onKilledBy += OnDieCallback;
 
             if(_healthDisplay == null){
                 print("floating health not ready!");
@@ -65,10 +65,10 @@ namespace Spartans.Players{
                 Debug.LogWarning("No Friendly Fire");
                 return;
             }
-            updateHealthClientRpc(damage);
+            updateHealthClientRpc(damage, userTeam);
             _currentHitpoints -= damage;
             onHealthChanged?.Invoke(_currentHitpoints);
-            if(_currentHitpoints <= 0) onDie?.Invoke();
+            if(_currentHitpoints <= 0) onKilledBy?.Invoke(userTeam);
             //deal damage
 
         }
@@ -82,11 +82,11 @@ namespace Spartans.Players{
         }
         */
         [ClientRpc]
-        public void updateHealthClientRpc(int damage){
+        public void updateHealthClientRpc(int damage, Teams team){
             if(IsServer) return;
             _currentHitpoints -= damage;
             onHealthChanged?.Invoke(_currentHitpoints);
-            if(_currentHitpoints <= 0) onDie?.Invoke();
+            if(_currentHitpoints <= 0) onKilledBy?.Invoke(team);
         }
 
         public int GetMaxHitpoints(){
@@ -96,9 +96,9 @@ namespace Spartans.Players{
             return _currentHitpoints;
         }
 
-        private void OnDieCallback(){
+        private void OnDieCallback(Teams killedByTeam){
             if(IsServer){
-                Spartans.GameMode.GameModeManager.Instance.AddScore(_playerController.GetTeamAssociation().Value, 1);
+                Spartans.GameMode.GameModeManager.Instance.AddScore(killedByTeam, 1);
                 timeOfDeath = _respawnTime;
                 _playerController._animationManager.SetParameter("dead", true);
             }

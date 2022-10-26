@@ -23,7 +23,7 @@ namespace Spartans.UI{
             _myHealth = _player.GetComponent<Health>();
 
             _myHealth.onHealthChanged += HandleOnHealthChange;
-            _myHealth.onDie += OnDieCallback;
+            _myHealth.onKilledBy += OnDieCallback;
 
             _nameText.text = _player.GetComponent<PlayerController>().playerName.ToString();
             //print($"{_nameText.text} ran Init()");
@@ -66,7 +66,7 @@ namespace Spartans.UI{
             print("Removed Listener");
         }
         */
-        private void OnDieCallback(){
+        private void OnDieCallback(Teams team){
             this.gameObject.SetActive(false);
         }
 

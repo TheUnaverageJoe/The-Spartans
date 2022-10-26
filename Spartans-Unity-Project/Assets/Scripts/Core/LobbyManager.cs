@@ -102,7 +102,7 @@ namespace Spartans{
         }
 
         private void NotifyClientConnected(ulong clientID){
-            print($"Client {clientID} connected");
+            //print($"Client {clientID} connected");
             LobbySync.Instance.StartButtonActive(false);
 
             if(IsServer){
@@ -130,7 +130,7 @@ namespace Spartans{
             }
             //LobbySync.Instance.AddPlayerConnection(newPlayer);
             connectedPlayers.Add(newPlayer);
-            print("Added player " + newPlayer.Id + " to lobby");
+            //print("Added player " + newPlayer.Id + " to lobby");
         }
         private void NotifyClientDisconnected(ulong clientID)
         {
@@ -159,22 +159,7 @@ namespace Spartans{
         private void PassOffToGameManager()
         {
             if(!IsServer) return;
-            /*
-            int counter = 0;
-            KeyValuePair<ulong, CharacterTypes>[] saved = new KeyValuePair<ulong, CharacterTypes>[playerCharacterSelections.Count];
-            foreach(KeyValuePair<ulong, CharacterTypes> entry in playerCharacterSelections)
-            {
-                //playerCharacterSelections.Remove(entry.Key);  Can do this if memory needs to be conserved
-                saved[counter] = entry;
-                counter+=1;
-                
-            }
-            GameManager.Instance.PopulatePlayerSelections(saved);
-            */
 
-
-            //trying new savedData static class strategy
-            //Explicitly call methods which the GameManager needs to run on scene start
             PlayerLobbyData[] playerDataArray = new PlayerLobbyData[connectedPlayers.Count];
             for(int i=0; i<connectedPlayers.Count; i++){
                 playerDataArray[i] = connectedPlayers[i];
@@ -201,34 +186,6 @@ namespace Spartans{
             PlayerLobbyData currentPlayerData = connectedPlayers[index];
             connectedPlayers[index] = new PlayerLobbyData(currentPlayerData.Id, currentPlayerData.Team, character, true);
             OfferStartIfAllReady();
-
-            /*
-            if(!playerCharacterSelections.ContainsKey(requestingClient))
-            {
-                playerCharacterSelections.Add(requestingClient, character);
-                
-                Teams teamAssignment = Teams.Red;
-                int clientEntryIndex = -1;
-                foreach(var item in connectedPlayers){
-                    if(item.Id == requestingClient){
-                        clientEntryIndex = connectedPlayers.IndexOf(item);
-                    }
-                    teamAssignment = redTeam.Contains(item.Id) ? Teams.Red : Teams.Blue;
-                }
-                
-                PlayerLobbyData newPlayer = new PlayerLobbyData(requestingClient, teamAssignment, character, true);
-                if(clientEntryIndex >= 0){
-                    connectedPlayers[clientEntryIndex] = newPlayer;
-                }
-
-                OfferStartIfAllReady();
-            }
-            else
-            {
-                print("Changing class not implimented");
-            }
-            */
-
         }
         public void RequestAssignCharacter(int character)
         {

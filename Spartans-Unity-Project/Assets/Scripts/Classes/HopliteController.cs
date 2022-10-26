@@ -61,7 +61,7 @@ namespace Spartans.Players{
                         Health _healthAffected = hit.transform.gameObject.GetComponent<Health>();
                         if(_healthAffected == GetComponent<Health>())
                         {
-                            print("You cant hit yourself silly");
+                            //print("You cant hit yourself silly");
                             continue;
                         }
                         //_healthAffected.TakeDamageServerRpc(_playerDamage);

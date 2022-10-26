@@ -9,6 +9,7 @@ namespace Spartans{
     {
         public int numberOfTeams;
         //public int maxTimeSeconds;
+        public int targetValue;
         public string modeName;
         public Sprite verticalBanner;
 

@@ -50,7 +50,7 @@ namespace Spartans.Players
             _classController = GetComponent<ClassController>();
             //previously in start
             _myHealth = GetComponent<Health>();
-            _myHealth.onDie += OnDieCallback;
+            _myHealth.onKilledBy += OnDieCallback;
             _myHealth.onRespawn += OnRespawnCallback;
 
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
@@ -223,7 +223,7 @@ namespace Spartans.Players
             }
         }
 
-        private void OnDieCallback(){
+        private void OnDieCallback(Teams team){
             this.GetComponent<Rigidbody>().useGravity = false;
             this.GetComponent<BoxCollider>().enabled = false;
             this.enabled = false;
@@ -239,6 +239,7 @@ namespace Spartans.Players
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            myTeam.OnValueChanged += SetTeamColor;
 
         }
         public override void OnNetworkDespawn()
@@ -264,12 +265,15 @@ namespace Spartans.Players
                 return true;
             }
         }
+
         public void ChangeTeam(Teams team)
         {
+            SetTeamColor(Teams.None, team);
             if(myTeam.Value == team) return;
 
             myTeam.Value = team;
         }
+
         public System.Nullable<Teams> GetTeamAssociation(){
             if(!IsServer){
                 Debug.LogError("GetTeamAssociation can only be called from server");
@@ -278,6 +282,25 @@ namespace Spartans.Players
 
             //print("myTeam var is: " + myTeam.Value);
             return myTeam.Value;
+        }
+        private void SetTeamColor(Teams prevTeam, Teams currentTeam)
+        {
+            Transform transformModel = transform.GetChild(1);
+            switch (currentTeam)
+            {
+                case Teams.Red:
+                    transformModel.GetChild(4).GetComponent<Renderer>().material.color = Color.red;
+                    break;
+                case Teams.Blue:
+                    transformModel.GetChild(4).GetComponent<Renderer>().material.color = Color.blue;
+                    break;
+                case Teams.Purple:
+                    transformModel.GetChild(4).GetComponent<Renderer>().material.color = Color.magenta;
+                    break;
+                case Teams.Green:
+                    transformModel.GetChild(4).GetComponent<Renderer>().material.color = Color.green;
+                    break;
+            }
         }
     }
 }

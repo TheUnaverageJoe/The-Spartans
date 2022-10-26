@@ -25,7 +25,7 @@ namespace Spartans.Players{
                 Instance = this;
                 DontDestroyOnLoad(this.gameObject);
             }else{
-                print("Stopped playerInput spawn");
+                //print("Stopped playerInput spawn");
                 Destroy(this.gameObject);
             }
             

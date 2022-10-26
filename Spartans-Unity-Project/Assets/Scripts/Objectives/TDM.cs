@@ -6,7 +6,7 @@ using Unity.Netcode;
 namespace Spartans.GameMode{
     public class TDM : GameModeBase
     {
-        private int _requiredEliminations = 10;
+        private int _requiredEliminations;
 
         public TDM(int teams, int reqKills, int maxTimeSeconds)
         {
@@ -22,13 +22,13 @@ namespace Spartans.GameMode{
             {
                 if(Scores[i] >= _requiredEliminations)
                 {
-                    System.Console.WriteLine("Win condition was met by team: " + i);
+                    //Debug.Log("Win condition was met by team: " + i);
                     return true;
                 }
             }
             if(CurrentGameTime >= MaxGameTime)
             {
-                System.Console.WriteLine("Time limit reached");
+                Debug.Log("Time limit reached");
                 return true;
             }
 
@@ -43,19 +43,19 @@ namespace Spartans.GameMode{
 
             for(int i=0; i<NumTeams; i++)
             {
-                if(Scores[i] == Scores[IndexOfHighestScore])
+                //Debug.Log("Checking team " + i + $"({(Teams)i})");
+                //Debug.Log("Highest score so far: " + Scores[IndexOfHighestScore] + " at index " + IndexOfHighestScore);
+                if(Scores[i] == Scores[IndexOfHighestScore] && i != 0)
                 {
+                    //Debug.Log($"team {i} score {Scores[i]} \n High score {Scores[IndexOfHighestScore]}");
                     isTie = true;
                 }
                 else if(Scores[i] > Scores[IndexOfHighestScore])
                 {
-                    if(isTie)
-                    {
-                        isTie = false;
-                    }
+                    isTie = false;
                     IndexOfHighestScore = i;
-                    
                 }
+                //Debug.Log("bool state " + isTie);
             }
             
             if(isTie){
