@@ -7,6 +7,7 @@ using TMPro;
 
 using Spartans.UI;
 using Spartans;
+using System;
 
 namespace Spartans.GameMode{
     ///Summary
@@ -54,6 +55,7 @@ namespace Spartans.GameMode{
 
         //consider making below var gamemode specific
         [SerializeField] private int MaxGameTime;
+        private GameTimer _gameTimer;
         public event System.Action<Teams> OnGameOver;
 
 
@@ -69,6 +71,8 @@ namespace Spartans.GameMode{
 
         //Start occurs during lobby scene
         void Start(){
+            _gameTimer = gameObject.AddComponent<GameTimer>();
+
             _canvasManager = FindObjectOfType<CanvasManager>();
             _gameModeBanner = _canvasManager.transform.Find("GameModeDisplay").GetComponent<Image>();
             TeamScores = new NetworkList<int>();
@@ -100,6 +104,7 @@ namespace Spartans.GameMode{
 
         void Update()
         {
+            /*
             if(_currentState == States.None){
                 return;
             }
@@ -136,6 +141,7 @@ namespace Spartans.GameMode{
                     print("Updated State to " + _currentState);
                 }
             }
+            */
         }
 
         public override void OnNetworkSpawn()
@@ -193,6 +199,7 @@ namespace Spartans.GameMode{
 
         //Called by GameManager after game scene has loaded to start preperations for game
         //Should ONLY be called 1 time
+        //Only called by Server
         public void StartAsSelectedMode(){
 
             _canvasManager = FindObjectOfType<CanvasManager>();
@@ -211,6 +218,8 @@ namespace Spartans.GameMode{
                 _scores[i].maxValue = _currentGameMode.targetValue;
                 TeamScores.Add(0);
             }
+
+            _gameTimer.OnSecondsChanged += ChangeGameTime;
             TeamScores.OnListChanged += UpdateTeamScore;
             OnGameOver += NotifyGameOverClientRpc;
             
@@ -219,7 +228,20 @@ namespace Spartans.GameMode{
                 _gameMode = new TDM(2, _currentGameMode.targetValue, MaxGameTime);
                 _currentState = States.Starting;
                 TimeRemaining.Value = MaxGameTime;
+
+                _gameTimer.StartTimer(MaxGameTime, () => {
+                    _currentState = States.InProgress;
+                    //print("Ran lambda function + " + _currentState);
+                    _gameTimer.StartTimer(114, () => {
+                        _currentState = States.Finished;
+                    });
+                });
             }
+        }
+
+        private void ChangeGameTime(int obj)
+        {
+            TimeRemaining.Value = _gameTimer.TimeInSeconds;
         }
 
         private void UpdateTimeRemaining(int previousValue, int newValue)
@@ -281,5 +303,14 @@ namespace Spartans.GameMode{
             _winnerText.text = $"Winner {team} Team";
 
         }
+
+        private void OnClientDisconnected(ulong clientId)
+        {
+            if (clientId == NetworkManager.ServerClientId)
+            {
+                Destroy(this.gameObject); 
+            }
+        }
+
     }
 }

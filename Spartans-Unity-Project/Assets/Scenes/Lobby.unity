@@ -10768,7 +10768,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7325974599030213545, guid: 3bd917570f7b2624ebeb64e26703c376, type: 3}
       propertyPath: MaxGameTime
-      value: 20
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7325974599030213547, guid: 3bd917570f7b2624ebeb64e26703c376, type: 3}
       propertyPath: m_Name

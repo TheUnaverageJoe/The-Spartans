@@ -65,6 +65,7 @@ namespace Spartans{
                 Destroy(NetworkManager.Singleton.gameObject);
             }
             SceneManager.LoadScene(MENU_SCENE_NAME);
+            Destroy(GameModeManager.Instance.gameObject); //destroy for Server
             Destroy(this.gameObject);
         }
 
@@ -176,6 +177,8 @@ namespace Spartans{
             if (clientId == NetworkManager.ServerClientId)
             {
                 Debug.LogWarning("server shutting down");
+                Destroy(NetworkManager.gameObject);
+                Destroy(GameModeManager.Instance.gameObject); //destroy for clients
                 SceneManager.LoadScene(MENU_SCENE_NAME, LoadSceneMode.Single);
             }
         }
