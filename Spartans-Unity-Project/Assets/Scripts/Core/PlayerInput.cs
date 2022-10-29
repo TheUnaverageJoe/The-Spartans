@@ -16,6 +16,7 @@ namespace Spartans.Players{
         public bool primary{get; private set;}
         public bool secondary{get; private set;}
         public bool special{get; private set;}
+        public bool interact{get; private set;}
 
         
         void Awake(){
@@ -63,8 +64,7 @@ namespace Spartans.Players{
             secondary = Input.GetButtonDown("Fire2");
             //special = Input.GetButtonDown("Fire3");
             special = Input.GetKeyDown(KeyCode.Q);
-            
-
+            interact = Input.GetKeyDown(KeyCode.F);
         }
     }
 }

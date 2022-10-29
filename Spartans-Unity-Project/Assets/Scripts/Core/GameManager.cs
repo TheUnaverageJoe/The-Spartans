@@ -29,7 +29,7 @@ namespace Spartans{
         public States activeState{get; private set;}
         private Scene m_LoadedScene;
         
-        //only for server Use
+        //only for server use
         private Dictionary<ulong, PlayerGameData> playerData = new Dictionary<ulong, PlayerGameData>();
 
         void Awake(){

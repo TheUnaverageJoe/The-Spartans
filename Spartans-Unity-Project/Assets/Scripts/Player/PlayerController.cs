@@ -33,6 +33,7 @@ namespace Spartans.Players
         private Animator _animator;
         private ClassController _classController;
         private Health _myHealth;
+        private FlagCarrier _flagCarrier;
         
 
         public void Awake(){
@@ -48,6 +49,8 @@ namespace Spartans.Players
             playerName = "Player " + NetworkObjectId;
             _animator = GetComponentInChildren<Animator>();
             _classController = GetComponent<ClassController>();
+            _flagCarrier = GetComponent<FlagCarrier>();
+            
             //previously in start
             _myHealth = GetComponent<Health>();
             _myHealth.onKilledBy += OnDieCallback;
@@ -65,6 +68,7 @@ namespace Spartans.Players
             
             _myHealth.Init(this);
             _classController.Init(this);
+            _flagCarrier.Init();
         }
         
         // Update is called once per frame
@@ -83,6 +87,10 @@ namespace Spartans.Players
             if(PlayerInput.Instance.escape)
             {
                 TogglePauseMenu();
+            }
+            if(PlayerInput.Instance.interact)
+            {
+                _flagCarrier.InteractFlag();
             }
 
             //Jump
