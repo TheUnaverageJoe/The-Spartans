@@ -68,7 +68,7 @@ namespace Spartans.Players
             
             _myHealth.Init(this);
             _classController.Init(this);
-            _flagCarrier.Init();
+            _flagCarrier.Init(this);
         }
         
         // Update is called once per frame
