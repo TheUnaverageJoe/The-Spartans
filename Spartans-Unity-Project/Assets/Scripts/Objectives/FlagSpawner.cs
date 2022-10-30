@@ -15,7 +15,7 @@ namespace Spartans.GameMode
         private GameObject _flag;
 
         // Start is called before the first frame update
-        void Start()
+        public void Init()
         {
             if(!NetworkManager.Singleton.IsServer) return;
             _flag = NetworkManager.Instantiate(_flagPrefab, Position, Quaternion.Euler(Rotation.x, Rotation.y, Rotation.z));

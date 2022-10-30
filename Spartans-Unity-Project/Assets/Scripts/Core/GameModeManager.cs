@@ -44,7 +44,8 @@ namespace Spartans.GameMode{
         private TMP_Text _timerText;
         private GameModeBase _gameMode;
         private TMP_Text _winnerText;
-        float timeTillNextTimerUpdate;
+        private FlagSpawner[] _flagSpawners;
+        //float timeTillNextTimerUpdate;
 
 
         //Network Variables for syncing
@@ -193,7 +194,8 @@ namespace Spartans.GameMode{
         private void UpdateGameMode(int previousValue, int newValue)
         {
             //print("Game Mode Index of " + newValue);
-            _gameModeBanner.sprite = _gameModes[newValue].verticalBanner;
+            _currentGameMode = _gameModes[newValue];
+            _gameModeBanner.sprite = _currentGameMode.verticalBanner;  
         }
 
 
@@ -208,24 +210,26 @@ namespace Spartans.GameMode{
             _timerText = containerObjForGameModeUI.GetComponentInChildren<TMP_Text>();
             _scores = containerObjForGameModeUI.GetComponentsInChildren<Slider>();
             _winnerText = _canvasManager.transform.Find("GameOver").GetComponentInChildren<TMP_Text>();
+            _flagSpawners = FindObjectsOfType<FlagSpawner>();
 
-
-            //print("Sliders found " + _scores.Length);
-
-            for(int i=0; i<_currentGameMode.numberOfTeams ; i++)
+            if(IsServer)
             {
-                //print("I is:" + i);
-                _scores[i].maxValue = _currentGameMode.targetValue;
-                TeamScores.Add(0);
+                for(int i=0; i<_currentGameMode.numberOfTeams; i++)
+                {
+                    _scores[i].maxValue = _currentGameMode.targetValue;
+                    TeamScores.Add(0);
+                }
             }
 
             _gameTimer.OnSecondsChanged += ChangeGameTime;
             TeamScores.OnListChanged += UpdateTeamScore;
             OnGameOver += NotifyGameOverClientRpc;
             
+            InitGameMode(_currentGameMode.modeName);
+
             if(IsServer)
             {
-                _gameMode = new TDM(2, _currentGameMode.targetValue, MaxGameTime);
+                //_gameMode = new TDM(2, _currentGameMode.targetValue, MaxGameTime);
                 _currentState = States.Starting;
                 TimeRemaining.Value = MaxGameTime;
 
@@ -309,6 +313,36 @@ namespace Spartans.GameMode{
             if (clientId == NetworkManager.ServerClientId)
             {
                 Destroy(this.gameObject); 
+            }
+        }
+
+        private void InitGameMode(string modeName)
+        {
+            switch(modeName)
+            {
+                case "TDM":
+                    if(IsServer)
+                    {
+                        _gameMode = new TDM(_currentGameMode.numberOfTeams, _currentGameMode.targetValue, MaxGameTime);
+                    }
+                    foreach(FlagSpawner spawner in _flagSpawners)
+                    {
+                        spawner.gameObject.SetActive(false);
+                    }
+                    break;
+                case "CTF":
+                    if(IsServer)
+                    {
+                        _gameMode = new CTF(_currentGameMode.numberOfTeams, _currentGameMode.targetValue, MaxGameTime);
+                        foreach(FlagSpawner spawner in _flagSpawners)
+                        {
+                            spawner.Init();
+                        }
+                    }
+                    break;
+                default:
+                    Debug.LogWarning("GameMode name not recognized");
+                    break;
             }
         }
 

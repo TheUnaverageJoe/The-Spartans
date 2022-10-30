@@ -6,8 +6,8 @@ namespace Spartans.GameMode{
     public abstract class GameModeBase
     {
         protected int MaxGameTime;
-        protected int CurrentGameTime;
         protected int NumTeams;
+        protected int _requiredScore;
         protected int[] Scores;
         //protected List<System.Func<int, bool>> predicates;
 

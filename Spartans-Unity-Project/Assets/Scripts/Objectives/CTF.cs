@@ -1,31 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Netcode;
 
-namespace Spartans.GameMode{
-    public class TDM : GameModeBase
+namespace Spartans.GameMode
+{
+    public class CTF : GameModeBase
     {
-        public TDM(int teams, int reqKills, int maxTimeSeconds)
+        public CTF(int teams, int reqCaptures, int maxTimeSeconds)
         {
             NumTeams = teams;
-            _requiredScore = reqKills;
+            _requiredScore = reqCaptures;
             MaxGameTime = maxTimeSeconds;
             Scores = new int[teams];
         }
-        
-        public override bool EndConditionsMet()
-        { 
-            for(int i=0; i<NumTeams; i++)
-            {
-                if(Scores[i] >= _requiredScore)
-                {
-                    //Debug.Log("Win condition was met by team: " + i);
-                    return true;
-                }
-            }
 
-            return false;  
+        public override void ChangeScoreForTeam(int index, int value)
+        {
+            Scores[index] = value;
         }
 
         public override Teams CheckWinner()
@@ -57,9 +48,18 @@ namespace Spartans.GameMode{
             }
         }
 
-        public override void ChangeScoreForTeam(int index, int value)
-        {
-            Scores[index] = value;
+        public override bool EndConditionsMet()
+        { 
+            for(int i=0; i<NumTeams; i++)
+            {
+                if(Scores[i] >= _requiredScore)
+                {
+                    //Debug.Log("Win condition was met by team: " + i);
+                    return true;
+                }
+            }
+
+            return false;  
         }
     }
 }
