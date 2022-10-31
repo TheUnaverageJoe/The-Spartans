@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Spartans.GameMode;
 
 using Unity.Netcode;
 
@@ -29,10 +30,32 @@ namespace Spartans.Players{
 
         private void OnTriggerEnter(Collider other)
         {
+            if(!IsServer) return;
+
             if(other.tag == "Flag")
             {
                 //print("Touched flag");
                 _triggerTouched = other;
+            }
+            if(other.tag == "FlagSpawner")
+            {
+                print("Carrier touched Spawner");
+                PlayerController player;
+                if(TryGetComponent<PlayerController>(out player))
+                {
+                    //player.GetTeamAssociation();
+                    if(player.GetTeamAssociation() == other.GetComponent<FlagSpawner>().GetTeamAssociation())
+                    {
+                        if(HaveFlag && Flag != null && Flag.Home.GetTeamAssociation() != player.GetTeamAssociation())
+                        {
+                            print("Captrured flag " + Flag.Home.GetTeamAssociation());
+                            DropFlag();
+                            Flag.Home.ResetFlag();
+                            Flag = null;
+                            GameModeManager.Instance.AddScore(player.GetTeamAssociation().Value, 1);
+                        }
+                    }
+                }
             }
         }
         private void OnTriggerExit(Collider other)
@@ -53,9 +76,7 @@ namespace Spartans.Players{
             }
             if(HaveFlag)
             {
-                Flag.transform.parent = null;
-                HaveFlag = false;
-                Flag.DroppedFlag();
+                DropFlag();
             }
             else
             {
@@ -77,9 +98,7 @@ namespace Spartans.Players{
         {
             if(HaveFlag)
             {
-                Flag.transform.parent = null;
-                HaveFlag = false;
-                Flag.DroppedFlag();
+                DropFlag();
             }
             else
             {
@@ -101,6 +120,13 @@ namespace Spartans.Players{
         {
             //Follow up to send sound to only player which grabbed flag
             AudioManager.Instance.PlayAudio(AudioManager.AudioChannels.Channel2, AudioManager.SoundClipsIndex.score_SFX);
+        }
+
+        private void DropFlag()
+        {
+            Flag.transform.parent = null;
+            HaveFlag = false;
+            Flag.DroppedFlag();
         }
     }
 }

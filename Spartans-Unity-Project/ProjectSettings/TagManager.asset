@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Spawn1
   - Flag
+  - FlagSpawner
   layers:
   - Default
   - TransparentFX

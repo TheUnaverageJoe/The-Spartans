@@ -212,14 +212,16 @@ namespace Spartans.GameMode{
             _winnerText = _canvasManager.transform.Find("GameOver").GetComponentInChildren<TMP_Text>();
             _flagSpawners = FindObjectsOfType<FlagSpawner>();
 
-            if(IsServer)
+            
+            for(int i=0; i<_currentGameMode.numberOfTeams; i++)
             {
-                for(int i=0; i<_currentGameMode.numberOfTeams; i++)
+                _scores[i].maxValue = _currentGameMode.targetValue;
+                if(IsServer)
                 {
-                    _scores[i].maxValue = _currentGameMode.targetValue;
                     TeamScores.Add(0);
                 }
             }
+            
 
             _gameTimer.OnSecondsChanged += ChangeGameTime;
             TeamScores.OnListChanged += UpdateTeamScore;

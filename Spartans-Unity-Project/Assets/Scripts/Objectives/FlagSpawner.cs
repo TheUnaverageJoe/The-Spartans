@@ -13,6 +13,7 @@ namespace Spartans.GameMode
         [SerializeField] private Vector3 Rotation;
 
         private GameObject _flag;
+        private Flag Flag;
 
         // Start is called before the first frame update
         public void Init()
@@ -21,11 +22,13 @@ namespace Spartans.GameMode
             _flag = NetworkManager.Instantiate(_flagPrefab, Position, Quaternion.Euler(Rotation.x, Rotation.y, Rotation.z));
             _flag.GetComponent<NetworkObject>().Spawn();
 
-            _flag.GetComponent<Flag>().Init(this);
+            Flag = _flag.GetComponent<Flag>();
+            Flag.Init(this);
         }
 
         public void ResetFlag()
         {
+            Flag.DroppedFlag();
             _flag.transform.position = Position;
             _flag.transform.rotation = Quaternion.Euler(Rotation.x, Rotation.y, Rotation.z);
         }
