@@ -85,7 +85,6 @@ namespace Spartans.Players{
         public override void PrimaryAttack()
         {
             AttackServerRpc();
-            //_playerController._animationManager.SetParameter("attack", true);
             _attackOnCooldown = true;
             StartCoroutine(ResetAttackCooldown());
         }
