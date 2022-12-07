@@ -284,6 +284,9 @@ namespace Spartans.GameMode{
             SelectedMode.OnValueChanged -= UpdateGameMode;
             TimeRemaining.OnValueChanged -= UpdateTimeRemaining;
             TeamScores.OnListChanged -= UpdateTeamScore;
+            OnGameOver -= NotifyGameOverClientRpc;
+            _gameTimer.OnSecondsChanged -= ChangeGameTime;
+            Instance = null;
         }
 
         //This method should only ever be called from the server
@@ -312,8 +315,10 @@ namespace Spartans.GameMode{
 
         private void OnClientDisconnected(ulong clientId)
         {
+            print("client DC");
             if (clientId == NetworkManager.ServerClientId)
             {
+                print("destroyed GameMode Manager");
                 Destroy(this.gameObject); 
             }
         }

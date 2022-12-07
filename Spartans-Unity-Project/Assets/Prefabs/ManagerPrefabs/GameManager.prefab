@@ -48,7 +48,7 @@ MonoBehaviour:
   _playerPrefabs:
   - {fileID: 1771422829377585750, guid: 731f87f4c37807b419d49c6c305565d7, type: 3}
   - {fileID: 4872088991276116381, guid: 22f6b6b329497b8418b47597209cd7ac, type: 3}
-  _input: {fileID: 0}
+  - {fileID: 2471870912812045740, guid: a3bd04d454842e74eb380f9c40683a1c, type: 3}
   _mainCamera: {fileID: 0}
 --- !u!114 &3702052154333532001
 MonoBehaviour:

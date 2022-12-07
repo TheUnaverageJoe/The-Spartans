@@ -14,7 +14,7 @@ namespace Spartans.Players{
         [SerializeField] private LayerMask _aimColliderMask = new LayerMask();
 
         [SerializeField]private int _playerDamage;
-        private PlayerController _playerController;
+        //private PlayerController _playerController;
         private RaycastHit[] allHit = new RaycastHit[0];
         
         private RaycastHit _lastAttackedObject;
@@ -25,8 +25,10 @@ namespace Spartans.Players{
         public override void Init(PlayerController playerController){
             _playerController = playerController;
             _rb = GetComponent<Rigidbody>();
-            //onAttackStart += PrimaryAttack;
-            //onSecondaryAttackStart += SecondaryAttack;
+
+            InputManager.Instance.OnPrimary += PrimaryAttack;
+            InputManager.Instance.OnSecondary += SecondaryAttack;
+            InputManager.Instance.OnSpecial += SpecialAttack;
         }
 
         // Update is called once per frame
@@ -35,18 +37,22 @@ namespace Spartans.Players{
             Debug.DrawRay(handRef.transform.position, handRef.transform.forward*3, Color.magenta, 0.25f);
             if(!IsLocalPlayer) return;
 
+            /*
             if(PlayerInput.Instance.primary && !_attackOnCooldown){
                 //onAttackStart.Invoke();
                 PrimaryAttack();
             }
+            
             if(PlayerInput.Instance.secondary && !_secondaryAttackOnCooldown){
                 //onSecondaryAttackStart?.Invoke();
                 SecondaryAttack();
             }
+            
             if(PlayerInput.Instance.special){
                 SpecialAttack();
                 _playerController.JumpStarted();
             }
+            */
         }
         void FixedUpdate(){
             if(!IsServer){
@@ -79,35 +85,51 @@ namespace Spartans.Players{
                     _rb.AddForce(Vector3.down*30, ForceMode.Acceleration);
                 }else{
                     _leaping = false;
+                    _playerController._animationManager.SetParameter("leaping", false);
                 }
             }
         }
         public override void PrimaryAttack()
         {
+            if(_attackOnCooldown) return;
+
             AttackServerRpc();
             _attackOnCooldown = true;
             StartCoroutine(ResetAttackCooldown());
         }
         public override void SecondaryAttack()
         {
+            if(_secondaryAttackOnCooldown) return;
+
             SecondaryAttackServerRpc();
             _secondaryAttackOnCooldown = true;
             StartCoroutine(ResetSecondaryAttackCooldown());
         }
         public override void SpecialAttack()
         {
+            if(_specialAttackOnCooldown || _playerController.IsAirborn()) return;
+
             SpecialAttackServerRpc();
+            _specialAttackOnCooldown = true;
+            StartCoroutine(ResetSpecialAttackCooldown());
         }
 
-        IEnumerator ResetAttackCooldown(){
+        IEnumerator ResetAttackCooldown()
+        {
             yield return new WaitForSeconds(1);
             _playerController._animationManager.SetParameter("attack", false);
             _attackOnCooldown = false;
             _hitPlayers.Clear();
         }
-        IEnumerator ResetSecondaryAttackCooldown(){
+        IEnumerator ResetSecondaryAttackCooldown()
+        {
             yield return new WaitForSeconds(3);
             _secondaryAttackOnCooldown = false;
+        }
+        IEnumerator ResetSpecialAttackCooldown()
+        {
+            yield return new WaitForSeconds(2);
+            _specialAttackOnCooldown = false;
         }
 
         [ServerRpc]
@@ -143,10 +165,19 @@ namespace Spartans.Players{
         {
             _playerController.JumpStarted();
             _leaping = true;
+            _playerController._animationManager.SetParameter("leaping", true);
+
             _rb.AddForce(transform.TransformDirection(Vector3.forward)*30, ForceMode.VelocityChange);
             _rb.AddForce(Vector3.up*30, ForceMode.VelocityChange);
 
             //_rb.AddForce(-transform.TransformDirection(Vector3.forward)*10, ForceMode.Acceleration);
+        }
+
+        void OnDisable()
+        {
+            InputManager.Instance.OnPrimary -= PrimaryAttack;
+            InputManager.Instance.OnSecondary -= SecondaryAttack;
+            InputManager.Instance.OnSpecial -= SpecialAttack;
         }
 
     }

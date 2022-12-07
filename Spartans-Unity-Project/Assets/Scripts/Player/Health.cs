@@ -9,36 +9,36 @@ namespace Spartans.Players{
     {
         [SerializeField]private int _maxHitpoints;
         [SerializeField] private int _currentHitpoints;
-        PlayerController _playerController;
-        FloatingHealth _healthDisplay;
         [SerializeField] private float _respawnTime = 4;
+        PlayerController _playerController;
+        //SFloatingHealth _healthDisplay;
         private float timeOfDeath = 0;
-        private int _previousHitpoints;
+        //private int _previousHitpoints;
 
 
 
         //int param is new health value
-        public event System.Action<int> onHealthChanged;
-        public event System.Action<Teams> onKilledBy;
-        public event System.Action onRespawn;
+        public event System.Action<int> OnHealthChanged;
+        public event System.Action<Teams> OnKilledBy;
+        public event System.Action OnRespawn;
 
 
         //Stand in for Awake and Start, Initialization method called from Player.cs
         public void Init(PlayerController playerController){
-            _healthDisplay = GetComponentInChildren<FloatingHealth>();
+            //_healthDisplay = GetComponentInChildren<FloatingHealth>();
             _playerController = playerController;
 
             //if(IsServer)
-            onKilledBy += OnDieCallback;
+            OnKilledBy += OnDieCallback;
 
-            if(_healthDisplay == null){
-                print("floating health not ready!");
-                return;
-            }
-            _healthDisplay.Init();
+            //if(_healthDisplay == null){
+            //    print("floating health not ready!");
+            //    return;
+            //}
+            //_healthDisplay.Init();
 
             //need to invoke after healthDisplay is setup to get it to update
-            onHealthChanged?.Invoke(_maxHitpoints);
+            OnHealthChanged?.Invoke(_maxHitpoints);
         }
 
         public void FixedUpdate(){
@@ -65,28 +65,20 @@ namespace Spartans.Players{
                 Debug.LogWarning("No Friendly Fire");
                 return;
             }
-            updateHealthClientRpc(damage, userTeam);
+            UpdateHealthClientRpc(damage, userTeam);
             _currentHitpoints -= damage;
-            onHealthChanged?.Invoke(_currentHitpoints);
-            if(_currentHitpoints <= 0) onKilledBy?.Invoke(userTeam);
+            OnHealthChanged?.Invoke(_currentHitpoints);
+            if(_currentHitpoints <= 0) OnKilledBy?.Invoke(userTeam);
             //deal damage
 
         }
-        /*
-        [ServerRpc(RequireOwnership = false)]
-        public void TakeDamageServerRpc(int damage){
-            updateHealthClientRpc(damage);
-            _currentHitpoints -= damage;
-            onHealthChanged?.Invoke(_currentHitpoints);
-            if(_currentHitpoints <= 0) onDie?.Invoke();
-        }
-        */
+
         [ClientRpc]
-        public void updateHealthClientRpc(int damage, Teams team){
+        public void UpdateHealthClientRpc(int damage, Teams team){
             if(IsServer) return;
             _currentHitpoints -= damage;
-            onHealthChanged?.Invoke(_currentHitpoints);
-            if(_currentHitpoints <= 0) onKilledBy?.Invoke(team);
+            OnHealthChanged?.Invoke(_currentHitpoints);
+            if(_currentHitpoints <= 0) OnKilledBy?.Invoke(team);
         }
 
         public int GetMaxHitpoints(){
@@ -106,21 +98,24 @@ namespace Spartans.Players{
         //Respawn is only called by the server hence why only a 
         //  clientRpc exists for respawning and not a serverRpc
         private void Respawn(){
-            _healthDisplay.gameObject.SetActive(true);
+            //_healthDisplay.gameObject.SetActive(true);
             _currentHitpoints = _maxHitpoints;
+            OnHealthChanged?.Invoke(_maxHitpoints);
+            OnRespawn.Invoke();
             _playerController._animationManager.SetParameter("dead", false);
-            onHealthChanged?.Invoke(_maxHitpoints);
-            onRespawn.Invoke();
 
             RespawnClientRpc();
         }
         [ClientRpc]
         public void RespawnClientRpc(){
             if(IsServer) return;
-            _healthDisplay.gameObject.SetActive(true);
+            //_healthDisplay.gameObject.SetActive(true);
             _currentHitpoints = _maxHitpoints;
-            onHealthChanged?.Invoke(_maxHitpoints);
-            onRespawn.Invoke();
+            OnHealthChanged?.Invoke(_maxHitpoints);
+            OnRespawn.Invoke();
+        }
+        void OnDisable(){
+            OnKilledBy -= OnDieCallback;
         }
     }
 }

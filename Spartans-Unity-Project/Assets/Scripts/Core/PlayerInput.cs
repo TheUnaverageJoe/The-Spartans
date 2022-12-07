@@ -10,6 +10,7 @@ namespace Spartans.Players{
         public float mouseX{get; private set;}
         public float mouseY{get; private set;}
 
+        public bool sprint{get; private set;}
         public bool jump{get; private set;}
         public bool escape{get; private set;}
         public bool tab{get; private set;}
@@ -57,6 +58,7 @@ namespace Spartans.Players{
             mouseY = Input.GetAxis("Mouse Y");
 
             jump = Input.GetButtonDown("Jump");
+            sprint = Input.GetButton("Sprint");
             escape = Input.GetButtonDown("Escape");
             tab = Input.GetKeyDown(KeyCode.Tab);
 

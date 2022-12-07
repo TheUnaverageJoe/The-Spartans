@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Cinemachine;
 using Spartans.UI;
+using UnityEngine.InputSystem;
 
 namespace Spartans.Players
 {
@@ -21,8 +22,9 @@ namespace Spartans.Players
         [SerializeField] private float _moveSpeed = 5f;
         [SerializeField] private float _MAX_SPEED = 8.0f;
         [SerializeField] private float _mouseSens = 1.0f;
-        [SerializeField] private Vector3 _lastSentInput;
-        [SerializeField] private Vector3 input;
+        private Vector3 input;
+        [SerializeField] private Vector2 ClientInput;
+        private bool _sprinting;
 
         
         private NetworkVariable<Teams> myTeam = new NetworkVariable<Teams>();
@@ -30,34 +32,44 @@ namespace Spartans.Players
         private GameManager _gameManager;
         private CanvasManager _HUD;
         private Rigidbody _rigidbody;
-        private Animator _animator;
         private ClassController _classController;
         private Health _myHealth;
         private FlagCarrier _flagCarrier;
-        
 
-        public void Awake(){
+        private void Init()
+        {
             _rigidbody = GetComponent<Rigidbody>();
             _myHealth = GetComponent<Health>();
             _animationManager = GetComponent<AnimationManager>();
+            _classController = GetComponent<ClassController>();
+            _flagCarrier = GetComponent<FlagCarrier>();
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager._canvasManager;
             _pauseScreen = _HUD.transform.Find("PauseScreen").GetComponent<PageUI>();
         }
 
-        public void Start(){
-            playerName = "Player " + NetworkObjectId;
-            _animator = GetComponentInChildren<Animator>();
-            _classController = GetComponent<ClassController>();
-            _flagCarrier = GetComponent<FlagCarrier>();
-            
-            //previously in start
-            _myHealth = GetComponent<Health>();
-            _myHealth.onKilledBy += OnDieCallback;
-            _myHealth.onRespawn += OnRespawnCallback;
+        public void Start(){   
+            if(NetworkManager.Singleton == null)
+            {
+                Debug.LogWarning("Player Controller started as offline");
+                Init();
+            }
+            //_myHealth = GetComponent<Health>();
+            _myHealth.OnKilledBy += OnDieCallback;
+            _myHealth.OnRespawn += OnRespawnCallback;
 
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             if(IsClient && IsOwner){
+                //PlayerControls.PlayerActions inputEvents = InputManager.Instance.CurrentActionMap();
+                //inputEvents.Interact.performed += TryInteract;
+                InputManager.Instance.OnInteract += TryInteract;
+                InputManager.Instance.OnEscape += Escape;
+                InputManager.Instance.OnJump += TryJump;
+
+                InputManager.Instance.OnMove += UpdateMoveInput;
+                InputManager.Instance.OnLook += Look;
+                InputManager.Instance.OnSprint += Sprint;
+
                 PlayerCameraFollow.Instance.FollowPlayer(transform.GetChild(0).transform);
                 PlayerCameraFollow.Instance.LookAtPlayer(transform.GetChild(0).transform);
                 transform.GetComponentInChildren<FloatingHealth>().camTransform = PlayerCameraFollow.Instance.camera.transform;
@@ -70,43 +82,63 @@ namespace Spartans.Players
             _classController.Init(this);
             _flagCarrier.Init(this);
         }
-        
-        // Update is called once per frame
-        void Update()
+
+        public override void OnNetworkSpawn()
         {
-            if(_animationManager == null || _animator == null){
+            Init();
+            playerName = NetworkObjectId.ToString();
+            myTeam.OnValueChanged += SetTeamColor;
+            //print("States SCOL: " + IsServer + IsClient + IsOwner + IsLocalPlayer);
+        }
+        //InputAction.CallbackContext context
+        private void TryInteract()
+        {
+            _flagCarrier.InteractFlag();
+        }
 
-                print("Assign an animator/animationManager dummy!!!");
-                return;
-            }
-            //Not player character of this client session
-            if(!IsLocalPlayer){
-                return;
-            }
-
-            if(PlayerInput.Instance.escape)
-            {
-                TogglePauseMenu();
-            }
-            if(PlayerInput.Instance.interact)
-            {
-                _flagCarrier.InteractFlag();
-            }
-
-            //Jump
-            if(PlayerInput.Instance.jump && _canJump && _grounded){
+        private void Escape()
+        {
+            TogglePauseMenu();
+        }
+        private void TryJump()
+        {
+            if(_canJump && _grounded){
                 RequestJumpServerRpc();
                 // _canJump = false;
                 // _grounded = false;
             }
+        }
+        private void Look(Vector2 vector2)
+        {
+            //print("updated look");
+            RequestRotationServerRpc(vector2.x*_mouseSens, -vector2.y*_mouseSens);
+        }
 
-            //Update rotation
-            requestRotationServerRpc(PlayerInput.Instance.mouseX*_mouseSens, -PlayerInput.Instance.mouseY*_mouseSens);
-            
-            //Update movement
-            input = PlayerInput.Instance.movementDir;
-            if(input != _lastSentInput){
-                _lastSentInput = input;
+        private void UpdateMoveInput(Vector2 vector2)
+        {
+            SendMovementInputServerRpc(vector2);
+        }
+        private void Sprint()
+        {
+            if(!_sprinting){
+                _MAX_SPEED = _MAX_SPEED*5;
+                _sprinting = true;
+            }else{
+                _MAX_SPEED = _MAX_SPEED/5;
+                _sprinting = false;
+            }
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            if(_animationManager == null){
+
+                print("Assign an animationManager dummy!!!");
+                return;
+            }
+            if(IsServer){
+                Move(ClientInput);
             }
         }
 
@@ -118,8 +150,14 @@ namespace Spartans.Players
             }
             if(IsLocalPlayer){
                 CheckGrounded();
-                requestMoveServerRpc(input);
+                //requestMoveServerRpc(input);
             }
+        }
+
+        [ServerRpc]
+        private void SendMovementInputServerRpc(Vector2 input)
+        {
+            this.ClientInput = input;
         }
 
     
@@ -128,7 +166,6 @@ namespace Spartans.Players
             JumpStarted();
             Vector3 horizPlane = new Vector3(_rigidbody.velocity.x, 0, _rigidbody.velocity.z);
             _rigidbody.AddForce(transform.up * _jumpForce, ForceMode.VelocityChange);
-            //StartCoroutine(ResetJump());
         }
 
         [ServerRpc]
@@ -136,12 +173,11 @@ namespace Spartans.Players
             if(!_grounded) return;
             JumpStarted();
             _animationManager.SetParameter("grounded", false);
-            //StartCoroutine(ResetJump());
             JumpResponseClientRpc();
         }
 
         [ServerRpc]
-        public void requestRotationServerRpc(float rotX, float rotY){
+        public void RequestRotationServerRpc(float rotX, float rotY){
             if (rotX != 0){
                 transform.Rotate(new Vector3(0, rotX, 0));
             }
@@ -150,6 +186,25 @@ namespace Spartans.Players
             }
         }
 
+        private void Move(Vector2 inputDir){
+            if(!_grounded) return;
+            Vector2 moveDir = inputDir.normalized;
+            _animationManager.SetParameter("speed", inputDir.magnitude);
+            if (moveDir == Vector2.zero && _grounded){
+                _rigidbody.velocity = Vector3.zero;
+            }
+            
+            Vector2 horizPlane = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.z);
+            float velocityComponentY = _rigidbody.velocity.y;
+            if(horizPlane.magnitude < _MAX_SPEED){
+                Vector3 moveDirWldSpace = transform.TransformDirection(new Vector3(moveDir.x,0, moveDir.y));
+                _rigidbody.AddForce(moveDirWldSpace*_moveSpeed*10, ForceMode.Force);
+            }else if(horizPlane.magnitude >= _MAX_SPEED){
+                _rigidbody.velocity = _rigidbody.velocity.normalized*_MAX_SPEED;
+                return;
+            }
+        }
+        /*
         [ServerRpc]
         public void requestMoveServerRpc(Vector3 dir){
             if(!_grounded) return;
@@ -169,9 +224,9 @@ namespace Spartans.Players
                 return;
             }
         }
-
+        */
         void CheckGrounded(){
-            if(!_canJump || _grounded) return;
+            if(!_canJump) return;
             RaycastHit hit;
             bool hitOccured = Physics.Raycast(transform.position-(Vector3.down*0.5f), Vector3.down, out hit, 0.6f, 1);
             Debug.DrawRay(transform.position-(Vector3.down*0.5f), Vector3.down * 0.6f, Color.blue);
@@ -186,7 +241,8 @@ namespace Spartans.Players
             }else if(!hitOccured){
                 _grounded = false;
             }else{
-                print("Unanticipated condition occured");
+                //ALREADY ON GROUND IN THIS CASE
+                //print("Unanticipated condition occured");
             }
         }
 
@@ -201,8 +257,10 @@ namespace Spartans.Players
             //Handle closing and opening of base PauseScreen UI
             if(_pauseScreen.gameObject.activeSelf){
                 _HUD.PopPage();
+                InputManager.Instance.ResumeInput();
                 MouseLock(true);
             }else{
+                InputManager.Instance.PauseInput();
                 _HUD.PushPage(_pauseScreen);
                 MouseLock(false);
             }
@@ -244,12 +302,6 @@ namespace Spartans.Players
             this.enabled = true;
         }
 
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-            myTeam.OnValueChanged += SetTeamColor;
-
-        }
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
@@ -264,14 +316,7 @@ namespace Spartans.Players
             StartCoroutine(ResetJump());
         }
         public bool IsAirborn(){
-            if(_grounded)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return !_grounded;
         }
 
         public void ChangeTeam(Teams team)
@@ -293,11 +338,17 @@ namespace Spartans.Players
         }
         private void SetTeamColor(Teams prevTeam, Teams currentTeam)
         {
-            Transform transformModel = transform.GetChild(1);
+            Transform transformModel = transform.GetChild(1).GetChild(4);
+            Transform colorRegion = transformModel;
+            {
+            if(_classController.GetType() == typeof(Spartans.Players.ShieldBarerController))
+                colorRegion = transform.GetChild(1);
+            }
             switch (currentTeam)
             {
                 case Teams.Red:
-                    transformModel.GetChild(4).GetComponent<Renderer>().material.color = Color.red;
+                    //transformModel..GetChild(4).GetComponent<Renderer>().material.color = Color.red;
+                    colorRegion.GetComponent<Renderer>().material.color = Color.red;
                     break;
                 case Teams.Blue:
                     transformModel.GetChild(4).GetComponent<Renderer>().material.color = Color.blue;

@@ -486,8 +486,7 @@ MonoBehaviour:
   _jumpForce: 12
   _moveSpeed: 5
   _MAX_SPEED: 8
-  _mouseSens: 1
-  _lastSentInput: {x: 0, y: 0, z: 0}
+  _mouseSens: 0.15
   input: {x: 0, y: 0, z: 0}
 --- !u!114 &874173009289139448
 MonoBehaviour:
@@ -1573,6 +1572,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camTransform: {fileID: 0}
+  _associatedHealth: {fileID: 874173009289139448}
 --- !u!1 &4468449499426714043
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,7 +6,7 @@ using TMPro;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine.SceneManagement;
 
-using Spartans.Players;
+using Spartans.GameMode;
 using Spartans.UI;
 using System;
 
@@ -61,7 +61,6 @@ namespace Spartans{
 
         public override void OnNetworkSpawn()
         {
-            base.OnNetworkSpawn();
             if(IsClient){
                 connectedPlayers.OnListChanged += LobbyPlayersHandler;
                 _startCountdown.OnValueChanged += StartTimeUpdate;
@@ -145,15 +144,18 @@ namespace Spartans{
         public void LeaveLobby()
         {
             NetworkManager.Singleton.Shutdown();
+            Destroy(GameModeManager.Instance.gameObject);
             Destroy(NetworkManager.Singleton.gameObject);
             SceneManager.LoadScene(MENU_SCENE_NAME);
         }
         public void BackToMenu()
         {
             //if(!IsServer && !IsClient){
-            Destroy(NetworkManager.Singleton.gameObject);
+            //Destroy(NetworkManager.Singleton.gameObject);
             //}
-            SceneManager.LoadScene("MainMenu");
+            Destroy(GameModeManager.Instance.gameObject);
+            Destroy(NetworkManager.Singleton.gameObject);
+            SceneManager.LoadScene(MENU_SCENE_NAME);
         }
 
         private void PassOffToGameManager()
@@ -217,7 +219,7 @@ namespace Spartans{
         
         IEnumerator StartSelectionCountdown(){
             //print("Starting ready countdown");
-            yield return new WaitForSeconds(5);
+            yield return new WaitForSeconds(3);
             //PlayerInput.Instance.OnDisable();
             var status = NetworkManager.SceneManager.LoadScene(GAMESCENE, LoadSceneMode.Single);
             if (status != SceneEventProgressStatus.Started)
@@ -241,8 +243,11 @@ namespace Spartans{
         private void OnDisable()
         {
             //print("Disabling LobbyManager");
-            NetworkManager.OnClientConnectedCallback -= NotifyClientConnected;
-            NetworkManager.OnClientDisconnectCallback -= NotifyClientDisconnected;
+            if(IsServer || IsClient)
+            {
+                NetworkManager.OnClientConnectedCallback -= NotifyClientConnected;
+                NetworkManager.OnClientDisconnectCallback -= NotifyClientDisconnected;
+            }
             connectedPlayers.OnListChanged -= LobbyPlayersHandler;
             _startCountdown.OnValueChanged -= StartTimeUpdate;
         }
@@ -253,7 +258,7 @@ namespace Spartans{
             //if(CheckCanStart())
             //{
             //GameMode.GameModeManager.Instance.SelectMode();
-            _startCountdown.Value = 5;
+            _startCountdown.Value = 3;
             LobbySync.Instance.StartButtonActive(false);
             StartStartingCountdown();
             PassOffToGameManager();
