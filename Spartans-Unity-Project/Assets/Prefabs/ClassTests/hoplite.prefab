@@ -487,7 +487,7 @@ MonoBehaviour:
   _moveSpeed: 5
   _MAX_SPEED: 8
   _mouseSens: 0.15
-  input: {x: 0, y: 0, z: 0}
+  ClientInput: {x: 0, y: 0}
 --- !u!114 &874173009289139448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -890,7 +890,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2865478616803977608}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.67107457, y: 0, z: 0, w: -0.74138993}
   m_LocalPosition: {x: 0.52, y: 3.287, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

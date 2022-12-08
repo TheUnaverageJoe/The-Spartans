@@ -338,11 +338,14 @@ namespace Spartans.Players
         }
         private void SetTeamColor(Teams prevTeam, Teams currentTeam)
         {
-            Transform transformModel = transform.GetChild(1).GetChild(4);
-            Transform colorRegion = transformModel;
-            {
+            Transform colorRegion;
+
             if(_classController.GetType() == typeof(Spartans.Players.ShieldBarerController))
-                colorRegion = transform.GetChild(1);
+            {
+                colorRegion = transform.GetChild(2);
+            }else
+            {
+                colorRegion = transform.GetChild(1).GetChild(4);
             }
             switch (currentTeam)
             {
@@ -351,13 +354,13 @@ namespace Spartans.Players
                     colorRegion.GetComponent<Renderer>().material.color = Color.red;
                     break;
                 case Teams.Blue:
-                    transformModel.GetChild(4).GetComponent<Renderer>().material.color = Color.blue;
+                    colorRegion.GetComponent<Renderer>().material.color = Color.blue;
                     break;
                 case Teams.Purple:
-                    transformModel.GetChild(4).GetComponent<Renderer>().material.color = Color.magenta;
+                    colorRegion.GetComponent<Renderer>().material.color = Color.magenta;
                     break;
                 case Teams.Green:
-                    transformModel.GetChild(4).GetComponent<Renderer>().material.color = Color.green;
+                    colorRegion.GetComponent<Renderer>().material.color = Color.green;
                     break;
             }
         }
