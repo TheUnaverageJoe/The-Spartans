@@ -16,6 +16,8 @@ namespace Spartans{
         {
             _canvasManager = FindObjectOfType<CanvasManager>();
             _canvasManager.Init();
+
+            Application.targetFrameRate = 144;
         }
 
         public void PlayButtonPressed(){

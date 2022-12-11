@@ -4,102 +4,141 @@ using UnityEngine;
 using Unity.Netcode;
 using Cinemachine;
 using Spartans.UI;
+using UnityEngine.InputSystem;
 
 namespace Spartans.Players
 {
     [RequireComponent(typeof(AnimationManager), typeof(Rigidbody))]
     public class PlayerController : NetworkBehaviour
     {
-        [SerializeField] public GameObject WorldSpaceCanvas;
-        [SerializeField] public Transform LookAtPoint;
-        [SerializeField] public AnimationManager AnimationManager;
-        [SerializeField] public Transform Spine;
-        [SerializeField] public string PlayerName{ get; private set; }
+        [SerializeField] public GameObject worldSpaceCanvas;
+        [SerializeField] public Transform lookAtPoint;
+        [SerializeField] public AnimationManager _animationManager;
+        [SerializeField] public Transform spine;
+        [SerializeField] public string playerName{ get; private set; }
         [SerializeField] private bool _canJump = true;
         [SerializeField] private bool _grounded = false;
         [SerializeField] private float _jumpForce = 12.0f;
         [SerializeField] private float _moveSpeed = 5f;
         [SerializeField] private float _MAX_SPEED = 8.0f;
         [SerializeField] private float _mouseSens = 1.0f;
-        [SerializeField] private Vector2 _lastSentInput;
-        [SerializeField] private Vector2 input;
+        private Vector3 input;
+        [SerializeField] private Vector2 ClientInput;
+        private bool _sprinting;
 
         
-
+        private NetworkVariable<Teams> myTeam = new NetworkVariable<Teams>();
+        private PageUI _pauseScreen;
         private GameManager _gameManager;
         private CanvasManager _HUD;
         private Rigidbody _rigidbody;
-        private Animator _animator;
         private ClassController _classController;
         private Health _myHealth;
-        
+        private FlagCarrier _flagCarrier;
 
-        public void Awake(){
+        private void Init()
+        {
             _rigidbody = GetComponent<Rigidbody>();
             _myHealth = GetComponent<Health>();
-            AnimationManager = GetComponent<AnimationManager>();
+            _animationManager = GetComponent<AnimationManager>();
+            _classController = GetComponent<ClassController>();
+            _flagCarrier = GetComponent<FlagCarrier>();
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager._canvasManager;
-          
+            _pauseScreen = _HUD.transform.Find("PauseScreen").GetComponent<PageUI>();
         }
 
-        public void Start(){
-            PlayerName = "Player " + NetworkObjectId;
-            _animator = GetComponentInChildren<Animator>();
-            _classController = GetComponent<ClassController>();
-            //previously in start
-            _myHealth = GetComponent<Health>();
-            _myHealth.onDie += OnDieCallback;
-            _myHealth.onRespawn += OnRespawnCallback;
+        public void Start(){   
+            if(NetworkManager.Singleton == null)
+            {
+                Debug.LogWarning("Player Controller started as offline");
+                Init();
+            }
+            //_myHealth = GetComponent<Health>();
+            _myHealth.OnKilledBy += OnDieCallback;
+            _myHealth.OnRespawn += OnRespawnCallback;
 
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             if(IsClient && IsOwner){
+                //PlayerControls.PlayerActions inputEvents = InputManager.Instance.CurrentActionMap();
+                //inputEvents.Interact.performed += TryInteract;
+                InputManager.Instance.OnInteract += TryInteract;
+                InputManager.Instance.OnEscape += Escape;
+                InputManager.Instance.OnJump += TryJump;
+
+                InputManager.Instance.OnMove += UpdateMoveInput;
+                InputManager.Instance.OnLook += Look;
+                InputManager.Instance.OnSprint += Sprint;
+
                 PlayerCameraFollow.Instance.FollowPlayer(transform.GetChild(0).transform);
                 PlayerCameraFollow.Instance.LookAtPlayer(transform.GetChild(0).transform);
                 transform.GetComponentInChildren<FloatingHealth>().camTransform = PlayerCameraFollow.Instance.camera.transform;
-                WorldSpaceCanvas.GetComponent<Canvas>().worldCamera = PlayerCameraFollow.Instance.camera;
-                WorldSpaceCanvas.GetComponentInChildren<FloatingHealth>().camTransform = PlayerCameraFollow.Instance.camera.transform;
+                worldSpaceCanvas.GetComponent<Canvas>().worldCamera = PlayerCameraFollow.Instance.camera;
+                worldSpaceCanvas.GetComponentInChildren<FloatingHealth>().camTransform = PlayerCameraFollow.Instance.camera.transform;
             }
 
             
             _myHealth.Init(this);
             _classController.Init(this);
+            _flagCarrier.Init(this);
         }
-        
+
+        public override void OnNetworkSpawn()
+        {
+            Init();
+            playerName = NetworkObjectId.ToString();
+            myTeam.OnValueChanged += SetTeamColor;
+            //print("States SCOL: " + IsServer + IsClient + IsOwner + IsLocalPlayer);
+        }
+        //InputAction.CallbackContext context
+        private void TryInteract()
+        {
+            _flagCarrier.InteractFlag();
+        }
+
+        private void Escape()
+        {
+            TogglePauseMenu();
+        }
+        private void TryJump()
+        {
+            if(_canJump && _grounded){
+                RequestJumpServerRpc();
+                // _canJump = false;
+                // _grounded = false;
+            }
+        }
+        private void Look(Vector2 vector2)
+        {
+            //print("updated look");
+            RequestRotationServerRpc(vector2.x*_mouseSens, -vector2.y*_mouseSens);
+        }
+
+        private void UpdateMoveInput(Vector2 vector2)
+        {
+            SendMovementInputServerRpc(vector2);
+        }
+        private void Sprint()
+        {
+            if(!_sprinting){
+                _MAX_SPEED = _MAX_SPEED*5;
+                _sprinting = true;
+            }else{
+                _MAX_SPEED = _MAX_SPEED/5;
+                _sprinting = false;
+            }
+        }
+
         // Update is called once per frame
         void Update()
         {
-            if(AnimationManager == null || _animator == null){
+            if(_animationManager == null){
 
-                print("Assign an animator/animationManager dummy!!!");
+                print("Assign an animationManager dummy!!!");
                 return;
             }
-            //Not player character of this client session
-            if(!IsLocalPlayer){
-                return;
-            }
-
-            if(Input.GetKeyDown(KeyCode.Escape)){
-                    if(Cursor.visible) MouseLock(true);
-                    else MouseLock(false);
-            }
-
-            //Jump
-            if(Input.GetButtonDown("Jump") && _canJump && _grounded){
-                RequestJumpServerRpc();
-                _canJump = false;
-                _grounded = false;
-            }
-
-            //Update rotation
-            requestRotationServerRpc(Input.GetAxis("Mouse X")*_mouseSens, - Input.GetAxis("Mouse Y")*_mouseSens);
-            
-            
-            
-            //Update movement
-            input = new Vector2(Input.GetAxisRaw("Horizontal") , Input.GetAxisRaw("Vertical"));
-            if(input != _lastSentInput){
-                _lastSentInput = input;
+            if(IsServer){
+                Move(ClientInput);
             }
         }
 
@@ -111,45 +150,66 @@ namespace Spartans.Players
             }
             if(IsLocalPlayer){
                 CheckGrounded();
-                requestMoveServerRpc(input);
+                //requestMoveServerRpc(input);
             }
+        }
+
+        [ServerRpc]
+        private void SendMovementInputServerRpc(Vector2 input)
+        {
+            this.ClientInput = input;
         }
 
     
         [ClientRpc]
         public void JumpResponseClientRpc(){
+            JumpStarted();
             Vector3 horizPlane = new Vector3(_rigidbody.velocity.x, 0, _rigidbody.velocity.z);
             _rigidbody.AddForce(transform.up * _jumpForce, ForceMode.VelocityChange);
-            StartCoroutine(ResetJump());
         }
 
         [ServerRpc]
         public void RequestJumpServerRpc(){
             if(!_grounded) return;
-            _canJump = false;
-            _grounded = false;
-            AnimationManager.SetParameter("grounded", false);
-            StartCoroutine(ResetJump());
+            JumpStarted();
+            _animationManager.SetParameter("grounded", false);
             JumpResponseClientRpc();
         }
 
         [ServerRpc]
-        public void requestRotationServerRpc(float rotX, float rotY){
+        public void RequestRotationServerRpc(float rotX, float rotY){
             if (rotX != 0){
                 transform.Rotate(new Vector3(0, rotX, 0));
             }
             if (rotY != 0){
-                LookAtPoint.Rotate(new Vector3(rotY, 0, 0));
+                lookAtPoint.Rotate(new Vector3(rotY, 0, 0));
             }
         }
 
-        [ServerRpc]
-        public void requestMoveServerRpc(Vector2 dir){
+        private void Move(Vector2 inputDir){
             if(!_grounded) return;
-            Vector3 moveDir = new Vector3(dir.x, 0, dir.y).normalized;
-            AnimationManager.SetParameter("speed", dir.magnitude);
-            AnimationManager.SetParameter("speedX", dir.x);
-            AnimationManager.SetParameter("speedY", dir.y);
+            Vector2 moveDir = inputDir.normalized;
+            _animationManager.SetParameter("speed", inputDir.magnitude);
+            if (moveDir == Vector2.zero && _grounded){
+                _rigidbody.velocity = Vector3.zero;
+            }
+            
+            Vector2 horizPlane = new Vector2(_rigidbody.velocity.x, _rigidbody.velocity.z);
+            float velocityComponentY = _rigidbody.velocity.y;
+            if(horizPlane.magnitude < _MAX_SPEED){
+                Vector3 moveDirWldSpace = transform.TransformDirection(new Vector3(moveDir.x,0, moveDir.y));
+                _rigidbody.AddForce(moveDirWldSpace*_moveSpeed*10, ForceMode.Force);
+            }else if(horizPlane.magnitude >= _MAX_SPEED){
+                _rigidbody.velocity = _rigidbody.velocity.normalized*_MAX_SPEED;
+                return;
+            }
+        }
+        /*
+        [ServerRpc]
+        public void requestMoveServerRpc(Vector3 dir){
+            if(!_grounded) return;
+            Vector3 moveDir = dir.normalized;
+            _animationManager.SetParameter("speed", dir.magnitude);
             if (moveDir == Vector3.zero && _grounded){
                 _rigidbody.velocity = Vector3.zero;
             }
@@ -164,9 +224,9 @@ namespace Spartans.Players
                 return;
             }
         }
-
+        */
         void CheckGrounded(){
-            if(!_canJump || _grounded) return;
+            if(!_canJump) return;
             RaycastHit hit;
             bool hitOccured = Physics.Raycast(transform.position-(Vector3.down*0.5f), Vector3.down, out hit, 0.6f, 1);
             Debug.DrawRay(transform.position-(Vector3.down*0.5f), Vector3.down * 0.6f, Color.blue);
@@ -175,16 +235,36 @@ namespace Spartans.Players
                 //check if we are the server because This func gets run on server and client
                 //thus it would produce a duplicate instruction to change the Animator parameter
                 if(IsServer){
-                  AnimationManager.SetParameter("grounded", true);
+                  _animationManager.SetParameter("grounded", true);
                 }
                 _grounded = true;
             }else if(!hitOccured){
                 _grounded = false;
             }else{
-                print("Unanticipated condition occured");
+                //ALREADY ON GROUND IN THIS CASE
+                //print("Unanticipated condition occured");
             }
         }
 
+        void TogglePauseMenu()
+        {
+            //Handle closing of open UI pages but exclude base PauseScreen case
+            if(_HUD.GetStackCount() > 2){
+                _HUD.PopPage();
+                return;
+            }
+
+            //Handle closing and opening of base PauseScreen UI
+            if(_pauseScreen.gameObject.activeSelf){
+                _HUD.PopPage();
+                InputManager.Instance.ResumeInput();
+                MouseLock(true);
+            }else{
+                InputManager.Instance.PauseInput();
+                _HUD.PushPage(_pauseScreen);
+                MouseLock(false);
+            }
+        }
         void MouseLock(bool Lock){
             if(Lock && Application.isFocused){
                 Cursor.lockState = CursorLockMode.Locked;
@@ -209,7 +289,7 @@ namespace Spartans.Players
             }
         }
 
-        private void OnDieCallback(){
+        private void OnDieCallback(Teams team){
             this.GetComponent<Rigidbody>().useGravity = false;
             this.GetComponent<BoxCollider>().enabled = false;
             this.enabled = false;
@@ -222,19 +302,67 @@ namespace Spartans.Players
             this.enabled = true;
         }
 
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-        }
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
         }
-
-
         IEnumerator ResetJump(){
             yield return new WaitForSeconds(0.5f);
             _canJump = true;
+        }
+        public void JumpStarted(){
+            _canJump = false;
+            _grounded = false;
+            StartCoroutine(ResetJump());
+        }
+        public bool IsAirborn(){
+            return !_grounded;
+        }
+
+        public void ChangeTeam(Teams team)
+        {
+            SetTeamColor(Teams.None, team);
+            if(myTeam.Value == team) return;
+
+            myTeam.Value = team;
+        }
+
+        public System.Nullable<Teams> GetTeamAssociation(){
+            if(!IsServer){
+                Debug.LogError("GetTeamAssociation can only be called from server");
+                return null;
+            }
+
+            //print("myTeam var is: " + myTeam.Value);
+            return myTeam.Value;
+        }
+        private void SetTeamColor(Teams prevTeam, Teams currentTeam)
+        {
+            Transform colorRegion;
+
+            if(_classController.GetType() == typeof(Spartans.Players.ShieldBarerController))
+            {
+                colorRegion = transform.GetChild(2);
+            }else
+            {
+                colorRegion = transform.GetChild(1).GetChild(4);
+            }
+            switch (currentTeam)
+            {
+                case Teams.Red:
+                    //transformModel..GetChild(4).GetComponent<Renderer>().material.color = Color.red;
+                    colorRegion.GetComponent<Renderer>().material.color = Color.red;
+                    break;
+                case Teams.Blue:
+                    colorRegion.GetComponent<Renderer>().material.color = Color.blue;
+                    break;
+                case Teams.Purple:
+                    colorRegion.GetComponent<Renderer>().material.color = Color.magenta;
+                    break;
+                case Teams.Green:
+                    colorRegion.GetComponent<Renderer>().material.color = Color.green;
+                    break;
+            }
         }
     }
 }

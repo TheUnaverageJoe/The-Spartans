@@ -43,7 +43,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 1857538385898756021, guid: b097e673f7220374dbc9f5f491baa682, type: 2}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -178,6 +178,7 @@ MonoBehaviour:
   sounds:
   - {fileID: 8300000, guid: 995187429e110ed4aaa68ace498e482b, type: 3}
   - {fileID: 8300000, guid: 32222ebdb222210438cc984ad2abcbfa, type: 3}
+  - {fileID: 8300000, guid: c4758595a55d49d46b890bd7e69cc6d4, type: 3}
   channel1: {fileID: 2303013263248460686}
   channel2: {fileID: 8839874997212295975}
   channel3: {fileID: 3549620314128341494}
@@ -321,7 +322,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 1273493387573783186, guid: b097e673f7220374dbc9f5f491baa682, type: 2}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0

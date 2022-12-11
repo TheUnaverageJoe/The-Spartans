@@ -6,9 +6,10 @@ using UnityEngine.UI;
 
 public class AudioManager : MonoBehaviour
 {
-    public enum SoundClipsIndex : int{
-        bg_music = 0,
-        spear_attack = 1
+    public enum SoundClipsIndex{
+        bg_music,
+        spear_attack,
+        score_SFX
     }
     public enum AudioChannels{
         Master_Volume,
@@ -41,7 +42,7 @@ public class AudioManager : MonoBehaviour
             DontDestroyOnLoad(this);
         }else
         {
-            print("Destroyed an spawned audio manager");
+            //print("Destroyed an spawned audio manager");
             Destroy(this.gameObject);
         }
     }

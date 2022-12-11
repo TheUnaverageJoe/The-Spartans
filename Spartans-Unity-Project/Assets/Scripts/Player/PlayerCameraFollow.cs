@@ -7,7 +7,7 @@ using Game.Core.Singletons;
 public class PlayerCameraFollow : CustomSingleton<PlayerCameraFollow>
 {
     private CinemachineVirtualCamera cinemachineVirtualCamera;
-    [HideInInspector] public Camera camera;
+    [HideInInspector] new public Camera camera;
 
     // Start is called before the first frame update
     void Awake()

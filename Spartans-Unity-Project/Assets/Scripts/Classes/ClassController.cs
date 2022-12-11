@@ -8,8 +8,9 @@ namespace Spartans.Players{
     {
         protected System.Action onAttackStart;
         protected System.Action onSecondaryAttackStart;
+        protected PlayerController _playerController;
 
-        protected bool _attackOnCooldown, _secondaryAttackOnCooldown = false;
+        protected bool _attackOnCooldown, _secondaryAttackOnCooldown, _specialAttackOnCooldown = false;
 
         public abstract void Init(PlayerController playerController);
         public abstract void PrimaryAttack();

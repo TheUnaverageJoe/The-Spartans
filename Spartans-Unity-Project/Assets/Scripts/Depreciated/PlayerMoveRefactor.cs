@@ -39,8 +39,8 @@ namespace Spartans.Players{
             //if(!IsLocalPlayer){
             //    _camera.gameObject.SetActive(false);
             //}
-            _myHealth.onDie += OnDieCallback;
-            _myHealth.onRespawn += OnRespawnCallback;
+            //_myHealth.onKilledBy += OnDieCallback;
+            _myHealth.OnRespawn += OnRespawnCallback;
         }
 
         // Update is called once per frame

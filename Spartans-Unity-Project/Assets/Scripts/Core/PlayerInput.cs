@@ -6,16 +6,18 @@ namespace Spartans.Players{
     public class PlayerInput : MonoBehaviour
     {
         public static PlayerInput Instance{get; private set;} = null;
-        public Vector3 movement{get; private set;}
+        public Vector3 movementDir{get; private set;}
         public float mouseX{get; private set;}
         public float mouseY{get; private set;}
 
+        public bool sprint{get; private set;}
         public bool jump{get; private set;}
         public bool escape{get; private set;}
         public bool tab{get; private set;}
         public bool primary{get; private set;}
         public bool secondary{get; private set;}
         public bool special{get; private set;}
+        public bool interact{get; private set;}
 
         
         void Awake(){
@@ -25,7 +27,7 @@ namespace Spartans.Players{
                 Instance = this;
                 DontDestroyOnLoad(this.gameObject);
             }else{
-                print("Stopped playerInput spawn");
+                //print("Stopped playerInput spawn");
                 Destroy(this.gameObject);
             }
             
@@ -34,7 +36,7 @@ namespace Spartans.Players{
         // Start is called before the first frame update
         void Start()
         {
-            movement = Vector3.zero;
+            movementDir = Vector3.zero;
             jump = false;
             tab = false;
             escape = false;
@@ -51,11 +53,12 @@ namespace Spartans.Players{
         // Update is called once per frame
         void Update()
         {
-            movement = new Vector3(Input.GetAxisRaw("Horizontal"), 0 , Input.GetAxisRaw("Vertical"));
+            movementDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0 , Input.GetAxisRaw("Vertical"));
             mouseX = Input.GetAxis("Mouse X");
             mouseY = Input.GetAxis("Mouse Y");
 
             jump = Input.GetButtonDown("Jump");
+            sprint = Input.GetButton("Sprint");
             escape = Input.GetButtonDown("Escape");
             tab = Input.GetKeyDown(KeyCode.Tab);
 
@@ -63,13 +66,7 @@ namespace Spartans.Players{
             secondary = Input.GetButtonDown("Fire2");
             //special = Input.GetButtonDown("Fire3");
             special = Input.GetKeyDown(KeyCode.Q);
-            
-
-        }
-        public void OnDisable(){
-            //print("Unassigned playerInput");
-            //Instance = null;
-            //Destroy(this.gameObject);
+            interact = Input.GetKeyDown(KeyCode.F);
         }
     }
 }

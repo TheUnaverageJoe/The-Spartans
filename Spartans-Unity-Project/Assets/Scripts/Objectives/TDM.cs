@@ -6,44 +6,60 @@ using Unity.Netcode;
 namespace Spartans.GameMode{
     public class TDM : GameModeBase
     {
-        //[SerializeField] private GameObject _gamemodeUI;
-        //[SerializeField] private int _numberOfTeams;
-
-        // Start is called before the first frame update
-        void Awake()
+        public TDM(int teams, int reqKills, int maxTimeSeconds)
         {
-            teamScoresDict = new Dictionary<int, NetworkVariable<int>>();
-            for(int i=0; i<base.numberOfTeams; i++)
+            NumTeams = teams;
+            _requiredScore = reqKills;
+            MaxGameTime = maxTimeSeconds;
+            Scores = new int[teams];
+        }
+        
+        public override bool EndConditionsMet()
+        { 
+            for(int i=0; i<NumTeams; i++)
             {
-                NetworkVariable<int> newVar = new NetworkVariable<int>();
-                base.teamScoresDict.Add(i, newVar);
+                if(Scores[i] >= _requiredScore)
+                {
+                    //Debug.Log("Win condition was met by team: " + i);
+                    return true;
+                }
             }
+
+            return false;  
         }
 
-        public override void OnNetworkSpawn(){
-            base.OnNetworkSpawn();
-
-            //base.gamemodeUI = _gamemodeUI;
-            //base.numberOfTeams = _numberOfTeams;
-            base.winConditions = new List<System.Action>();
-            base.currentGameState = States.Starting;
-
-        }
-
-        protected override States GetGameState()
+        public override Teams CheckWinner()
         {
-            return base.currentGameState;
-            //throw new System.NotImplementedException();
-        }
+            int IndexOfHighestScore = 0;
+            bool isTie = false;
 
-        public override bool WinConditionsMet()
-        {
+            for(int i=0; i<NumTeams; i++)
+            {
+                //Debug.Log("Checking team " + i + $"({(Teams)i})");
+                //Debug.Log("Highest score so far: " + Scores[IndexOfHighestScore] + " at index " + IndexOfHighestScore);
+                if(Scores[i] == Scores[IndexOfHighestScore] && i != 0)
+                {
+                    //Debug.Log($"team {i} score {Scores[i]} \n High score {Scores[IndexOfHighestScore]}");
+                    isTie = true;
+                }
+                else if(Scores[i] > Scores[IndexOfHighestScore])
+                {
+                    isTie = false;
+                    IndexOfHighestScore = i;
+                }
+                //Debug.Log("bool state " + isTie);
+            }
             
-            //throw new System.NotImplementedException();
-            foreach(System.Action pred in base.winConditions){
-                print("found pred " + pred.ToString());
+            if(isTie){
+                return (Teams)(-1);
+            }else{
+                return (Teams)IndexOfHighestScore; //If we have a winner return their team index
             }
-            return false;
+        }
+
+        public override void ChangeScoreForTeam(int index, int value)
+        {
+            Scores[index] = value;
         }
     }
 }
