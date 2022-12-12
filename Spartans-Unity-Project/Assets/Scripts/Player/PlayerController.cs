@@ -343,6 +343,8 @@ namespace Spartans.Players
             if(_classController.GetType() == typeof(Spartans.Players.ShieldBarerController))
             {
                 colorRegion = transform.GetChild(2);
+            }else if(_classController.GetType() == typeof(Spartans.Players.ArcherController)){
+                colorRegion = transform.GetChild(1).GetChild(0);
             }else
             {
                 colorRegion = transform.GetChild(1).GetChild(4);

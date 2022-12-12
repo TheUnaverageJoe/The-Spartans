@@ -31,7 +31,7 @@ namespace Spartans.UI{
         void Update(){
             if(GameManager.Instance != null && GameManager.Instance.activeState != GameManager.States.Lobby)
             {
-                if(PlayerInput.Instance.escape)
+                //if(PlayerInput.Instance.escape)
                 {
                     //print("esc pressed");
                     //PopPage();
