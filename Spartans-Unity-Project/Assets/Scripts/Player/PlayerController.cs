@@ -83,40 +83,13 @@ namespace Spartans.Players
             _flagCarrier.Init(this);
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-            if(_animationManager == null){
-
-                print("Assign an animationManager dummy!!!");
-                return;
-            }
-            if(IsServer){
-                Move(ClientInput);
-            }
-        }
-
-        //server needs to update grounded state for all players on server side
-        //if not the server or a local player object, aka the player spawned when join game, dont update
-        void FixedUpdate(){
-            if(IsServer && !IsLocalPlayer){
-                CheckGrounded();
-            }
-            if(IsLocalPlayer){
-                CheckGrounded();
-                //requestMoveServerRpc(input);
-            }
-        }
-
-                public override void OnNetworkSpawn()
+        public override void OnNetworkSpawn()
         {
             Init();
             playerName = NetworkObjectId.ToString();
             myTeam.OnValueChanged += SetTeamColor;
             //print("States SCOL: " + IsServer + IsClient + IsOwner + IsLocalPlayer);
         }
-
-
         //InputAction.CallbackContext context
         private void TryInteract()
         {
@@ -153,6 +126,31 @@ namespace Spartans.Players
             }else{
                 _MAX_SPEED = _MAX_SPEED/5;
                 _sprinting = false;
+            }
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            if(_animationManager == null){
+
+                print("Assign an animationManager dummy!!!");
+                return;
+            }
+            if(IsServer){
+                Move(ClientInput);
+            }
+        }
+
+        //server needs to update grounded state for all players on server side
+        //if not the server or a local player object, aka the player spawned when join game, dont update
+        void FixedUpdate(){
+            if(IsServer && !IsLocalPlayer){
+                CheckGrounded();
+            }
+            if(IsLocalPlayer){
+                CheckGrounded();
+                //requestMoveServerRpc(input);
             }
         }
 
@@ -253,9 +251,6 @@ namespace Spartans.Players
             //Handle closing of open UI pages but exclude base PauseScreen case
             if(_HUD.GetStackCount() > 2){
                 _HUD.PopPage();
-                Debug.Log("Popped cuz 2");
-                InputManager.Instance.ResumeInput();
-                MouseLock(true);
                 return;
             }
 
@@ -326,7 +321,7 @@ namespace Spartans.Players
 
         public void ChangeTeam(Teams team)
         {
-            SetTeamColor(Teams.Neutral, team);
+            SetTeamColor(Teams.None, team);
             if(myTeam.Value == team) return;
 
             myTeam.Value = team;
@@ -356,9 +351,6 @@ namespace Spartans.Players
             }
             switch (currentTeam)
             {
-                case Teams.Neutral:
-                    colorRegion.GetComponent<Renderer>().material.color = new Color(127, 0, 204); //Color = Purple
-                    break;
                 case Teams.Red:
                     //transformModel..GetChild(4).GetComponent<Renderer>().material.color = Color.red;
                     colorRegion.GetComponent<Renderer>().material.color = Color.red;

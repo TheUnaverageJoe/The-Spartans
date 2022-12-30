@@ -73,8 +73,5 @@ namespace Spartans.UI{
         {
             return _pageStack.Count;
         }
-        void OnDisable(){
-            _pageStack.Clear();
-        }
     }
 }

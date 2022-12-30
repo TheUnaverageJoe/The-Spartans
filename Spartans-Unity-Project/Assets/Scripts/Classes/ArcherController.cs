@@ -8,7 +8,7 @@ namespace Spartans.Players{
     public class ArcherController : ClassController
     {
 
-        //private PlayerController _playerController;
+        private PlayerController _playerController;
         private bool _isAiming;
 
 
