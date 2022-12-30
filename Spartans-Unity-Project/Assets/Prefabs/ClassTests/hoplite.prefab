@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3c430f382484144e925c097c2d33cfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Weight: 1
+  m_Weight: 0.4
   m_Data:
     m_ConstrainedObject: {fileID: 2229371365082707951}
     m_SourceObjects:
@@ -201,8 +201,8 @@ MonoBehaviour:
         transform: {fileID: 0}
         weight: 0
     m_Offset: {x: 0, y: 0, z: 0}
-    m_MinLimit: -180
-    m_MaxLimit: 180
+    m_MinLimit: -98
+    m_MaxLimit: 92
     m_AimAxis: 4
     m_UpAxis: 2
     m_WorldUpType: 0
@@ -212,7 +212,7 @@ MonoBehaviour:
     m_ConstrainedAxes:
       x: 1
       y: 1
-      z: 1
+      z: 0
 --- !u!1 &1208401456690028220
 GameObject:
   m_ObjectHideFlags: 0
@@ -866,6 +866,92 @@ Transform:
   m_Father: {fileID: 2107852699435388377}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2665215975826612712
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2256992177200205314}
+  - component: {fileID: 930658108512907670}
+  m_Layer: 0
+  m_Name: HeadAim
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2256992177200205314
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2665215975826612712}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6411730062728618827}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &930658108512907670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2665215975826612712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3c430f382484144e925c097c2d33cfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Weight: 1
+  m_Data:
+    m_ConstrainedObject: {fileID: 46276921065977451}
+    m_SourceObjects:
+      m_Length: 1
+      m_Item0:
+        transform: {fileID: 4044370124485730335}
+        weight: 1
+      m_Item1:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item2:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item3:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item4:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item5:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item6:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item7:
+        transform: {fileID: 0}
+        weight: 0
+    m_Offset: {x: 0, y: 0, z: 0}
+    m_MinLimit: -79
+    m_MaxLimit: 77
+    m_AimAxis: 4
+    m_UpAxis: 2
+    m_WorldUpType: 0
+    m_WorldUpObject: {fileID: 0}
+    m_WorldUpAxis: 2
+    m_MaintainOffset: 0
+    m_ConstrainedAxes:
+      x: 1
+      y: 1
+      z: 0
 --- !u!1 &2865478616803977608
 GameObject:
   m_ObjectHideFlags: 0
@@ -1270,7 +1356,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3902417655043037643}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 20}
+  m_LocalPosition: {x: -1.11, y: -0.46, z: 3.95}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2531,6 +2617,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7488203800996181859}
+  - {fileID: 2256992177200205314}
   m_Father: {fileID: 6253523416891696360}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2623,6 +2710,7 @@ GameObject:
   - component: {fileID: 6932337251828858263}
   - component: {fileID: 3431313044593046085}
   - component: {fileID: 4453511660580975699}
+  - component: {fileID: 6024737223298717430}
   m_Layer: 0
   m_Name: Paladin WProp J Nordstrom
   m_TagString: Untagged
@@ -2700,6 +2788,94 @@ MonoBehaviour:
   - m_Rig: {fileID: 1067792212380214114}
     m_Active: 1
   m_Effectors: []
+--- !u!114 &6024737223298717430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6738276501006515794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2d8418b0b9634b1892b0268dd9c2743, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boneShape: 1
+  drawBones: 1
+  drawTripods: 0
+  boneSize: 1
+  tripodSize: 1
+  boneColor: {r: 0, g: 0, b: 1, a: 0.5}
+  m_Transforms:
+  - {fileID: 1916467076552508540}
+  - {fileID: 8270346138546339072}
+  - {fileID: 3638030617072330206}
+  - {fileID: 8204101299848453426}
+  - {fileID: 634688893342118829}
+  - {fileID: 7591896545596290683}
+  - {fileID: 2314068974012691267}
+  - {fileID: 2107852699435388377}
+  - {fileID: 6427606972122883455}
+  - {fileID: 8735855901269087659}
+  - {fileID: 4532357361960269065}
+  - {fileID: 2229371365082707951}
+  - {fileID: 4750713776178930439}
+  - {fileID: 6077231076575253356}
+  - {fileID: 8130134500638082039}
+  - {fileID: 81042729881210939}
+  - {fileID: 4005111281382456826}
+  - {fileID: 828143089367733952}
+  - {fileID: 4842926697534425327}
+  - {fileID: 4262595464626679627}
+  - {fileID: 3989449642373389624}
+  - {fileID: 6709029362251130781}
+  - {fileID: 2581205573627868395}
+  - {fileID: 1122788021298764073}
+  - {fileID: 9037792830359758110}
+  - {fileID: 4566555032023514173}
+  - {fileID: 1198433840863594118}
+  - {fileID: 945455886297201844}
+  - {fileID: 4704818029812903503}
+  - {fileID: 6317114215829379401}
+  - {fileID: 773799393871827804}
+  - {fileID: 4969092415665151280}
+  - {fileID: 6927655570313188792}
+  - {fileID: 2576066526446411009}
+  - {fileID: 1678843701223935829}
+  - {fileID: 8184868933724578521}
+  - {fileID: 6850912683401502389}
+  - {fileID: 8780828791323063064}
+  - {fileID: 8747243879362009317}
+  - {fileID: 805641447815454481}
+  - {fileID: 46276921065977451}
+  - {fileID: 3025618212662588037}
+  - {fileID: 5781317624339561510}
+  - {fileID: 8943434467530712746}
+  - {fileID: 3710666793392863902}
+  - {fileID: 146360221682768902}
+  - {fileID: 8273426968523290283}
+  - {fileID: 5257934824420424907}
+  - {fileID: 2334864315292976549}
+  - {fileID: 7110590850048949000}
+  - {fileID: 1729166998903834689}
+  - {fileID: 4562017858642748126}
+  - {fileID: 7180260996915712232}
+  - {fileID: 667216329489849359}
+  - {fileID: 9018362173440129561}
+  - {fileID: 6497440987752227626}
+  - {fileID: 4737870432837651307}
+  - {fileID: 2003858038797057119}
+  - {fileID: 8309191754541100395}
+  - {fileID: 395790097189080275}
+  - {fileID: 3444749769877545999}
+  - {fileID: 468774662804890503}
+  - {fileID: 6803602608819652694}
+  - {fileID: 8143772442606413233}
+  - {fileID: 2627940692919965693}
+  - {fileID: 2497375569672584094}
+  - {fileID: 5371796339667137049}
+  - {fileID: 5909648455999201355}
+  - {fileID: 3320900639945400549}
 --- !u!1 &6793472829418052873
 GameObject:
   m_ObjectHideFlags: 0
