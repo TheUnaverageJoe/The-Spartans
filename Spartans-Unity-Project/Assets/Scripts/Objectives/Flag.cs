@@ -13,7 +13,7 @@ namespace Spartans.GameMode
         
         private bool held;
         private float currentIslandTime;
-        private NetworkVariable<Teams> TeamAssociation = new NetworkVariable<Teams>(Teams.None);
+        private NetworkVariable<Teams> TeamAssociation = new NetworkVariable<Teams>(Teams.Neutral);
         public FlagSpawner Home{get; private set;}
 
 
