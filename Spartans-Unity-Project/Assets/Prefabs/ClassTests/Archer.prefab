@@ -1618,12 +1618,7 @@ GameObject:
   - component: {fileID: 3255800713322765034}
   - component: {fileID: 7000217329686785003}
   - component: {fileID: -5769478461773841196}
-<<<<<<< Updated upstream
   - component: {fileID: 6060181552370595679}
-=======
-  - component: {fileID: 8185116401741077797}
-  - component: {fileID: 5648846498406888}
->>>>>>> Stashed changes
   m_Layer: 0
   m_Name: Archer
   m_TagString: Player
@@ -1753,8 +1748,7 @@ MonoBehaviour:
   _jumpForce: 12
   _moveSpeed: 5
   _MAX_SPEED: 8
-<<<<<<< Updated upstream
-  _mouseSens: 1
+  _mouseSens: 0.15
   ClientInput: {x: 0, y: 0}
 --- !u!114 &608841707993611160
 MonoBehaviour:
@@ -1768,10 +1762,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e0e55ba8171a5644b04d124c57d5367, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-=======
-  _mouseSens: 0.15
-  ClientInput: {x: 0, y: 0}
->>>>>>> Stashed changes
 --- !u!114 &7784362515395398255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1835,23 +1825,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   _playerDamage: 1
-<<<<<<< Updated upstream
 --- !u!114 &6060181552370595679
-=======
---- !u!114 &8185116401741077797
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4872088991276116381}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e0e55ba8171a5644b04d124c57d5367, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &5648846498406888
->>>>>>> Stashed changes
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

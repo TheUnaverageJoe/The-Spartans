@@ -101,8 +101,9 @@ public class InputManager : MonoBehaviour
             OnSprint?.Invoke();
             print("Sprinting");
         }
-        else
+        else if(context.action.phase == InputActionPhase.Canceled)
         {
+            OnSprint?.Invoke();
             print("sprint stopped");
         }
     }
@@ -132,9 +133,22 @@ public class InputManager : MonoBehaviour
     }
 
 
-    public PlayerControls.PlayerActions CurrentActionMap()
+    public InputActionMap CurrentActionMap()
     {
-        return Controls.Player;
+        
+        if(Controls.Player.enabled && !Controls.UI.enabled)
+        {
+            return Controls.Player;
+        }
+        else if(Controls.UI.enabled && !Controls.Player.enabled)
+        {
+            return Controls.UI;
+        }
+        else
+        {
+            Debug.LogError("Either both or none action maps are active");
+            return null;
+        }
     }
     public void PauseInput()
     {

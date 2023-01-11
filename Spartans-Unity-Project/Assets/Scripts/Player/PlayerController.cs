@@ -46,6 +46,7 @@ namespace Spartans.Players
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager._canvasManager;
             _pauseScreen = _HUD.transform.Find("PauseScreen").GetComponent<PageUI>();
+            Debug.Log("Ran Init()");
         }
 
         public void Start(){   
@@ -80,7 +81,10 @@ namespace Spartans.Players
             
             _myHealth.Init(this);
             _classController.Init(this);
-            _flagCarrier.Init(this);
+            if(myTeam.Value != Teams.Neutral)
+            {
+                _flagCarrier.Init(this);
+            }
         }
 
         // Update is called once per frame
@@ -111,7 +115,7 @@ namespace Spartans.Players
         public override void OnNetworkSpawn()
         {
             Init();
-            playerName = NetworkObjectId.ToString();
+            playerName = OwnerClientId.ToString();
             myTeam.OnValueChanged += SetTeamColor;
             //print("States SCOL: " + IsServer + IsClient + IsOwner + IsLocalPlayer);
         }
@@ -284,7 +288,15 @@ namespace Spartans.Players
 
         public override void OnNetworkDespawn()
         {
+            Debug.Log("Despawned player " + playerName);
             base.OnNetworkDespawn();
+            InputManager.Instance.OnInteract -= TryInteract;
+            InputManager.Instance.OnEscape -= Escape;
+            InputManager.Instance.OnJump -= TryJump;
+
+            InputManager.Instance.OnMove -= UpdateMoveInput;
+            InputManager.Instance.OnLook -= Look;
+            InputManager.Instance.OnSprint -= Sprint;
         }
         IEnumerator ResetJump(){
             yield return new WaitForSeconds(0.5f);

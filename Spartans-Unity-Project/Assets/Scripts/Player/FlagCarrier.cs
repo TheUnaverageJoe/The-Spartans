@@ -39,7 +39,7 @@ namespace Spartans.Players{
             }
             if(other.tag == "FlagSpawner")
             {
-                print("Carrier touched Spawner");
+                //print("Carrier touched Spawner");
                 PlayerController player;
                 if(TryGetComponent<PlayerController>(out player))
                 {
