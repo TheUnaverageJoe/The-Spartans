@@ -26,9 +26,12 @@ namespace Spartans.Players{
             _playerController = playerController;
             _rb = GetComponent<Rigidbody>();
 
-            InputManager.Instance.OnPrimary += PrimaryAttack;
-            InputManager.Instance.OnSecondary += SecondaryAttack;
-            InputManager.Instance.OnSpecial += SpecialAttack;
+            if(IsClient && IsOwner)
+            {
+                InputManager.Instance.OnPrimary += PrimaryAttack;
+                InputManager.Instance.OnSecondary += SecondaryAttack;
+                InputManager.Instance.OnSpecial += SpecialAttack;
+            }
         }
 
         // Update is called once per frame
@@ -37,22 +40,6 @@ namespace Spartans.Players{
             Debug.DrawRay(handRef.transform.position, handRef.transform.forward*3, Color.magenta, 0.25f);
             if(!IsLocalPlayer) return;
 
-            /*
-            if(PlayerInput.Instance.primary && !_attackOnCooldown){
-                //onAttackStart.Invoke();
-                PrimaryAttack();
-            }
-            
-            if(PlayerInput.Instance.secondary && !_secondaryAttackOnCooldown){
-                //onSecondaryAttackStart?.Invoke();
-                SecondaryAttack();
-            }
-            
-            if(PlayerInput.Instance.special){
-                SpecialAttack();
-                _playerController.JumpStarted();
-            }
-            */
         }
         void FixedUpdate(){
             if(!IsServer){

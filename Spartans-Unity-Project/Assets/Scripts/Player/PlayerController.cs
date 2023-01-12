@@ -115,7 +115,8 @@ namespace Spartans.Players
         public override void OnNetworkSpawn()
         {
             Init();
-            playerName = OwnerClientId.ToString();
+            playerName = "Player " + OwnerClientId.ToString();
+            transform.GetComponentInChildren<FloatingHealth>().ChangeName(playerName);
             myTeam.OnValueChanged += SetTeamColor;
             //print("States SCOL: " + IsServer + IsClient + IsOwner + IsLocalPlayer);
         }
@@ -137,25 +138,62 @@ namespace Spartans.Players
                 // _grounded = false;
             }
         }
+
+        private void Sprint()
+        {
+            if(IsServer)
+            {
+                if(!_sprinting)
+                {
+                    _MAX_SPEED = _MAX_SPEED*5;
+                    _sprinting = true;
+                }
+                else
+                {
+                    _MAX_SPEED = _MAX_SPEED/5;
+                    _sprinting = false;
+                }
+            }
+            else
+            {
+                SprintServerRpc();
+            }
+            
+        }
+        [ServerRpc]
+        private void SprintServerRpc()
+        {
+            if(!_sprinting)
+            {
+                _MAX_SPEED = _MAX_SPEED*5;
+                _sprinting = true;
+            }
+            else
+            {
+                _MAX_SPEED = _MAX_SPEED/5;
+                _sprinting = false;
+            }
+        }
+
         private void Look(Vector2 vector2)
         {
             //print("updated look");
             RequestRotationServerRpc(vector2.x*_mouseSens, -vector2.y*_mouseSens);
         }
 
+        [ServerRpc]
+        public void RequestRotationServerRpc(float rotX, float rotY){
+            if (rotX != 0){
+                transform.Rotate(new Vector3(0, rotX, 0));
+            }
+            if (rotY != 0){
+                lookAtPoint.Rotate(new Vector3(rotY, 0, 0));
+            }
+        }
+
         private void UpdateMoveInput(Vector2 vector2)
         {
             SendMovementInputServerRpc(vector2);
-        }
-        private void Sprint()
-        {
-            if(!_sprinting){
-                _MAX_SPEED = _MAX_SPEED*5;
-                _sprinting = true;
-            }else{
-                _MAX_SPEED = _MAX_SPEED/5;
-                _sprinting = false;
-            }
         }
 
         [ServerRpc]
@@ -164,7 +202,6 @@ namespace Spartans.Players
             this.ClientInput = input;
         }
 
-    
         [ClientRpc]
         public void JumpResponseClientRpc(){
             JumpStarted();
@@ -180,15 +217,6 @@ namespace Spartans.Players
             JumpResponseClientRpc();
         }
 
-        [ServerRpc]
-        public void RequestRotationServerRpc(float rotX, float rotY){
-            if (rotX != 0){
-                transform.Rotate(new Vector3(0, rotX, 0));
-            }
-            if (rotY != 0){
-                lookAtPoint.Rotate(new Vector3(rotY, 0, 0));
-            }
-        }
 
         private void Move(Vector2 inputDir){
             if(!_grounded) return;
@@ -290,13 +318,16 @@ namespace Spartans.Players
         {
             Debug.Log("Despawned player " + playerName);
             base.OnNetworkDespawn();
-            InputManager.Instance.OnInteract -= TryInteract;
-            InputManager.Instance.OnEscape -= Escape;
-            InputManager.Instance.OnJump -= TryJump;
+            if(IsClient && IsOwner)
+            {
+                InputManager.Instance.OnInteract -= TryInteract;
+                InputManager.Instance.OnEscape -= Escape;
+                InputManager.Instance.OnJump -= TryJump;
 
-            InputManager.Instance.OnMove -= UpdateMoveInput;
-            InputManager.Instance.OnLook -= Look;
-            InputManager.Instance.OnSprint -= Sprint;
+                InputManager.Instance.OnMove -= UpdateMoveInput;
+                InputManager.Instance.OnLook -= Look;
+                InputManager.Instance.OnSprint -= Sprint;
+            }
         }
         IEnumerator ResetJump(){
             yield return new WaitForSeconds(0.5f);

@@ -11,7 +11,6 @@ namespace Spartans.Players{
         //private PlayerController _playerController;
         private bool _isAiming;
 
-
         public override void Init(PlayerController playerController)
         {
             _playerController = playerController;

@@ -57,6 +57,11 @@ namespace Spartans.UI{
             //this.transform.position = _player.transform.position + (Vector3.up * 4.5f);
         }
 
+        public void ChangeName(string newName)
+        {
+            _nameText.text = newName;
+        }
+
         private void OnHealthChangeCallback(int value)
         {
             float maxHP = (float)_associatedHealth.GetMaxHitpoints();

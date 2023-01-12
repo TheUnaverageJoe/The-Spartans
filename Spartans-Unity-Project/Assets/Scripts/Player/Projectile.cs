@@ -29,8 +29,8 @@ public class Projectile : NetworkBehaviour
         if(!IsServer){
             return;
         }
-        PlayerController otherPlayer;
-        if(!other.TryGetComponent<PlayerController>(out otherPlayer)){
+        //PlayerController otherPlayer;
+        if(!other.TryGetComponent<PlayerController>(out PlayerController otherPlayer)){
             //Not a player
             this.gameObject.GetComponent<NetworkObject>().Despawn();
             return;
@@ -46,8 +46,8 @@ public class Projectile : NetworkBehaviour
             return;
         }
         
-        Health hitTarget;
-        if(other.TryGetComponent<Health>(out hitTarget)){
+        //Health hitTarget;
+        if(other.TryGetComponent<Health>(out Health hitTarget)){
             //hitTarget.TakeDamageServerRpc(_damage);
             hitTarget.TakeDamage(_damage, sourcePlayer.GetTeamAssociation().Value);
             this.gameObject.GetComponent<NetworkObject>().Despawn();
