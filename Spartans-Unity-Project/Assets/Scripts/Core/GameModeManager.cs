@@ -103,48 +103,6 @@ namespace Spartans.GameMode{
             }
         }
 
-        void Update()
-        {
-            /*
-            if(_currentState == States.None){
-                return;
-            }
-            if(IsServer)
-            {
-                //Starting Phase
-                if(_currentState==States.Starting && TimeRemaining.Value > 0)
-                {
-                    if(timeTillNextTimerUpdate <= 0)
-                    {
-                        TimeRemaining.Value -= 1;
-                        timeTillNextTimerUpdate = 1;
-                    }
-                    else
-                    {
-                        timeTillNextTimerUpdate -= Time.deltaTime;
-                    }
-                }//Post starting state
-                else if(_currentState!=States.Starting && TimeRemaining.Value > 0)
-                {
-                    if(timeTillNextTimerUpdate <= 0)
-                    {
-                        TimeRemaining.Value -= 1;
-                        timeTillNextTimerUpdate = 1;
-                    }
-                    else
-                    {
-                        timeTillNextTimerUpdate -= Time.deltaTime;
-                    }
-                }
-                else{
-                    _currentState = _currentState+1;
-                    TimeRemaining.Value = 85;
-                    print("Updated State to " + _currentState);
-                }
-            }
-            */
-        }
-
         public override void OnNetworkSpawn()
         {
             if(IsClient)
@@ -211,7 +169,6 @@ namespace Spartans.GameMode{
             _scores = containerObjForGameModeUI.GetComponentsInChildren<Slider>();
             _winnerText = _canvasManager.transform.Find("GameOver").GetComponentInChildren<TMP_Text>();
             _flagSpawners = FindObjectsOfType<FlagSpawner>();
-
             
             for(int i=0; i<_currentGameMode.numberOfTeams; i++)
             {
@@ -290,14 +247,18 @@ namespace Spartans.GameMode{
         }
 
         //This method should only ever be called from the server
+        /// <summary>
+        ///Currently subtracting 1 from team parameter-IMPLIMENTATION
+        /// </summary>
         public void AddScore(Teams team, int valueToAdd)
         {
             if(!IsServer){
                 Debug.LogWarning("This method should not be called in a client instance");
                 return;
             }
-            //print("Added score of " + valueToAdd + " to team " + team);
-            TeamScores[(int)team] += valueToAdd;
+            print("Added score of " + valueToAdd + " to team " + team);
+            //subtract 1 from index because Teams.Neutral does not have a team scorebar
+            TeamScores[(int)team-1] += valueToAdd;
             if(_gameMode.EndConditionsMet())
             {
                 OnGameOver?.Invoke(_gameMode.CheckWinner());

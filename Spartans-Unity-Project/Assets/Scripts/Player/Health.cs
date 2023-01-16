@@ -90,6 +90,7 @@ namespace Spartans.Players{
 
         private void OnDieCallback(Teams killedByTeam){
             if(IsServer){
+                print("killed by: " + killedByTeam);
                 Spartans.GameMode.GameModeManager.Instance.AddScore(killedByTeam, 1);
                 timeOfDeath = _respawnTime;
                 _playerController._animationManager.SetParameter("dead", true);

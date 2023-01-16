@@ -42,9 +42,9 @@ namespace Spartans.GameMode
             }
             
             if(isTie){
-                return (Teams)(-1);
+                return (Teams)(0);
             }else{
-                return (Teams)IndexOfHighestScore; //If we have a winner return their team index
+                return (Teams)IndexOfHighestScore+1; //If we have a winner return their team index
             }
         }
 

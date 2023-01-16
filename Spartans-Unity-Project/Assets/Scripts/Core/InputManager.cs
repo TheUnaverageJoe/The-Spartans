@@ -99,12 +99,12 @@ public class InputManager : MonoBehaviour
         {
 
             OnSprint?.Invoke();
-            print("Sprinting");
+            //print("Sprinting");
         }
         else if(context.action.phase == InputActionPhase.Canceled)
         {
             OnSprint?.Invoke();
-            print("sprint stopped");
+            //print("sprint stopped");
         }
     }
 

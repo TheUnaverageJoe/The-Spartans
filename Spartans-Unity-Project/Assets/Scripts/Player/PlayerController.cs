@@ -22,10 +22,10 @@ namespace Spartans.Players
         [SerializeField] private float _moveSpeed = 5f;
         [SerializeField] private float _MAX_SPEED = 8.0f;
         [SerializeField] private float _mouseSens = 1.0f;
+        [SerializeField] public bool IsNPC; // Used to isolate target dummy logic
         private Vector3 input;
         [SerializeField] private Vector2 ClientInput;
         private bool _sprinting;
-
         
         private NetworkVariable<Teams> myTeam = new NetworkVariable<Teams>();
         private PageUI _pauseScreen;
@@ -38,6 +38,15 @@ namespace Spartans.Players
 
         private void Init()
         {
+            if(NetworkObject.IsSceneObject == true || NetworkObject.IsSceneObject == null && IsNPC)
+            {
+                //print("Is Scene Object: " + NetworkObject.IsSceneObject);
+                _myHealth = GetComponent<Health>();
+                _animationManager = GetComponent<AnimationManager>();
+                _gameManager = FindObjectOfType<GameManager>();
+                //Debug.Log("Ran Init() for In scene");
+                return;
+            }
             _rigidbody = GetComponent<Rigidbody>();
             _myHealth = GetComponent<Health>();
             _animationManager = GetComponent<AnimationManager>();
@@ -46,21 +55,29 @@ namespace Spartans.Players
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager._canvasManager;
             _pauseScreen = _HUD.transform.Find("PauseScreen").GetComponent<PageUI>();
-            Debug.Log("Ran Init()");
+            //Debug.Log("Ran Init()");
         }
 
-        public void Start(){   
-            if(NetworkManager.Singleton == null)
+        public void Start()
+        {
+            if(NetworkManager.Singleton == null || IsNPC)
             {
-                Debug.LogWarning("Player Controller started as offline");
+                //Debug.LogWarning("Player Controller started as offline or NPC/Target DUmmy");
+                //Debug.Log("myTeam is: " + myTeam.Value);
                 Init();
+                _myHealth.Init(this);
             }
             //_myHealth = GetComponent<Health>();
             _myHealth.OnKilledBy += OnDieCallback;
             _myHealth.OnRespawn += OnRespawnCallback;
 
+            if(NetworkObject.IsSceneObject == true || NetworkObject.IsSceneObject == null && IsNPC)
+            {
+                //print(NetworkObject.IsSceneObject);
+                return;
+            }
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
-            if(IsClient && IsOwner){
+            if(IsClient && IsOwner && IsLocalPlayer){
                 //PlayerControls.PlayerActions inputEvents = InputManager.Instance.CurrentActionMap();
                 //inputEvents.Interact.performed += TryInteract;
                 InputManager.Instance.OnInteract += TryInteract;
@@ -83,6 +100,7 @@ namespace Spartans.Players
             _classController.Init(this);
             if(myTeam.Value != Teams.Neutral)
             {
+                //print("Flag carrier Team Value: " + myTeam.Value);
                 _flagCarrier.Init(this);
             }
         }
@@ -90,9 +108,8 @@ namespace Spartans.Players
         // Update is called once per frame
         void Update()
         {
-            if(_animationManager == null){
-
-                print("Assign an animationManager dummy!!!");
+            if(IsNPC)
+            {
                 return;
             }
             if(IsServer){
@@ -114,10 +131,14 @@ namespace Spartans.Players
 
         public override void OnNetworkSpawn()
         {
+            if(IsNPC){
+                return;
+            }
             Init();
             playerName = "Player " + OwnerClientId.ToString();
             transform.GetComponentInChildren<FloatingHealth>().ChangeName(playerName);
             myTeam.OnValueChanged += SetTeamColor;
+            //myTeam.OnValueChanged += (prev, newVal)=>{print("Team value changed:" + newVal);};
             //print("States SCOL: " + IsServer + IsClient + IsOwner + IsLocalPlayer);
         }
         //InputAction.CallbackContext context

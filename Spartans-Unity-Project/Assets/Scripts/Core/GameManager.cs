@@ -33,6 +33,7 @@ namespace Spartans{
         private Dictionary<ulong, PlayerGameData> playerData = new Dictionary<ulong, PlayerGameData>();
 
         void Awake(){
+            _canvasManager = FindObjectOfType<CanvasManager>();
             if(Instance == null){
                 Instance = this;
                 DontDestroyOnLoad(this.gameObject);
@@ -47,7 +48,7 @@ namespace Spartans{
 
             if(activeState >= States.PreGame){
                 print("GameManager finding Canvas and Init()ing");
-                _canvasManager = FindObjectOfType<CanvasManager>();
+                //_canvasManager = FindObjectOfType<CanvasManager>();
                 _canvasManager.Init();
             }
             
