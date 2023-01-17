@@ -123,4 +123,9 @@ public class AnimationManager : NetworkBehaviour
         if(!IsServer) UpdateAnimatorServerRpc(name, value.ToString(), val);
         return true;
     }
+    public void Play(string name, int layer)
+    {
+        _animator.Play(name, layer);
+    }
 }
+

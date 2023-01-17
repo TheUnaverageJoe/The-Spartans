@@ -20,6 +20,7 @@ namespace Spartans.Players{
         private RaycastHit _lastAttackedObject;
         private List<Transform> _hitPlayers = new List<Transform>();
         private Rigidbody _rb;
+        private Collider leapedTarget = null;
         private bool _leaping;
 
         public override void Init(PlayerController playerController){
@@ -63,14 +64,28 @@ namespace Spartans.Players{
                     }
                 }
             }
-
+            Vector3 targetSeekerRay = transform.forward + -transform.up;
+            targetSeekerRay.Normalize();
+            targetSeekerRay *= 4;
             if(_leaping)
             {
                 if(_playerController.IsAirborn())
                 {
                     //_rb.AddForce(-transform.TransformDirection(Vector3.forward)*20, ForceMode.Acceleration);
                     _rb.AddForce(Vector3.down*30, ForceMode.Acceleration);
+                    if(Physics.Raycast(transform.position, transform.TransformDirection(targetSeekerRay), out RaycastHit hit, 4f, attackMask))
+                    {
+                        leapedTarget = hit.collider;
+                        hit.collider.GetComponent<LeapTarget>().LeapedTarget();
+                        //print("STABBED");
+                    }
+                    Debug.DrawRay(transform.position, transform.TransformDirection(targetSeekerRay), Color.green, 0.2f);
                 }else{
+                    if(leapedTarget!=null)
+                    {
+                        print("Unpinned");
+                        leapedTarget.GetComponent<LeapTarget>().Unpinned();
+                    }
                     _leaping = false;
                     _playerController._animationManager.SetParameter("leaping", false);
                 }

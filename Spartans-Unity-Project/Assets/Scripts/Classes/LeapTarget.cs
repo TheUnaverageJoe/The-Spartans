@@ -2,17 +2,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LeapTarget : MonoBehaviour
+namespace Spartans.Players
 {
-    // Start is called before the first frame update
-    void Start()
+    public class LeapTarget : MonoBehaviour
     {
-        
-    }
+        private AnimationManager _animManager;
+        private bool pinned;
+        public event System.Action<bool> OnPinned;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public void Init(AnimationManager anim)
+        {
+            pinned = false;
+            _animManager = anim;
+        }
+
+        public void LeapedTarget()
+        {
+            pinned = true;
+            //_animManager.SetParameter("pinned", true);
+            _animManager.Play("FallBackDeathAnim", 0);
+            OnPinned.Invoke(true);
+        }
+
+        public void Unpinned()
+        {
+            pinned = false;
+            _animManager.SetParameter("pinned", false);
+            OnPinned.Invoke(false);
+        }
     }
 }
+

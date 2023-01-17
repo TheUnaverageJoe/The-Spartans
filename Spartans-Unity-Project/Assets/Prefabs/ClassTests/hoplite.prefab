@@ -357,6 +357,7 @@ GameObject:
   - component: {fileID: 7153520548376365376}
   - component: {fileID: 8483553969547998223}
   - component: {fileID: 6700975831283530086}
+  - component: {fileID: 2221322383066811625}
   m_Layer: 6
   m_Name: hoplite
   m_TagString: Player
@@ -487,6 +488,7 @@ MonoBehaviour:
   _moveSpeed: 5
   _MAX_SPEED: 8
   _mouseSens: 0.15
+  IsNPC: 0
   ClientInput: {x: 0, y: 0}
 --- !u!114 &874173009289139448
 MonoBehaviour:
@@ -551,6 +553,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FlagLocalPosition: {x: 0, y: 0, z: 0}
   FlagLocalRotation: {x: 0, y: 0, z: 0}
+--- !u!114 &2221322383066811625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1771422829377585750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ace20615c7a07eb448437331c9cb4a9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1875633422815777173
 GameObject:
   m_ObjectHideFlags: 0

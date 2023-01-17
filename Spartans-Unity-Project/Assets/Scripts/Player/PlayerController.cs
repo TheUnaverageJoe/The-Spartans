@@ -23,6 +23,7 @@ namespace Spartans.Players
         [SerializeField] private float _MAX_SPEED = 8.0f;
         [SerializeField] private float _mouseSens = 1.0f;
         [SerializeField] public bool IsNPC; // Used to isolate target dummy logic
+        [SerializeField]private bool immobilized = false;
         private Vector3 input;
         [SerializeField] private Vector2 ClientInput;
         private bool _sprinting;
@@ -35,6 +36,7 @@ namespace Spartans.Players
         private ClassController _classController;
         private Health _myHealth;
         private FlagCarrier _flagCarrier;
+        private LeapTarget _leapTarget;
 
         private void Init()
         {
@@ -44,6 +46,10 @@ namespace Spartans.Players
                 _myHealth = GetComponent<Health>();
                 _animationManager = GetComponent<AnimationManager>();
                 _gameManager = FindObjectOfType<GameManager>();
+                _leapTarget = GetComponent<LeapTarget>();
+                if(_leapTarget) _leapTarget.Init(_animationManager);
+                if(_leapTarget) _leapTarget.OnPinned += Immobilized;
+
                 //Debug.Log("Ran Init() for In scene");
                 return;
             }
@@ -55,6 +61,11 @@ namespace Spartans.Players
             _gameManager = FindObjectOfType<GameManager>();
             _HUD = _gameManager._canvasManager;
             _pauseScreen = _HUD.transform.Find("PauseScreen").GetComponent<PageUI>();
+            _leapTarget = GetComponent<LeapTarget>();
+            //print(_leapTarget);
+            if(_leapTarget) _leapTarget.Init(_animationManager);
+            if(_leapTarget) _leapTarget.OnPinned += Immobilized;
+
             //Debug.Log("Ran Init()");
         }
 
@@ -141,7 +152,33 @@ namespace Spartans.Players
             //myTeam.OnValueChanged += (prev, newVal)=>{print("Team value changed:" + newVal);};
             //print("States SCOL: " + IsServer + IsClient + IsOwner + IsLocalPlayer);
         }
-        //InputAction.CallbackContext context
+        
+        private void Immobilized(bool pinned)
+        {
+            immobilized = pinned;
+            if(IsNPC) return;
+            if(pinned)
+            {
+                InputManager.Instance.OnInteract -= TryInteract;
+                InputManager.Instance.OnEscape -= Escape;
+                InputManager.Instance.OnJump -= TryJump;
+
+                InputManager.Instance.OnMove -= UpdateMoveInput;
+                InputManager.Instance.OnLook -= Look;
+                InputManager.Instance.OnSprint -= Sprint;
+            }
+            else
+            {
+                InputManager.Instance.OnInteract += TryInteract;
+                InputManager.Instance.OnEscape += Escape;
+                InputManager.Instance.OnJump += TryJump;
+
+                InputManager.Instance.OnMove += UpdateMoveInput;
+                InputManager.Instance.OnLook += Look;
+                InputManager.Instance.OnSprint += Sprint;
+            }
+        }
+
         private void TryInteract()
         {
             _flagCarrier.InteractFlag();
@@ -348,6 +385,7 @@ namespace Spartans.Players
                 InputManager.Instance.OnMove -= UpdateMoveInput;
                 InputManager.Instance.OnLook -= Look;
                 InputManager.Instance.OnSprint -= Sprint;
+                if(_leapTarget) _leapTarget.OnPinned -= Immobilized;
             }
         }
         IEnumerator ResetJump(){
