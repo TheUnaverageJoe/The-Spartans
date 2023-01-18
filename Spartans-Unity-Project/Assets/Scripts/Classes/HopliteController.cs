@@ -48,7 +48,7 @@ namespace Spartans.Players{
             }
             
             if(_attackOnCooldown){
-                allHit = Physics.RaycastAll(handRef.transform.position, transform.TransformDirection(handRef.transform.up), 3, attackMask);
+                allHit = Physics.RaycastAll(handRef.transform.position, handRef.transform.up, 3, attackMask);
 
                 foreach(RaycastHit hit in allHit){
                     if(!_hitPlayers.Contains(hit.transform)){
@@ -67,19 +67,20 @@ namespace Spartans.Players{
             Vector3 targetSeekerRay = transform.forward + -transform.up;
             targetSeekerRay.Normalize();
             targetSeekerRay *= 4;
+            Debug.DrawRay(transform.position, targetSeekerRay, Color.green, 0.2f);
             if(_leaping)
             {
                 if(_playerController.IsAirborn())
                 {
                     //_rb.AddForce(-transform.TransformDirection(Vector3.forward)*20, ForceMode.Acceleration);
                     _rb.AddForce(Vector3.down*30, ForceMode.Acceleration);
-                    if(Physics.Raycast(transform.position, transform.TransformDirection(targetSeekerRay), out RaycastHit hit, 4f, attackMask))
+                    if(Physics.Raycast(transform.position, targetSeekerRay, out RaycastHit hit, 4f, attackMask))
                     {
                         leapedTarget = hit.collider;
                         hit.collider.GetComponent<LeapTarget>().LeapedTarget();
                         //print("STABBED");
                     }
-                    Debug.DrawRay(transform.position, transform.TransformDirection(targetSeekerRay), Color.green, 0.2f);
+                    
                 }else{
                     if(leapedTarget!=null)
                     {

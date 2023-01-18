@@ -1749,6 +1749,8 @@ MonoBehaviour:
   _moveSpeed: 5
   _MAX_SPEED: 8
   _mouseSens: 0.15
+  IsNPC: 0
+  immobilized: 0
   ClientInput: {x: 0, y: 0}
 --- !u!114 &608841707993611160
 MonoBehaviour:
@@ -1776,7 +1778,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHitpoints: 5
   _currentHitpoints: 5
-  _respawnTime: 4
+  _respawnTime: 6
 --- !u!114 &3255800713322765034
 MonoBehaviour:
   m_ObjectHideFlags: 0

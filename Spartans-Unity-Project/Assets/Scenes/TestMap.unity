@@ -4208,7 +4208,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHitpoints: 5
   _currentHitpoints: 5
-  _respawnTime: 4
+  _respawnTime: 6
 --- !u!4 &945455887038702698
 Transform:
   m_ObjectHideFlags: 0
@@ -8248,6 +8248,7 @@ MonoBehaviour:
   _MAX_SPEED: 8
   _mouseSens: 0.15
   IsNPC: 1
+  immobilized: 0
   ClientInput: {x: 0, y: 0}
 --- !u!1 &4172951606076001332
 GameObject:

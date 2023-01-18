@@ -357,7 +357,7 @@ AnimatorStateMachine:
     m_Position: {x: 200, y: 410, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 3279612196178462132}
-    m_Position: {x: 200, y: 130, z: 0}
+    m_Position: {x: 210, y: 130, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 7605503739141477778}
     m_Position: {x: -50, y: 310, z: 0}
@@ -440,7 +440,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Finish_BAKED
-  m_Speed: 1
+  m_Speed: 0.25
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -2773511268900823940}
@@ -605,7 +605,7 @@ AnimatorStateTransition:
   m_TransitionDuration: 0.38969612
   m_TransitionOffset: 0.16605361
   m_ExitTime: 0.9004414
-  m_HasExitTime: 1
+  m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
@@ -645,7 +645,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Leap_BAKED
-  m_Speed: 1
+  m_Speed: 0.5
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 1487633795096591503}

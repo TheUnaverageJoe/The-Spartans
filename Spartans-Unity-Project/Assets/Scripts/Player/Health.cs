@@ -9,7 +9,7 @@ namespace Spartans.Players{
     {
         [SerializeField]private int _maxHitpoints;
         [SerializeField] private int _currentHitpoints;
-        [SerializeField] private float _respawnTime = 4;
+        [SerializeField] private float _respawnTime;
         PlayerController _playerController;
         //SFloatingHealth _healthDisplay;
         private float timeOfDeath = 0;
