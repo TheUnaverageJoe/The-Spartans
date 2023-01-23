@@ -2638,6 +2638,7 @@ GameObject:
   - component: {fileID: 6932337251828858263}
   - component: {fileID: 3431313044593046085}
   - component: {fileID: 4453511660580975699}
+  - component: {fileID: 4243096057791691286}
   m_Layer: 0
   m_Name: Paladin WProp J Nordstrom
   m_TagString: Untagged
@@ -2715,6 +2716,18 @@ MonoBehaviour:
   - m_Rig: {fileID: 1067792212380214114}
     m_Active: 1
   m_Effectors: []
+--- !u!114 &4243096057791691286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6738276501006515794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 540916ae957720744bff99459f1fdf72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6793472829418052873
 GameObject:
   m_ObjectHideFlags: 0

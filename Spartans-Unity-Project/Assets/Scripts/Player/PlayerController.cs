@@ -153,11 +153,11 @@ namespace Spartans.Players
             //print("States SCOL: " + IsServer + IsClient + IsOwner + IsLocalPlayer);
         }
         
-        private void Immobilized(bool pinned)
+        public void Immobilize(bool immobile)
         {
-            immobilized = pinned;
-            if(IsNPC) return;
-            if(pinned)
+            immobilized = immobile;
+
+            if(immobile)
             {
                 InputManager.Instance.OnInteract -= TryInteract;
                 InputManager.Instance.OnEscape -= Escape;
@@ -176,6 +176,41 @@ namespace Spartans.Players
                 InputManager.Instance.OnMove += UpdateMoveInput;
                 InputManager.Instance.OnLook += Look;
                 InputManager.Instance.OnSprint += Sprint;
+            }
+        }
+        private void Immobilized(bool pinned)
+        {
+            immobilized = pinned;
+
+            if(pinned)
+            {
+                if(!IsNPC)
+                {
+                    InputManager.Instance.OnInteract -= TryInteract;
+                    InputManager.Instance.OnEscape -= Escape;
+                    InputManager.Instance.OnJump -= TryJump;
+
+                    InputManager.Instance.OnMove -= UpdateMoveInput;
+                    InputManager.Instance.OnLook -= Look;
+                    InputManager.Instance.OnSprint -= Sprint;
+                }
+
+                GetComponent<Collider>().enabled = false;
+            }
+            else
+            {
+                if(!IsNPC)
+                {
+                    InputManager.Instance.OnInteract += TryInteract;
+                    InputManager.Instance.OnEscape += Escape;
+                    InputManager.Instance.OnJump += TryJump;
+
+                    InputManager.Instance.OnMove += UpdateMoveInput;
+                    InputManager.Instance.OnLook += Look;
+                    InputManager.Instance.OnSprint += Sprint;
+                }
+
+                GetComponent<Collider>().enabled = true;
             }
         }
 

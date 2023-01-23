@@ -19,7 +19,7 @@ namespace Spartans.Players
         public void LeapedTarget()
         {
             pinned = true;
-            //_animManager.SetParameter("pinned", true);
+            _animManager.SetParameter("pinned", true);
             _animManager.Play("FallBackDeathAnim", 0);
             OnPinned.Invoke(true);
         }

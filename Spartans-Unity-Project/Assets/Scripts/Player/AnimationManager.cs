@@ -116,7 +116,7 @@ public class AnimationManager : NetworkBehaviour
                 return false;
             }
         }else{
-            print("Parameter not found");
+            Debug.LogWarning("Parameter not found");
             return false;
         }
         //print($"{name} set to {value}");

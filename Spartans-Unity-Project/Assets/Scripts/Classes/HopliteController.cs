@@ -78,19 +78,31 @@ namespace Spartans.Players{
                     {
                         leapedTarget = hit.collider;
                         hit.collider.GetComponent<LeapTarget>().LeapedTarget();
+                        _playerController.Immobilize(true);
+                        GetComponent<Rigidbody>().velocity = Vector3.zero;
                         //print("STABBED");
                     }
                     
                 }else{
                     if(leapedTarget!=null)
                     {
-                        print("Unpinned");
-                        leapedTarget.GetComponent<LeapTarget>().Unpinned();
+                        //UnpinnedEvent();
                     }
                     _leaping = false;
                     _playerController._animationManager.SetParameter("leaping", false);
                 }
             }
+        }
+        public void UnpinnedEvent()
+        {
+            if(leapedTarget)
+            {
+                print("Unpinned");
+                leapedTarget.GetComponent<LeapTarget>().Unpinned();
+                _playerController.Immobilize(false);
+            }
+            else
+                print("No target to Unpin");
         }
         public override void PrimaryAttack()
         {
