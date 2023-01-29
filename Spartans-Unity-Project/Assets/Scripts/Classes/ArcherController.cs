@@ -15,6 +15,10 @@ namespace Spartans.Players{
         {
             _playerController = playerController;
         }
+        public override void Init(TargetDummy targetDummy)
+        {
+            _targetDummy = targetDummy;
+        }
 
         public override void PrimaryAttack()
         {

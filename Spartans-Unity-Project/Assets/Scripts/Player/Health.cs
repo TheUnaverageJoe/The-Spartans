@@ -11,6 +11,7 @@ namespace Spartans.Players{
         [SerializeField] private int _currentHitpoints;
         [SerializeField] private float _respawnTime;
         PlayerController _playerController;
+        TargetDummy _targetDummy;
         //SFloatingHealth _healthDisplay;
         private float timeOfDeath = 0;
         //private int _previousHitpoints;
@@ -31,13 +32,15 @@ namespace Spartans.Players{
             //if(IsServer)
             OnKilledBy += OnDieCallback;
 
-            //if(_healthDisplay == null){
-            //    print("floating health not ready!");
-            //    return;
-            //}
-            //_healthDisplay.Init();
-
             //need to invoke after healthDisplay is setup to get it to update
+            OnHealthChanged?.Invoke(_maxHitpoints);
+        }
+        //Second Init hacky way of adding targetDummy instead of using interface, 
+        // given that I dont think any other non-player characters will be made
+        public void Init(TargetDummy targetDummy)
+        {
+            _targetDummy = targetDummy;
+            OnKilledBy += OnDieCallback;
             OnHealthChanged?.Invoke(_maxHitpoints);
         }
 
@@ -59,11 +62,23 @@ namespace Spartans.Players{
                 return;
             }
             //NEED TO consider case of is friendly fire off
-            if(_playerController.GetTeamAssociation() == userTeam)
+            if(_playerController)
             {
-                //NO FRIENDLY FIRE
-                Debug.LogWarning("No Friendly Fire");
-                return;
+                if(_playerController.GetTeamAssociation() == userTeam)
+                {
+                    //NO FRIENDLY FIRE
+                    Debug.LogWarning("No Friendly Fire");
+                    return;
+                }
+            }
+            else
+            {
+                if(_targetDummy.GetTeamAssociation() == userTeam)
+                {
+                    //NO FRIENDLY FIRE
+                    Debug.LogWarning("No Friendly Fire");
+                    return;
+                }
             }
             UpdateHealthClientRpc(damage, userTeam);
             _currentHitpoints -= damage;
@@ -93,7 +108,14 @@ namespace Spartans.Players{
                 print("killed by: " + killedByTeam);
                 Spartans.GameMode.GameModeManager.Instance.AddScore(killedByTeam, 1);
                 timeOfDeath = _respawnTime;
-                _playerController._animationManager.SetParameter("dead", true);
+                if(_playerController)
+                {
+                    _playerController._animationManager.SetParameter("dead", true);
+                }
+                else
+                {
+                    _targetDummy._animationManager.SetParameter("dead", true);
+                }
             }
         }
         //Respawn is only called by the server hence why only a 
@@ -103,7 +125,14 @@ namespace Spartans.Players{
             _currentHitpoints = _maxHitpoints;
             OnHealthChanged?.Invoke(_maxHitpoints);
             OnRespawn.Invoke();
-            _playerController._animationManager.SetParameter("dead", false);
+            if(_playerController)
+            {
+                _playerController._animationManager.SetParameter("dead", false);
+            }
+            else
+            {
+                _targetDummy._animationManager.SetParameter("dead", true);
+            }
 
             RespawnClientRpc();
         }

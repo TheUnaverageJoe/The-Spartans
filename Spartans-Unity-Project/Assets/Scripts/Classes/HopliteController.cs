@@ -23,7 +23,8 @@ namespace Spartans.Players{
         private Collider leapedTarget = null;
         private bool _leaping;
 
-        public override void Init(PlayerController playerController){
+        public override void Init(PlayerController playerController)
+        {
             _playerController = playerController;
             _rb = GetComponent<Rigidbody>();
 
@@ -34,6 +35,12 @@ namespace Spartans.Players{
                 InputManager.Instance.OnSpecial += SpecialAttack;
             }
         }
+        public override void Init(TargetDummy targetDummy)
+        {
+            _targetDummy = targetDummy;
+            _rb = GetComponent<Rigidbody>();
+        }
+
 
         // Update is called once per frame
         void Update()
@@ -42,15 +49,19 @@ namespace Spartans.Players{
             if(!IsLocalPlayer) return;
 
         }
-        void FixedUpdate(){
-            if(!IsServer){
+        void FixedUpdate()
+        {
+            if(!IsServer)
+            {
                 return;
             }
             
-            if(_attackOnCooldown){
+            if(_attackOnCooldown)
+            {
                 allHit = Physics.RaycastAll(handRef.transform.position, handRef.transform.up, 3, attackMask);
 
-                foreach(RaycastHit hit in allHit){
+                foreach(RaycastHit hit in allHit)
+                {
                     if(!_hitPlayers.Contains(hit.transform)){
                         Health _healthAffected = hit.transform.gameObject.GetComponent<Health>();
                         if(_healthAffected == GetComponent<Health>())
@@ -83,7 +94,9 @@ namespace Spartans.Players{
                         //print("STABBED");
                     }
                     
-                }else{
+                }
+                else
+                {
                     if(leapedTarget!=null)
                     {
                         //UnpinnedEvent();
@@ -170,7 +183,7 @@ namespace Spartans.Players{
                 rot = Quaternion.LookRotation(dir);
             }
             GameObject newProjectile = NetworkManager.Instantiate(_arrowPrefab, initialPos, rot);
-            newProjectile.GetComponent<Projectile>().SetSource(GetComponent<PlayerController>());
+            newProjectile.GetComponent<Projectile>().SetSource(GetComponent<PlayerController>().GetTeamAssociation().Value);
             newProjectile.GetComponent<NetworkObject>().Spawn();
             newProjectile.GetComponent<Rigidbody>().AddForce(newProjectile.transform.forward * speedModifier, ForceMode.VelocityChange);
         }

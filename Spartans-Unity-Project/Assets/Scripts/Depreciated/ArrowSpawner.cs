@@ -38,7 +38,7 @@ public class ArrowSpawner : NetworkBehaviour
             //Vector3 dir = ray.direction - ray.origin;
 
             GameObject newProjectile = NetworkManager.Instantiate(_arrowPrefab, initialPos, rot);
-            newProjectile.GetComponent<Projectile>().SetSource(GetComponent<Spartans.Players.PlayerController>());
+            newProjectile.GetComponent<Projectile>().SetSource(GetComponent<Spartans.Players.PlayerController>().GetTeamAssociation().Value);
             newProjectile.GetComponent<NetworkObject>().Spawn();
             newProjectile.GetComponent<Rigidbody>().AddForce(newProjectile.transform.forward * speedModifier, ForceMode.VelocityChange);
             
@@ -64,7 +64,7 @@ public class ArrowSpawner : NetworkBehaviour
         //Vector3 dir = ray.direction - ray.origin;
 
         GameObject newProjectile = NetworkManager.Instantiate(_arrowPrefab, initialPos, rot);
-        newProjectile.GetComponent<Projectile>().SetSource(GetComponent<Spartans.Players.PlayerController>());
+        newProjectile.GetComponent<Projectile>().SetSource(GetComponent<Spartans.Players.PlayerController>().GetTeamAssociation().Value);
         newProjectile.GetComponent<NetworkObject>().Spawn();
         newProjectile.GetComponent<Rigidbody>().AddForce(newProjectile.transform.forward * speedModifier, ForceMode.VelocityChange);
     }

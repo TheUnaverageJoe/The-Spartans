@@ -25,6 +25,11 @@ namespace Spartans.Players
             _playerController = playerController;
             //_rb = GetComponent<Rigidbody>();
         }
+        public override void Init(TargetDummy targetDummy)
+        {
+            _targetDummy = targetDummy;
+            //_rb = GetComponent<Rigidbody>();
+        }
 
         public override void PrimaryAttack()
         {

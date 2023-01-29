@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
+using Spartans;
 using Spartans.Players;
 
 public class Projectile : NetworkBehaviour
 {
     [SerializeField] private int _damage;
     [SerializeField] private float _maxLifeSpanTime;//in seconds
-    private PlayerController sourcePlayer;
+    private System.Nullable<Teams> sourcePlayer;
     private float _lifeSpanTime = 0;
     //private Collider _collider;
 
@@ -33,29 +34,39 @@ public class Projectile : NetworkBehaviour
         if(!other.TryGetComponent<PlayerController>(out PlayerController otherPlayer)){
             //Not a player
             this.gameObject.GetComponent<NetworkObject>().Despawn();
+            //return
+        }
+        if(!other.TryGetComponent<TargetDummy>(out TargetDummy dummyPlayer) && !otherPlayer)
+        {
+            this.gameObject.GetComponent<NetworkObject>().Despawn();
             return;
         }
+        
         if(sourcePlayer == null){
             print("PROBLEM");
         }
-        if(otherPlayer == sourcePlayer){
-            return;
-        }
-        if(sourcePlayer.GetTeamAssociation().Value == otherPlayer.GetTeamAssociation().Value)
+        if(!dummyPlayer)
         {
-            return;
+            if(otherPlayer.GetTeamAssociation().Value == sourcePlayer.Value){
+                return;
+            }
+            if(sourcePlayer.Value == otherPlayer.GetTeamAssociation().Value)
+            {
+                return;
+            }
         }
         
         //Health hitTarget;
         if(other.TryGetComponent<Health>(out Health hitTarget)){
             //hitTarget.TakeDamageServerRpc(_damage);
-            hitTarget.TakeDamage(_damage, sourcePlayer.GetTeamAssociation().Value);
+            hitTarget.TakeDamage(_damage, sourcePlayer.Value);
+            Debug.Log("Dummy took damage", dummyPlayer.transform);
             this.gameObject.GetComponent<NetworkObject>().Despawn();
         }
         //print($"Projectile hit {other.name}");    
     }
 
-    public void SetSource(PlayerController source){
-        sourcePlayer = source;
+    public void SetSource(Teams sourceTeam){
+        sourcePlayer = sourceTeam;
     }
 }
