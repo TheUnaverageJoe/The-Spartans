@@ -32,21 +32,27 @@ namespace Spartans{
         //only for server use
         private Dictionary<ulong, PlayerGameData> playerData = new Dictionary<ulong, PlayerGameData>();
 
-        void Awake(){
+        void Awake()
+        {
             _canvasManager = FindObjectOfType<CanvasManager>();
-            if(Instance == null){
+            if(Instance == null)
+            {
                 Instance = this;
                 DontDestroyOnLoad(this.gameObject);
-            }else{
+            }
+            else
+            {
                 Destroy(this.gameObject);
             }
         }
 
-        void Start(){
+        void Start()
+        {
             NetworkManager.SceneManager.OnSceneEvent += SceneEventHandler;
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnected;
 
-            if(activeState >= States.PreGame){
+            if(activeState >= States.PreGame)
+            {
                 print("GameManager finding Canvas and Init()ing");
                 //_canvasManager = FindObjectOfType<CanvasManager>();
                 _canvasManager.Init();
@@ -57,11 +63,13 @@ namespace Spartans{
             Physics.gravity = new Vector3(0, -20f, 0);
         }
 
-        public void StopConnection(){
+        public void StopConnection()
+        {
             NetworkManager.Singleton.Shutdown();
             activeState = States.Lobby;
             Instance = null;
-            if(NetworkManager.Singleton != null){
+            if(NetworkManager.Singleton != null)
+            {
                 print("GameManager killed Network Manager");
                 Destroy(NetworkManager.Singleton.gameObject);
             }
@@ -70,7 +78,8 @@ namespace Spartans{
             Destroy(this.gameObject);
         }
 
-        private void OnClickBackCallback(){
+        private void OnClickBackCallback()
+        {
             SceneManager.LoadScene(MENU_SCENE_NAME);
         }
         private void SpawnPlayersFromLobby()
@@ -83,7 +92,8 @@ namespace Spartans{
                 {
                     spawnLocation = new Vector3(Random.Range(30, 35), 2, Random.Range(-10, 10));
                     startingRot = Quaternion.Euler(0, -90, 0);
-                }else
+                }
+                else
                 {
                     spawnLocation = new Vector3(Random.Range(-30, -35), 2, Random.Range(-10, 10));
                     startingRot = Quaternion.Euler(0, 90, 0);
@@ -149,11 +159,14 @@ namespace Spartans{
             }
         }
 
-        public void LoadPlayerData(){
+        public void LoadPlayerData()
+        {
             List<PlayerGameData> temp = SavedData.LoadDataFromPlayerLobby();
 
-            foreach(var item in temp){
-                if(playerData.ContainsKey(item.Id)){
+            foreach(var item in temp)
+            {
+                if(playerData.ContainsKey(item.Id))
+                {
                     Debug.LogWarning("DUPLICATE KEY ADDED WHEN LOADING PLAYER DATA FROM LOBBY");
                 }
                 playerData.Add(item.Id, item);

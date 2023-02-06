@@ -43,7 +43,8 @@ namespace Spartans.UI{
                 //_associatedHealth = _player.GetComponent<Health>();
 
                 _associatedHealth.OnHealthChanged += OnHealthChangeCallback;
-                _associatedHealth.OnKilledBy += OnDieCallback;
+                //_associatedHealth.OnKilledBy += OnDieCallback;
+                Health.OnKilledBy += OnDieCallback;
                 _associatedHealth.OnRespawn += OnRespawnCallback;
             }
         }
@@ -74,8 +75,9 @@ namespace Spartans.UI{
             //print("Set slider to: " + _slider.value);
             
         }
-        private void OnDieCallback(Teams team){
-            this.gameObject.SetActive(false);
+        private void OnDieCallback(Health health, Teams team){
+            if(health == _associatedHealth)
+                this.gameObject.SetActive(false);
         }
 
         private void OnRespawnCallback()

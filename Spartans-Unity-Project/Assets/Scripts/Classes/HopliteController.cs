@@ -89,7 +89,7 @@ namespace Spartans.Players{
                     {
                         leapedTarget = hit.collider;
                         hit.collider.GetComponent<LeapTarget>().LeapedTarget();
-                        _playerController.Immobilize(true);
+                        _playerController.StopMovement(true);
                         GetComponent<Rigidbody>().velocity = Vector3.zero;
                         //print("STABBED");
                     }
@@ -112,7 +112,7 @@ namespace Spartans.Players{
             {
                 print("Unpinned");
                 leapedTarget.GetComponent<LeapTarget>().Unpinned();
-                _playerController.Immobilize(false);
+                _playerController.StopMovement(false);
             }
             else
                 print("No target to Unpin");
@@ -183,7 +183,7 @@ namespace Spartans.Players{
                 rot = Quaternion.LookRotation(dir);
             }
             GameObject newProjectile = NetworkManager.Instantiate(_arrowPrefab, initialPos, rot);
-            newProjectile.GetComponent<Projectile>().SetSource(GetComponent<PlayerController>().GetTeamAssociation().Value);
+            newProjectile.GetComponent<Projectile>().SetSource(GetComponent<PlayerController>());
             newProjectile.GetComponent<NetworkObject>().Spawn();
             newProjectile.GetComponent<Rigidbody>().AddForce(newProjectile.transform.forward * speedModifier, ForceMode.VelocityChange);
         }
@@ -195,6 +195,7 @@ namespace Spartans.Players{
             _leaping = true;
             _playerController._animationManager.SetParameter("leaping", true);
 
+            _rb.velocity = Vector3.zero;
             _rb.AddForce(transform.TransformDirection(Vector3.forward)*30, ForceMode.VelocityChange);
             _rb.AddForce(Vector3.up*30, ForceMode.VelocityChange);
 

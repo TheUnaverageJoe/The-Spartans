@@ -20,12 +20,13 @@ namespace Spartans.Players{
 
         //int param is new health value
         public event System.Action<int> OnHealthChanged;
-        public event System.Action<Teams> OnKilledBy;
+        public static event System.Action<Health, Teams> OnKilledBy;
         public event System.Action OnRespawn;
 
 
         //Stand in for Awake and Start, Initialization method called from Player.cs
-        public void Init(PlayerController playerController){
+        public void Init(PlayerController playerController)
+        {
             //_healthDisplay = GetComponentInChildren<FloatingHealth>();
             _playerController = playerController;
 
@@ -46,9 +47,11 @@ namespace Spartans.Players{
 
         public void FixedUpdate(){
             if(!IsServer)return;
-            if(timeOfDeath > 0){
+            if(timeOfDeath > 0)
+            {
                 timeOfDeath -= Time.fixedDeltaTime;
-                if(timeOfDeath <= 0){
+                if(timeOfDeath <= 0)
+                {
                     Respawn();
                 }
             }
@@ -57,7 +60,8 @@ namespace Spartans.Players{
         //Method should only be called from server exclusive code blocks
         public void TakeDamage(int damage, Teams userTeam)
         {
-            if(!IsServer){
+            if(!IsServer)
+            {
                 print("TakeDamage not called from server");
                 return;
             }
@@ -83,7 +87,7 @@ namespace Spartans.Players{
             UpdateHealthClientRpc(damage, userTeam);
             _currentHitpoints -= damage;
             OnHealthChanged?.Invoke(_currentHitpoints);
-            if(_currentHitpoints <= 0) OnKilledBy?.Invoke(userTeam);
+            if(_currentHitpoints <= 0) OnKilledBy?.Invoke(this, userTeam);
             //deal damage
 
         }
@@ -93,20 +97,24 @@ namespace Spartans.Players{
             if(IsServer) return;
             _currentHitpoints -= damage;
             OnHealthChanged?.Invoke(_currentHitpoints);
-            if(_currentHitpoints <= 0) OnKilledBy?.Invoke(team);
+            if(_currentHitpoints <= 0) OnKilledBy?.Invoke(this,team);
         }
 
-        public int GetMaxHitpoints(){
+        public int GetMaxHitpoints()
+        {
             return _maxHitpoints;
         }
-        public int GetHitpoints(){
+        public int GetHitpoints()
+        {
             return _currentHitpoints;
         }
 
-        private void OnDieCallback(Teams killedByTeam){
-            if(IsServer){
+        private void OnDieCallback(Health health, Teams killedByTeam)
+        {
+            if(IsServer && health==this)
+            {
                 print("killed by: " + killedByTeam);
-                Spartans.GameMode.GameModeManager.Instance.AddScore(killedByTeam, 1);
+                //Spartans.GameMode.GameModeManager.Instance.AddScore(killedByTeam, 1);
                 timeOfDeath = _respawnTime;
                 if(_playerController)
                 {
@@ -120,7 +128,8 @@ namespace Spartans.Players{
         }
         //Respawn is only called by the server hence why only a 
         //  clientRpc exists for respawning and not a serverRpc
-        private void Respawn(){
+        private void Respawn()
+        {
             //_healthDisplay.gameObject.SetActive(true);
             _currentHitpoints = _maxHitpoints;
             OnHealthChanged?.Invoke(_maxHitpoints);
@@ -131,20 +140,22 @@ namespace Spartans.Players{
             }
             else
             {
-                _targetDummy._animationManager.SetParameter("dead", true);
+                _targetDummy._animationManager.SetParameter("dead", false);
             }
 
             RespawnClientRpc();
         }
         [ClientRpc]
-        public void RespawnClientRpc(){
+        public void RespawnClientRpc()
+        {
             if(IsServer) return;
             //_healthDisplay.gameObject.SetActive(true);
             _currentHitpoints = _maxHitpoints;
             OnHealthChanged?.Invoke(_maxHitpoints);
             OnRespawn.Invoke();
         }
-        void OnDisable(){
+        void OnDisable()
+        {
             OnKilledBy -= OnDieCallback;
         }
     }

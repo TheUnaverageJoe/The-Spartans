@@ -22,7 +22,6 @@ namespace Spartans.Players
         [SerializeField] private float _moveSpeed = 5f;
         [SerializeField] private float _MAX_SPEED = 8.0f;
         [SerializeField] private float _mouseSens = 1.0f;
-        [SerializeField] public bool IsNPC; // Used to isolate target dummy logic
         [SerializeField]private bool immobilized = false;
         private Vector3 input;
         [SerializeField] private Vector2 ClientInput;
@@ -40,19 +39,6 @@ namespace Spartans.Players
 
         private void Init()
         {
-            if(NetworkObject.IsSceneObject == true || NetworkObject.IsSceneObject == null && IsNPC)
-            {
-                //print("Is Scene Object: " + NetworkObject.IsSceneObject);
-                _myHealth = GetComponent<Health>();
-                _animationManager = GetComponent<AnimationManager>();
-                _gameManager = FindObjectOfType<GameManager>();
-                _leapTarget = GetComponent<LeapTarget>();
-                if(_leapTarget) _leapTarget.Init(_animationManager);
-                if(_leapTarget) _leapTarget.OnPinned += Immobilized;
-
-                //Debug.Log("Ran Init() for In scene");
-                return;
-            }
             _rigidbody = GetComponent<Rigidbody>();
             _myHealth = GetComponent<Health>();
             _animationManager = GetComponent<AnimationManager>();
@@ -62,7 +48,7 @@ namespace Spartans.Players
             _HUD = _gameManager._canvasManager;
             _pauseScreen = _HUD.transform.Find("PauseScreen").GetComponent<PageUI>();
             _leapTarget = GetComponent<LeapTarget>();
-            //print(_leapTarget);
+
             if(_leapTarget) _leapTarget.Init(_animationManager);
             if(_leapTarget) _leapTarget.OnPinned += Immobilized;
 
@@ -71,22 +57,16 @@ namespace Spartans.Players
 
         public void Start()
         {
-            if(NetworkManager.Singleton == null || IsNPC)
+            if(NetworkManager.Singleton == null)
             {
-                //Debug.LogWarning("Player Controller started as offline or NPC/Target DUmmy");
-                //Debug.Log("myTeam is: " + myTeam.Value);
                 Init();
                 _myHealth.Init(this);
             }
-            //_myHealth = GetComponent<Health>();
-            _myHealth.OnKilledBy += OnDieCallback;
+            
+            //_myHealth.OnKilledBy += OnDieCallback;
+            Health.OnKilledBy += OnDieCallback;
             _myHealth.OnRespawn += OnRespawnCallback;
 
-            if(NetworkObject.IsSceneObject == true || NetworkObject.IsSceneObject == null && IsNPC)
-            {
-                //print(NetworkObject.IsSceneObject);
-                return;
-            }
             //isLocalPlayer makes anything in player scripts happen only on 1 time because theres only 1 player object
             if(IsClient && IsOwner && IsLocalPlayer){
                 //PlayerControls.PlayerActions inputEvents = InputManager.Instance.CurrentActionMap();
@@ -119,22 +99,22 @@ namespace Spartans.Players
         // Update is called once per frame
         void Update()
         {
-            if(IsNPC)
+            if(IsServer)
             {
-                return;
-            }
-            if(IsServer){
                 Move(ClientInput);
             }
         }
 
         //server needs to update grounded state for all players on server side
         //if not the server or a local player object, aka the player spawned when join game, dont update
-        void FixedUpdate(){
-            if(IsServer && !IsLocalPlayer){
+        void FixedUpdate()
+        {
+            if(IsServer && !IsLocalPlayer)
+            {
                 CheckGrounded();
             }
-            if(IsLocalPlayer){
+            if(IsLocalPlayer)
+            {
                 CheckGrounded();
                 //requestMoveServerRpc(input);
             }
@@ -142,9 +122,6 @@ namespace Spartans.Players
 
         public override void OnNetworkSpawn()
         {
-            if(IsNPC){
-                return;
-            }
             Init();
             playerName = "Player " + OwnerClientId.ToString();
             transform.GetComponentInChildren<FloatingHealth>().ChangeName(playerName);
@@ -152,31 +129,15 @@ namespace Spartans.Players
             //myTeam.OnValueChanged += (prev, newVal)=>{print("Team value changed:" + newVal);};
             //print("States SCOL: " + IsServer + IsClient + IsOwner + IsLocalPlayer);
         }
+
+        public PlayerController GetPlayer()
+        {
+            return this;
+        }
         
-        public void Immobilize(bool immobile)
+        public void StopMovement(bool immobile)
         {
             immobilized = immobile;
-
-            if(immobile)
-            {
-                InputManager.Instance.OnInteract -= TryInteract;
-                InputManager.Instance.OnEscape -= Escape;
-                InputManager.Instance.OnJump -= TryJump;
-
-                InputManager.Instance.OnMove -= UpdateMoveInput;
-                InputManager.Instance.OnLook -= Look;
-                InputManager.Instance.OnSprint -= Sprint;
-            }
-            else
-            {
-                InputManager.Instance.OnInteract += TryInteract;
-                InputManager.Instance.OnEscape += Escape;
-                InputManager.Instance.OnJump += TryJump;
-
-                InputManager.Instance.OnMove += UpdateMoveInput;
-                InputManager.Instance.OnLook += Look;
-                InputManager.Instance.OnSprint += Sprint;
-            }
         }
         private void Immobilized(bool pinned)
         {
@@ -184,39 +145,22 @@ namespace Spartans.Players
 
             if(pinned)
             {
-                if(!IsNPC)
-                {
-                    InputManager.Instance.OnInteract -= TryInteract;
-                    InputManager.Instance.OnEscape -= Escape;
-                    InputManager.Instance.OnJump -= TryJump;
-
-                    InputManager.Instance.OnMove -= UpdateMoveInput;
-                    InputManager.Instance.OnLook -= Look;
-                    InputManager.Instance.OnSprint -= Sprint;
-                }
-
                 GetComponent<Collider>().enabled = false;
+                _rigidbody.useGravity = false;
             }
             else
             {
-                if(!IsNPC)
-                {
-                    InputManager.Instance.OnInteract += TryInteract;
-                    InputManager.Instance.OnEscape += Escape;
-                    InputManager.Instance.OnJump += TryJump;
-
-                    InputManager.Instance.OnMove += UpdateMoveInput;
-                    InputManager.Instance.OnLook += Look;
-                    InputManager.Instance.OnSprint += Sprint;
-                }
-
                 GetComponent<Collider>().enabled = true;
+                _rigidbody.useGravity = true;
             }
         }
 
         private void TryInteract()
         {
-            _flagCarrier.InteractFlag();
+            if(_grounded && !immobilized)
+            {
+                _flagCarrier.InteractFlag();
+            }
         }
 
         private void Escape()
@@ -225,12 +169,28 @@ namespace Spartans.Players
         }
         private void TryJump()
         {
-            if(_canJump && _grounded){
+            if(_canJump && _grounded && !immobilized){
                 RequestJumpServerRpc();
                 // _canJump = false;
                 // _grounded = false;
             }
         }
+        [ServerRpc]
+        public void RequestJumpServerRpc()
+        {
+            if(!_grounded || immobilized) return;
+            JumpStarted();
+            _animationManager.SetParameter("grounded", false);
+            JumpResponseClientRpc();
+        }
+        [ClientRpc]
+        public void JumpResponseClientRpc()
+        {
+            JumpStarted();
+            Vector3 horizPlane = new Vector3(_rigidbody.velocity.x, 0, _rigidbody.velocity.z);
+            _rigidbody.AddForce(transform.up * _jumpForce, ForceMode.VelocityChange);
+        }
+
 
         private void Sprint()
         {
@@ -271,15 +231,23 @@ namespace Spartans.Players
         private void Look(Vector2 vector2)
         {
             //print("updated look");
+            
             RequestRotationServerRpc(vector2.x*_mouseSens, -vector2.y*_mouseSens);
         }
 
         [ServerRpc]
-        public void RequestRotationServerRpc(float rotX, float rotY){
-            if (rotX != 0){
+        public void RequestRotationServerRpc(float rotX, float rotY)
+        {
+            if(!_grounded || immobilized)
+            {
+                return;
+            }
+            if (rotX != 0)
+            {
                 transform.Rotate(new Vector3(0, rotX, 0));
             }
-            if (rotY != 0){
+            if (rotY != 0)
+            {
                 lookAtPoint.Rotate(new Vector3(rotY, 0, 0));
             }
         }
@@ -295,24 +263,8 @@ namespace Spartans.Players
             this.ClientInput = input;
         }
 
-        [ClientRpc]
-        public void JumpResponseClientRpc(){
-            JumpStarted();
-            Vector3 horizPlane = new Vector3(_rigidbody.velocity.x, 0, _rigidbody.velocity.z);
-            _rigidbody.AddForce(transform.up * _jumpForce, ForceMode.VelocityChange);
-        }
-
-        [ServerRpc]
-        public void RequestJumpServerRpc(){
-            if(!_grounded) return;
-            JumpStarted();
-            _animationManager.SetParameter("grounded", false);
-            JumpResponseClientRpc();
-        }
-
-
         private void Move(Vector2 inputDir){
-            if(!_grounded) return;
+            if(!_grounded || immobilized) return;
             Vector2 moveDir = inputDir.normalized;
             _animationManager.SetParameter("speed", inputDir.magnitude);
             if (moveDir == Vector2.zero && _grounded){
@@ -394,7 +346,9 @@ namespace Spartans.Players
             }
         }
 
-        private void OnDieCallback(Teams team){
+        private void OnDieCallback(Health health, Teams team)
+        {
+            if(_myHealth != health) return;
             this.GetComponent<Rigidbody>().useGravity = false;
             this.GetComponent<BoxCollider>().enabled = false;
             this.enabled = false;

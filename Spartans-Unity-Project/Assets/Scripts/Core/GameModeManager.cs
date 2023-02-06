@@ -6,10 +6,11 @@ using UnityEngine.UI;
 using TMPro;
 
 using Spartans.UI;
-using Spartans;
+using Spartans.Players;
 using System;
 
-namespace Spartans.GameMode{
+namespace Spartans.GameMode
+{
     ///Summary
     ///This class controls game mode specific logic such as win conditions, also in charge of updating UI related to game mode data
     ///Do Not Destroy On Load Singleton use, starts in lobby scene and carries through(for now)
@@ -160,8 +161,8 @@ namespace Spartans.GameMode{
         //Called by GameManager after game scene has loaded to start preperations for game
         //Should ONLY be called 1 time
         //Only called by Server
-        public void StartAsSelectedMode(){
-
+        public void StartAsSelectedMode()
+        {
             _canvasManager = FindObjectOfType<CanvasManager>();
 
             Transform containerObjForGameModeUI = _canvasManager.transform.Find("TDM_UI").GetChild(0);
@@ -179,7 +180,8 @@ namespace Spartans.GameMode{
                 }
             }
             
-
+            //intiallize listeners for game scene
+            Health.OnKilledBy += OnPlayerKilled;
             _gameTimer.OnSecondsChanged += ChangeGameTime;
             TeamScores.OnListChanged += UpdateTeamScore;
             OnGameOver += NotifyGameOverClientRpc;
@@ -199,6 +201,16 @@ namespace Spartans.GameMode{
                         _currentState = States.Finished;
                     });
                 });
+            }
+        }
+
+        private void OnPlayerKilled(Health health, Teams team)
+        {
+            if(_gameMode.GetType() == typeof(CTF))
+                return;
+            else
+            {
+                AddScore(team, 1);
             }
         }
 

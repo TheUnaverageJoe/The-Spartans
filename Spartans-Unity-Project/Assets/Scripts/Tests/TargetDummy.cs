@@ -46,7 +46,8 @@ namespace  Spartans.Players
                     Init();
                     //_myHealth.Init(this);
                 }
-                _myHealth.OnKilledBy += OnDieCallback;
+                //_myHealth.OnKilledBy += OnDieCallback;
+                Health.OnKilledBy += OnDieCallback;
                 _myHealth.OnRespawn += OnRespawnCallback;
             }
 
@@ -79,8 +80,9 @@ namespace  Spartans.Players
                 GetComponent<Collider>().enabled = !pinned;
             }
 
-            void CheckGrounded(){
-                if(!_canJump) return;
+            void CheckGrounded()
+            {
+                if(!_canJump) return; 
                 RaycastHit hit;
                 bool hitOccured = Physics.Raycast(transform.position-(Vector3.down*0.5f), Vector3.down, out hit, 0.6f, 1);
                 Debug.DrawRay(transform.position-(Vector3.down*0.5f), Vector3.down * 0.6f, Color.blue);
@@ -100,7 +102,9 @@ namespace  Spartans.Players
                 }
             }
 
-            private void OnDieCallback(Teams team){
+            private void OnDieCallback(Health health, Teams team)
+            {
+                if(_myHealth != health) return;
                 this.GetComponent<Rigidbody>().useGravity = false;
                 this.GetComponent<BoxCollider>().enabled = false;
                 this.enabled = false;
@@ -108,7 +112,7 @@ namespace  Spartans.Players
 
             private void OnRespawnCallback()
             {
-            this.GetComponent<Rigidbody>().useGravity = true;
+                this.GetComponent<Rigidbody>().useGravity = true;
                 this.GetComponent<BoxCollider>().enabled = true;
                 this.enabled = true;
             }
