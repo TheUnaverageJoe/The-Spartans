@@ -48,7 +48,7 @@ namespace Spartans{
 
         void Start()
         {
-            NetworkManager.SceneManager.OnSceneEvent += SceneEventHandler;
+            //NetworkManager.SceneManager.OnSceneEvent += SceneEventHandler;
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnected;
 
             if(activeState >= States.PreGame)
@@ -197,5 +197,9 @@ namespace Spartans{
             }
         }
      
+        public void StartHost()
+        {
+            NetworkManager.StartHost();
+        }
     }
 }

@@ -10,8 +10,14 @@ public class InputManager : MonoBehaviour
 
     private PlayerControls Controls;
 
-    //public Vector2 MoveInput = new Vector2();
-    //public Vector2 LookInput = new Vector2();
+    private Vector2 _moveInput;
+    private Vector2 _lookInput;
+
+    //Getters and Setters
+    public Vector2 MoveInput {get {return _moveInput;}}
+    public Vector2 LookInput {get {return _lookInput;}}
+
+    //Public events
     public event Action<Vector2> OnMove;
     public event Action<Vector2> OnLook;
     public event Action OnInteract;
@@ -21,6 +27,8 @@ public class InputManager : MonoBehaviour
     public event Action OnSecondary;
     public event Action OnSpecial;
     public event Action OnSprint;
+
+    // Singleton Structure
     void Awake()
     {
         if(Instance == null)
@@ -34,42 +42,69 @@ public class InputManager : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
-    // Start is called before the first frame update
+
+    // Init input listeners
     void Start()
     {
         Controls.Player.Enable();
 
-        Controls.Player.Move.performed += Move;
-        Controls.Player.Move.canceled += Move;
-        Controls.Player.Look.performed += Look;
-        Controls.Player.Look.canceled += Look;
+        Controls.Player.Move.performed += MoveHandler;
+        Controls.Player.Move.canceled += MoveHandler;
+        Controls.Player.Look.performed += LookHandler;
+        Controls.Player.Look.canceled += LookHandler;
 
-        Controls.Player.Primary.performed += Primary;
-        Controls.Player.Secondary.performed += Secondary;
-        Controls.Player.Special.performed += Special;
-        Controls.Player.Jump.performed += Jump;
-        Controls.Player.Interact.performed += Interact;
-        Controls.Player.Escape.performed += Escape;
-        Controls.Player.Sprint.performed += Sprint;
-        Controls.Player.Sprint.canceled += Sprint;
+        Controls.Player.Primary.performed += PrimaryHandler;
+        Controls.Player.Secondary.performed += SecondaryHandler;
+        Controls.Player.Special.performed += SpecialHandler;
+        Controls.Player.Jump.performed += JumpHandler;
+        Controls.Player.Interact.performed += InteractHandler;
+        Controls.Player.Escape.performed += EscapeHandler;
+        Controls.Player.Sprint.performed += SprintHandler;
+        Controls.Player.Sprint.canceled += SprintHandler;
 
-        Controls.UI.Exit.performed += Escape;
+        Controls.UI.Exit.performed += EscapeHandler;
     }
 
-    private void Jump(InputAction.CallbackContext context)
+    //Event Handlers
+    private void MoveHandler(InputAction.CallbackContext context)
+    {
+        if(context.action.phase == InputActionPhase.Performed)
+        {
+            _moveInput = context.ReadValue<Vector2>();
+            OnMove?.Invoke(_moveInput);
+        }
+        else if(context.action.phase == InputActionPhase.Canceled)
+        {
+            _moveInput = context.ReadValue<Vector2>();
+            OnMove?.Invoke(_moveInput);
+        }
+    }
+    private void LookHandler(InputAction.CallbackContext context)
+    {
+        if(context.action.phase == InputActionPhase.Performed)
+        {
+            _lookInput = context.ReadValue<Vector2>();
+            OnLook?.Invoke(_lookInput);
+        }
+        //else if(context.action.phase == InputActionPhase.Canceled)
+        {
+            //Debug.LogWarning("Looking stopped!");
+            //_lookInput = context.ReadValue<Vector2>();
+            //OnLook?.Invoke(_lookInput);
+        }
+    }
+    private void JumpHandler(InputAction.CallbackContext context)
     {
         OnJump?.Invoke();
     }
-
-    private void Escape(InputAction.CallbackContext context)
+    private void EscapeHandler(InputAction.CallbackContext context)
     {
         if(context.action.phase == InputActionPhase.Performed)
         {
             OnEscape?.Invoke();
         }
     }
-
-    private void Interact(InputAction.CallbackContext context)
+    private void InteractHandler(InputAction.CallbackContext context)
     {
         if(context.action.phase == InputActionPhase.Performed)
         {
@@ -77,7 +112,7 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    private void Primary(InputAction.CallbackContext context)
+    private void PrimaryHandler(InputAction.CallbackContext context)
     {
         if(context.action.phase == InputActionPhase.Performed)
         {
@@ -85,15 +120,15 @@ public class InputManager : MonoBehaviour
             OnPrimary?.Invoke();
         }
     }
-    private void Secondary(InputAction.CallbackContext context)
+    private void SecondaryHandler(InputAction.CallbackContext context)
     {
         OnSecondary?.Invoke();
     }
-    private void Special(InputAction.CallbackContext context)
+    private void SpecialHandler(InputAction.CallbackContext context)
     {
         OnSpecial?.Invoke();
     }
-    private void Sprint(InputAction.CallbackContext context)
+    private void SprintHandler(InputAction.CallbackContext context)
     {
         if(context.action.phase == InputActionPhase.Performed)
         {
@@ -108,31 +143,9 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    private void Look(InputAction.CallbackContext context)
-    {
-        if(context.action.phase == InputActionPhase.Performed)
-        {
-            OnLook?.Invoke(context.ReadValue<Vector2>());
-        }
-        else if(context.action.phase == InputActionPhase.Canceled)
-        {
-            
-        }
-    }
+    
 
-    private void Move(InputAction.CallbackContext context)
-    {
-        if(context.action.phase == InputActionPhase.Performed)
-        {
-            OnMove?.Invoke(context.ReadValue<Vector2>());
-        }
-        else if(context.action.phase == InputActionPhase.Canceled)
-        {
-            OnMove?.Invoke(context.ReadValue<Vector2>());
-        }
-    }
-
-
+    // Getter for action map just in case
     public InputActionMap CurrentActionMap()
     {
         
@@ -150,6 +163,7 @@ public class InputManager : MonoBehaviour
             return null;
         }
     }
+    //
     public void PauseInput()
     {
         Controls.Player.Disable();
@@ -161,6 +175,7 @@ public class InputManager : MonoBehaviour
         Controls.UI.Disable();
     }
 
+    //Handle Unsubbing listeners
     private void OnDisable()
     {
         if(this != Instance)
@@ -168,18 +183,21 @@ public class InputManager : MonoBehaviour
             //Debug.Log("nothing to do this time");
             return;
         }
-        Controls.Player.Move.performed -= Move;
-        Controls.Player.Move.canceled -= Move;
-        Controls.Player.Look.performed -= Look;
-        Controls.Player.Look.canceled -= Look;
 
-        Controls.Player.Primary.performed -= Primary;
-        Controls.Player.Secondary.performed -= Secondary;
-        Controls.Player.Special.performed -= Special;
-        Controls.Player.Jump.performed -= Jump;
-        Controls.Player.Interact.performed -= Interact;
-        Controls.Player.Escape.performed -= Escape;
+        Controls.Player.Move.performed -= MoveHandler;
+        Controls.Player.Move.canceled -= MoveHandler;
+        Controls.Player.Look.performed -= LookHandler;
+        Controls.Player.Look.canceled -= LookHandler;
+
+        Controls.Player.Primary.performed -= PrimaryHandler;
+        Controls.Player.Secondary.performed -= SecondaryHandler;
+        Controls.Player.Special.performed -= SpecialHandler;
+        Controls.Player.Jump.performed -= JumpHandler;
+        Controls.Player.Interact.performed -= InteractHandler;
+        Controls.Player.Escape.performed -= EscapeHandler;
+        Controls.Player.Sprint.performed -= SprintHandler;
+        Controls.Player.Sprint.canceled -= SprintHandler;
         
-        Controls.UI.Exit.performed -= Escape;
+        Controls.UI.Exit.performed -= EscapeHandler;
     }
 }
