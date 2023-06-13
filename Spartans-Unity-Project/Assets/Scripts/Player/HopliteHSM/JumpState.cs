@@ -8,6 +8,7 @@ public class JumpState : HopliteBaseState
     public override void EnterState()
     {
         Debug.Log("Entered Jump State");
+        StateMachine.AnimationManager.SetParameter("grounded", false);
     }
     public override void UpdateState()
     {
@@ -20,7 +21,7 @@ public class JumpState : HopliteBaseState
     }
     public override void CheckSwitchState()
     {
-        if(StateMachine.IsGrounded && StateMachine.CurrentMovement != Vector2.zero){
+        if(StateMachine.IsGrounded && StateMachine.CurrentMovement == Vector2.zero){
             StateMachine.SwitchState(HopliteStateMachine.States.Idle);
         }else if(!StateMachine.IsGrounded){
             StateMachine.SwitchState(HopliteStateMachine.States.Fall);

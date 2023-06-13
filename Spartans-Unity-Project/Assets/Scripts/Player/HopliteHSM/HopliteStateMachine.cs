@@ -43,7 +43,9 @@ public class HopliteStateMachine : NetworkBehaviour
         _concreteStates = new Dictionary<States, HopliteBaseState>()
         {
             {States.Idle, new IdleState(this)},
-            {States.Walk, new WalkState(this)}
+            {States.Walk, new WalkState(this)},
+            {States.Jump, new JumpState(this)},
+            {States.Fall, new FallState(this)}
         };
     }
 
@@ -65,6 +67,7 @@ public class HopliteStateMachine : NetworkBehaviour
     public Vector2 CurrentMovement {get {return _currentMovement;}}
     public Vector2 CurrentLook {get {return _currentLook;}}
     public bool IsGrounded {get {return _grounded;}}
+    public bool JumpReady {get {return _canJump;}}
 
     void Awake()
     {
@@ -74,6 +77,7 @@ public class HopliteStateMachine : NetworkBehaviour
         // Subscribe to relevant Events
          InputManager.Instance.OnMove += UpdateMoveInput;
          InputManager.Instance.OnLook += UpdateLookInput;
+         InputManager.Instance.OnJump += TryJump;
     }
     void Start()
     {
@@ -128,5 +132,11 @@ public class HopliteStateMachine : NetworkBehaviour
                 //print("Unanticipated condition occured");
             }
     }
-    
+    private void TryJump()
+    {
+        if(_canJump && _grounded)
+        {
+            
+        }
+    }
 }

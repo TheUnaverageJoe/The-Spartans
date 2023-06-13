@@ -29,7 +29,7 @@ public class IdleState : HopliteBaseState
         if(StateMachine.CurrentMovement != Vector2.zero)
         {
             StateMachine.SwitchState(HopliteStateMachine.States.Walk);
-        }
+        }else if()
     }
     public override void InitSubState()
     {

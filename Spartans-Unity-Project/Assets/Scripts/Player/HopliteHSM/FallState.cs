@@ -10,7 +10,7 @@ public class FallState : HopliteBaseState
     public override void EnterState()
     {
         Debug.Log("Entered Fall State");
-        StateMachine.AnimationManager.SetParameter("grounded", false);
+        StateMachine.AnimationManager.Play("Fall", 0);
     }
 
     public override void UpdateState()
